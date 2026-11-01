@@ -1,0 +1,38 @@
+% !TEX program = xelatex
+% 上海电机学院 学士学位论文 示例
+% 编译：latexmk（已配置 latexmkrc），或 xelatex -> biber -> xelatex -> xelatex
+\documentclass{sdjuthesis}
+% 可选项：fontset=windows|fandol|mac（默认自动检测）、nodeclaration（不输出声明页）
+
+\addbibresource{refs.bib}
+
+% ---------------- 论文信息 ----------------
+% \title[页眉中的题目]{封面题目，过长可用 \\ 换行}
+\title{二甲醚清洁燃料均质压燃燃烧数值模拟研究}
+\author{张三}
+\studentid{202012345678}
+\school{机械学院}
+\major{机械设计制造及其自动化}
+\supervisor{李四\quad 教授}
+\coverdate{二〇二七年五月}
+
+\begin{document}
+
+\makecover        % 封面（无页眉页码）
+
+\frontmatter      % 页码：I, II, III ...（声明页、摘要、目录）
+\makedeclaration  % 学术诚信声明、版权使用授权书
+\input{chapters/abstract}
+\sdjutableofcontents
+
+\mainmatter       % 页码：1, 2, 3 ...
+\input{chapters/ch1-intro}
+\input{chapters/ch2-method}
+\input{chapters/ch3-conclusion}
+
+\backmatter
+\nocite{*}        % 样本中 [3]–[10] 在正文中未引用，这里一并列出
+\sdjubibliography
+\input{chapters/acknowledgements}
+
+\end{document}

@@ -1,0 +1,55 @@
+\chapter{DME均质充量压燃着火的数值模拟方法}
+
+\section{二级标题}
+
+正文内容
+
+\subsection{三级标题}
+
+正文内容
+
+% 公式另起一行，按章编号；较长公式在等号或运算符处转行，上下式在等号处对齐
+\begin{equation}
+  m = \sum_{k=1}^{K} m_k
+  \label{eq:sum}
+\end{equation}
+\begin{equation}
+  \begin{aligned}
+    f(x,y) &= f(0,0)+\frac{1}{1!}\Bigl(x\frac{\partial}{\partial x}+y\frac{\partial}{\partial y}\Bigr)f(0,0)\\
+           &\quad +\frac{1}{2!}\Bigl(x\frac{\partial}{\partial x}+y\frac{\partial}{\partial y}\Bigr)^{2}f(0,0)+\cdots\\
+           &\quad +\frac{1}{n!}\Bigl(x\frac{\partial}{\partial x}+y\frac{\partial}{\partial y}\Bigr)^{n}f(0,0)+\cdots
+  \end{aligned}
+  \label{eq:taylor}
+\end{equation}
+
+% 表格：三线表，表名在上方。跨页时用 longtable，续页自动重复表头并在右上方标「续表」
+\begin{longtable}{cccc}
+  \caption{选取组分的热力学性质}\label{tab:thermo}\\
+  \toprule
+  组分 & H\textsubscript{f}(kcal/mol) & S\textsubscript{f}(kcal/mol) & C\textsubscript{p}(kcal/mol) \\
+  \midrule
+  \endfirsthead
+  \sdjucontinued{4}
+  \toprule
+  组分 & H\textsubscript{f}(kcal/mol) & S\textsubscript{f}(kcal/mol) & C\textsubscript{p}(kcal/mol) \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  A1 & 100 & 100 & 100 \\
+  A2 &     &     &     \\
+  A3 &     &     &     \\
+  A4 & 100 & 100 & 100 \\
+  A5 &     &     &     \\
+  A6 &     &     &     \\
+  A7 &     &     &     \\
+  A8 &     &     &     \\
+\end{longtable}
+
+% 图：图名在正下方
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.55\textwidth]{fig2-1}
+  \caption{气缸压力随曲轴转角变化的曲线}
+  \label{fig:pressure}
+\end{figure}

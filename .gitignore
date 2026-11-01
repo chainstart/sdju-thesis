@@ -1,0 +1,16 @@
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+*:Zone.Identifier
+
+# 学校原始模板材料（不公开）
+/3 毕业设计（论文）材料模板/
