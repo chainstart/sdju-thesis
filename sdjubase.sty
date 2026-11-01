@@ -1,0 +1,104 @@
+%% sdjubase.sty
+%% 上海电机学院 毕业设计（论文）系列模板的公共设定：
+%% 字体、字号与行距命令、正文基础格式、参考文献样式。
+%% 由 sdjuthesis.cls（论文）与 sdjuproposal.cls（开题报告）共同加载，须在 ctex 文档类之后载入。
+%%
+%% 行距约定：Word 文档网格为 15.6 磅，「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp，「2 倍」= 31.2bp。
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sdjubase}[2026/11/01 v1.0 SDJU common settings]
+
+\RequirePackage{xparse}
+\RequirePackage{calc}
+\RequirePackage{etoolbox}
+\RequirePackage{geometry}
+\RequirePackage{fancyhdr}
+\RequirePackage{titletoc}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{booktabs,longtable,multirow,array}
+\RequirePackage{caption}
+\RequirePackage{enumitem}
+\RequirePackage{tikz}
+\RequirePackage[backend=biber,style=gb7714-2005,gbnamefmt=lowercase,
+  gbpub=false,gbtype=true,url=true]{biblatex}
+
+% ===============================================================
+% 字体：宋体 / 黑体 / Times New Roman；找不到时用 Fandol / TeX Gyre Termes
+% ===============================================================
+\providecommand\songti{}\providecommand\heiti{}
+\providecommand\kaishu{}\providecommand\fangsong{}
+\IfFontExistsTF{SimSun}{%
+  \setCJKmainfont{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
+  \setCJKsansfont{SimHei}[AutoFakeBold=2]
+  \setCJKmonofont{SimSun}
+  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
+  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=2]
+  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
+  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}}{\setCJKfamilyfont{zhfs}{SimSun}}
+}{%
+  \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
+  \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
+  \setCJKmonofont{FandolFang-Regular.otf}
+  \setCJKfamilyfont{zhsong}{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
+  \setCJKfamilyfont{zhhei}{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
+  \setCJKfamilyfont{zhkai}{FandolKai-Regular.otf}
+  \setCJKfamilyfont{zhfs}{FandolFang-Regular.otf}
+}
+\renewcommand\songti{\CJKfamily{zhsong}}
+\renewcommand\heiti{\CJKfamily{zhhei}}
+\renewcommand\kaishu{\CJKfamily{zhkai}}
+\renewcommand\fangsong{\CJKfamily{zhfs}}
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}
+  {\setmainfont{texgyretermes}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,
+     ItalicFont=*-italic,BoldItalicFont=*-bolditalic]}
+\IfFontExistsTF{Arial}{\setsansfont{Arial}}
+  {\setsansfont{texgyreheros}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,
+     ItalicFont=*-italic,BoldItalicFont=*-bolditalic]}
+\RequirePackage{unicode-math}
+\setmathfont{texgyretermes-math.otf}
+\IfFontExistsTF{Microsoft YaHei}
+  {\setCJKfamilyfont{sdjuyahei}{Microsoft YaHei}\newcommand\sdju@yahei{\CJKfamily{sdjuyahei}}}
+  {\newcommand\sdju@yahei{\heiti}}
+\xeCJKDeclareCharClass{CJK}{"25A1,"221A}   % □ √ 用中文字体
+
+% ===============================================================
+% 格式参数（字号单位 bp，即 Word 中的「磅」）
+% ===============================================================
+\newcommand\sdjufont[2]{\fontsize{#1}{#2}\selectfont}
+\def\sdju@grid{15.6bp}                       % 单倍行距
+% 正文：小四号，1.25 倍行距，首行缩进 2 字符
+\renewcommand\normalsize{%
+  \@setfontsize\normalsize{12bp}{19.5bp}%
+  \abovedisplayskip 6bp plus 3bp minus 3bp
+  \abovedisplayshortskip 0bp plus 3bp
+  \belowdisplayshortskip 6bp plus 3bp minus 3bp
+  \belowdisplayskip \abovedisplayskip
+  \let\@listi\@listI}
+\normalsize
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+% 按 Word 的「x 倍行距」设置当前字号的行距：\sdjuspacing{1.5}
+\ExplSyntaxOn
+\NewDocumentCommand\sdjuspacing{m}
+  {\fontsize{\f@size}{\fp_eval:n{#1*15.6}bp}\selectfont}
+\ExplSyntaxOff
+% 华文中宋（开题报告封面用，无则用宋体）
+\IfFontExistsTF{STZhongsong}
+  {\setCJKfamilyfont{sdjuzhongsong}{STZhongsong}[AutoFakeBold=2]\newcommand\sdju@zhongsong{\CJKfamily{sdjuzhongsong}}}
+  {\newcommand\sdju@zhongsong{\songti}}
+
+% ===============================================================
+% 参考文献：GB/T 7714-2005 顺序编码制（与学校样本一致），\cite 为上标中括号；
+%   条目悬挂缩进 2 字符。字号、行距与标题由各文档类设定。
+% ===============================================================
+\AtBeginBibliography{\renewcommand*{\bibpagespunct}{\addcolon}}% 页码前用冒号：1998:11-12
+\defbibenvironment{bibliography}
+  {\list{}{%
+     \setlength{\leftmargin}{2\ccwd}\setlength{\itemindent}{-2\ccwd}%
+     \setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}%
+     \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}}}
+  {\endlist}
+  {\item\printfield[labelnumberwidth]{labelnumber}\space}
+
+\endinput

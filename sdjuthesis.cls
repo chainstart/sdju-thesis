@@ -19,82 +19,7 @@
 
 \LoadClass[UTF8,a4paper,oneside,openany,zihao=-4,linespread=1,fontset=none]{ctexbook}
 
-\RequirePackage{xparse}
-\RequirePackage{calc}
-\RequirePackage{etoolbox}
-\RequirePackage{geometry}
-\RequirePackage{fancyhdr}
-\RequirePackage{titletoc}
-\RequirePackage{amsmath,amssymb}
-\RequirePackage{graphicx}
-\RequirePackage{xcolor}
-\RequirePackage{booktabs,longtable,multirow,array}
-\RequirePackage{caption}
-\RequirePackage{enumitem}
-\RequirePackage{tikz}
-\RequirePackage[backend=biber,style=gb7714-2005,gbnamefmt=lowercase,
-  gbpub=false,gbtype=true,url=true]{biblatex}
-
-% ===============================================================
-% 字体：宋体 / 黑体 / Times New Roman；找不到时用 Fandol / TeX Gyre Termes
-% ===============================================================
-\providecommand\songti{}\providecommand\heiti{}
-\providecommand\kaishu{}\providecommand\fangsong{}
-\IfFontExistsTF{SimSun}{%
-  \setCJKmainfont{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKsansfont{SimHei}[AutoFakeBold=2]
-  \setCJKmonofont{SimSun}
-  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=2]
-  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
-  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}}{\setCJKfamilyfont{zhfs}{SimSun}}
-}{%
-  \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
-  \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
-  \setCJKmonofont{FandolFang-Regular.otf}
-  \setCJKfamilyfont{zhsong}{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
-  \setCJKfamilyfont{zhhei}{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
-  \setCJKfamilyfont{zhkai}{FandolKai-Regular.otf}
-  \setCJKfamilyfont{zhfs}{FandolFang-Regular.otf}
-}
-\renewcommand\songti{\CJKfamily{zhsong}}
-\renewcommand\heiti{\CJKfamily{zhhei}}
-\renewcommand\kaishu{\CJKfamily{zhkai}}
-\renewcommand\fangsong{\CJKfamily{zhfs}}
-\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}
-  {\setmainfont{texgyretermes}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,
-     ItalicFont=*-italic,BoldItalicFont=*-bolditalic]}
-\IfFontExistsTF{Arial}{\setsansfont{Arial}}
-  {\setsansfont{texgyreheros}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,
-     ItalicFont=*-italic,BoldItalicFont=*-bolditalic]}
-\RequirePackage{unicode-math}
-\setmathfont{texgyretermes-math.otf}
-\IfFontExistsTF{Microsoft YaHei}
-  {\setCJKfamilyfont{sdjuyahei}{Microsoft YaHei}\newcommand\sdju@yahei{\CJKfamily{sdjuyahei}}}
-  {\newcommand\sdju@yahei{\heiti}}
-\xeCJKDeclareCharClass{CJK}{"25A1,"221A}   % □ √ 用中文字体
-
-% ===============================================================
-% 格式参数（字号单位 bp，即 Word 中的「磅」）
-% ===============================================================
-\newcommand\sdjufont[2]{\fontsize{#1}{#2}\selectfont}
-\def\sdju@grid{15.6bp}                       % 单倍行距
-% 正文：小四号，1.25 倍行距，首行缩进 2 字符
-\renewcommand\normalsize{%
-  \@setfontsize\normalsize{12bp}{19.5bp}%
-  \abovedisplayskip 6bp plus 3bp minus 3bp
-  \abovedisplayshortskip 0bp plus 3bp
-  \belowdisplayshortskip 6bp plus 3bp minus 3bp
-  \belowdisplayskip \abovedisplayskip
-  \let\@listi\@listI}
-\normalsize
-\setlength{\parindent}{2em}
-\setlength{\parskip}{0pt}
-% 按 Word 的「x 倍行距」设置当前字号的行距：\sdjuspacing{1.5}
-\ExplSyntaxOn
-\NewDocumentCommand\sdjuspacing{m}
-  {\fontsize{\f@size}{\fp_eval:n{#1*15.6}bp}\selectfont}
-\ExplSyntaxOff
+\RequirePackage{sdjubase}
 
 % 页面：上 2.8cm，下、左、右 2.5cm，页眉 2cm
 \geometry{a4paper,top=28mm,bottom=25mm,left=25mm,right=25mm,
@@ -142,7 +67,7 @@
 
 % ===============================================================
 % 标题
-%   一级：小二号黑体，居中，段前 0、段后 12 磅，每章另起页
+%   一级：小二号黑体加粗，居中，段前 0、段后 12 磅，每章另起页
 %   二级：四号宋体，左对齐（首行缩进 2 字符），段前 12、段后 0 磅
 %   三级：小四号黑体，左对齐（首行缩进 2 字符），段前 12、段后 0 磅
 % ===============================================================
@@ -150,7 +75,7 @@
 \setcounter{tocdepth}{1}
 \ctexset{
   chapter={
-    format=\centering\heiti\sdjufont{18bp}{\sdju@grid},
+    format=\centering\heiti\bfseries\sdjufont{18bp}{31.2bp}\rule{0pt}{0.7\baselineskip},% 小二号超过一格网格，按两格（2×15.6）排行
     nameformat={}, titleformat={},
     name={,}, number=\arabic{chapter}, aftername=\enspace,
     beforeskip=0pt, afterskip=12bp, fixskip=true,
@@ -170,18 +95,22 @@
   figurename={图},
   tablename={表},
 }
-% 不编号的一级标题；可选参数为目录中显示的文字（省略则不进目录）
-\NewDocumentCommand\sdjuchapter{om}{%
-  \chapter*{#2}%
-  \IfValueT{#1}{\addcontentsline{toc}{chapter}{#1}}%
+% 不编号的一级标题；可选参数为目录中显示的文字（省略或留空则不进目录）
+% 第二个可选参数为标题前的段前距离（默认 0）
+\NewDocumentCommand\sdjuchapter{o O{0pt} m}{%
+  \begingroup
+    \ctexset{chapter/beforeskip={#2}}%
+    \chapter*{#3}%
+  \endgroup
+  \IfValueT{#1}{\if\relax\detokenize{#1}\relax\else\addcontentsline{toc}{chapter}{#1}\fi}%
   \markboth{}{}}
 
 % ===============================================================
-% 目录：标题小二号黑体居中，段后 12 磅；列出一、二级标题
-%   一级：黑体四号；二级：黑体小四号，缩进 2 字符；页码统一为五号 Times New Roman
+% 目录：标题小二号黑体加粗居中，段前 31.2 磅、段后 12 磅；列出一、二级标题
+%   一级：黑体四号；二级：黑体小四号，缩进 2 字符；引导线为短横线；页码统一为五号 Times New Roman
 % ===============================================================
 \newcommand\sdju@tocpage[1]{{\sdjufont{10.5bp}{10.5bp}\rmfamily #1}}
-\newcommand\sdju@tocdots{\titlerule*[0.5em]{\sdjufont{10.5bp}{10.5bp}.}}
+\newcommand\sdju@tocdots{\leaders\hbox{\sdjufont{10.5bp}{10.5bp}\rmfamily -}\hfill}% 引导线：短横线
 \contentsmargin{0pt}
 \titlecontents{chapter}[0pt]
   {\heiti\sdjufont{14bp}{19.5bp}}
@@ -192,7 +121,7 @@
   {\thecontentslabel\enspace}{}
   {\sdju@tocdots\sdju@tocpage{\thecontentspage}}
 \newcommand\sdjutableofcontents{%
-  \sdjuchapter{目\hspace{1em}录}%
+  \sdjuchapter[][31.2bp]{目\hspace{1em}录}%
   \begingroup\setlength\parindent{0pt}\@starttoc{toc}\endgroup
   \clearpage}
 
@@ -233,15 +162,7 @@
 % 参考文献：GB/T 7714-2005 顺序编码制（与学校样本一致），\cite 为上标中括号
 %   标题小二号黑体居中；条目小四号，悬挂缩进 2 字符，1.25 倍行距
 % ===============================================================
-\AtBeginBibliography{\renewcommand*{\bibpagespunct}{\addcolon}}% 页码前用冒号：1998:11-12
 \defbibheading{sdju}[\bibname]{\sdjuchapter[#1]{#1}}
-\defbibenvironment{bibliography}
-  {\list{}{%
-     \setlength{\leftmargin}{2\ccwd}\setlength{\itemindent}{-2\ccwd}%
-     \setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}%
-     \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}}}
-  {\endlist}
-  {\item\printfield[labelnumberwidth]{labelnumber}\space}
 \AtBeginBibliography{\sdjufont{12bp}{19.5bp}}
 \newcommand\sdjubibliography{\printbibliography[heading=sdju]}
 
@@ -341,7 +262,7 @@
 % 摘要
 %   中文：标题小二号黑体居中；正文小四号宋体，首行缩进 2 字符，段前段后 12 磅，1.25 倍行距；
 %         「关键词：」五号黑体，关键词小四号宋体，逗号分开，最后一个后面无标点
-%   英文：标题小二号 Times New Roman 加粗居中；正文同上；「Key words:」五号加粗
+%   英文：标题小二号 Times New Roman 加粗居中，段前 31.2 磅；正文同上；「Key words:」五号加粗
 % ===============================================================
 \newcommand\sdju@keywords{}
 \newcommand\sdju@keywordsen{}
@@ -356,7 +277,7 @@
   {\sdju@kwline{{\heiti\sdjufont{10.5bp}{19.5bp}关键词：}}{\sdju@keywords}%
    \setlength{\parskip}{0pt}}
 \newenvironment{abstracten}
-  {\sdjuchapter{\rmfamily\bfseries ABSTRACT}\setlength{\parskip}{12bp}}
+  {\sdjuchapter[][31.2bp]{\rmfamily\bfseries ABSTRACT}\setlength{\parskip}{12bp}}
   {\sdju@kwline{{\rmfamily\bfseries\sdjufont{10.5bp}{19.5bp}Key words: }}{\sdju@keywordsen}%
    \setlength{\parskip}{0pt}}
 
