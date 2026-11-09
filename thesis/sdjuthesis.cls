@@ -4,9 +4,9 @@
 %% 编译：xelatex -> biber -> xelatex -> xelatex（或直接 latexmk）
 %%
 %% 行距约定：Word 文档网格为 15.6 磅，「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp，「2 倍」= 31.2bp。
-%% 标题、目录等处的间距按 Word 的行框算法换算（见 sdjubase.sty 中 \sdju@pre、\sdju@post 的说明）。
+%% 标题、目录等处的间距按 Word 的行框算法换算（见下文 \sdju@pre、\sdju@post 的说明）。
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjuthesis}[2026/11/09 v2.2 SDJU Bachelor Thesis Template]
+\ProvidesClass{sdjuthesis}[2026/11/09 v2.3 SDJU Bachelor Thesis Template]
 
 % ---------------------------------------------------------------
 % 选项：nodeclaration 不输出声明页
@@ -19,7 +19,189 @@
 
 \LoadClass[UTF8,a4paper,oneside,openany,zihao=-4,linespread=1,fontset=none]{ctexbook}
 
-\RequirePackage{sdjubase}
+% ===============================================================
+% 宏包
+% ===============================================================
+\RequirePackage{xparse}
+\RequirePackage{calc}
+\RequirePackage{etoolbox}
+\RequirePackage{geometry}
+\RequirePackage{fancyhdr}
+\RequirePackage{titletoc}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{booktabs,longtable,multirow,array}
+\RequirePackage{caption}
+\RequirePackage{enumitem}
+\RequirePackage{tikz}
+\RequirePackage[backend=biber,style=gb7714-2005,gbnamefmt=lowercase,
+  gbpub=false,gbtype=true,url=true]{biblatex}
+
+% ===============================================================
+% 字体：宋体 / 黑体 / Times New Roman，封面用微软雅黑；找不到时用 Fandol / TeX Gyre Termes
+% ===============================================================
+\providecommand\songti{}\providecommand\heiti{}
+\providecommand\kaishu{}\providecommand\fangsong{}
+\IfFontExistsTF{SimSun}{%
+  \setCJKmainfont{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
+  \setCJKsansfont{SimHei}[AutoFakeBold=2]
+  \setCJKmonofont{SimSun}
+  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
+  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=2]
+  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
+  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}}{\setCJKfamilyfont{zhfs}{SimSun}}
+}{%
+  \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
+  \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
+  \setCJKmonofont{FandolFang-Regular.otf}
+  \setCJKfamilyfont{zhsong}{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
+  \setCJKfamilyfont{zhhei}{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
+  \setCJKfamilyfont{zhkai}{FandolKai-Regular.otf}
+  \setCJKfamilyfont{zhfs}{FandolFang-Regular.otf}
+}
+\renewcommand\songti{\CJKfamily{zhsong}}
+\renewcommand\heiti{\CJKfamily{zhhei}}
+\renewcommand\kaishu{\CJKfamily{zhkai}}
+\renewcommand\fangsong{\CJKfamily{zhfs}}
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}
+  {\setmainfont{texgyretermes}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,
+     ItalicFont=*-italic,BoldItalicFont=*-bolditalic]}
+\IfFontExistsTF{Arial}{\setsansfont{Arial}}
+  {\setsansfont{texgyreheros}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,
+     ItalicFont=*-italic,BoldItalicFont=*-bolditalic]}
+\RequirePackage{unicode-math}
+\setmathfont{texgyretermes-math.otf}
+\IfFontExistsTF{Microsoft YaHei}
+  {\setCJKfamilyfont{sdjuyahei}{Microsoft YaHei}\newcommand\sdju@yahei{\CJKfamily{sdjuyahei}}}
+  {\newcommand\sdju@yahei{\heiti}}
+\xeCJKDeclareCharClass{CJK}{"25A1,"221A}   % □ √ 用中文字体
+
+% ===============================================================
+% 格式参数（字号单位 bp，即 Word 中的「磅」）
+% ===============================================================
+\newcommand\sdjufont[2]{\fontsize{#1}{#2}\selectfont}
+\def\sdju@grid{15.6bp}                       % 单倍行距
+% 正文：小四号，1.25 倍行距，首行缩进 2 字符
+\renewcommand\normalsize{%
+  \@setfontsize\normalsize{12bp}{19.5bp}%
+  \abovedisplayskip 6bp plus 3bp minus 3bp
+  \abovedisplayshortskip 0bp plus 3bp
+  \belowdisplayshortskip 6bp plus 3bp minus 3bp
+  \belowdisplayskip \abovedisplayskip
+  \let\@listi\@listI}
+\normalsize
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+% 按 Word 的「x 倍行距」设置当前字号的行距：\sdjuspacing{1.5}
+\ExplSyntaxOn
+\NewDocumentCommand\sdjuspacing{m}
+  {\fontsize{\f@size}{\fp_eval:n{#1*15.6}bp}\selectfont}
+\ExplSyntaxOff
+
+% ===============================================================
+% Word 行框与 TeX 基线间距的换算
+%   Word 把每一行排在一个「行框」里：行框高即行距（单倍 15.6 磅的倍数；四号、小二号字
+%   高于一格，单倍行距时占两格 31.2 磅），文字在行框内上下居中；段前、段后加在行框之外，
+%   相邻两段的段后与段前取较大者。TeX 则直接规定相邻两行基线的距离。
+%   在字号或行距变化的地方（标题与正文之间、目录各级条目之间）两种算法结果不同，
+%   下面的命令按 Word 的算法补上差值，使这些间距只由「字号、行框高、段前、段后」决定：
+%     \sdju@above{字号}{行框高}  行框中基线以上的高度
+%     \sdju@below{字号}{行框高}  行框中基线以下的高度
+%     \sdju@pre{字号}{行框高}    从正文行（小四号、19.5 磅）转入这种行之前应补的距离
+%     \sdju@post{字号}{行框高}   从这种行回到正文行之后应补的距离
+% ===============================================================
+\def\sdju@emcenter{0.359}% 宋体、黑体的字面中心在基线上方 0.359 个字高处
+\def\sdju@above#1#2{\dimexpr(#2)/2+\sdju@emcenter\dimexpr#1\relax\relax}
+\def\sdju@below#1#2{\dimexpr(#2)/2-\sdju@emcenter\dimexpr#1\relax\relax}
+\def\sdju@pre#1#2{\dimexpr\sdju@below{12bp}{19.5bp}-\sdju@below{#1}{#2}\relax}
+\def\sdju@post#1#2{\dimexpr\sdju@below{#1}{#2}-\sdju@below{12bp}{19.5bp}\relax}
+% 标题紧跟在上一个标题之后时，LaTeX 不加段前距离；Word 取「上一标题的段后」与
+% 「本标题的段前」中较大者。在各级标题的 format 开头调用，补上这段距离：
+%   \sdju@headstart{字号}{行框高}{段前}{段后}
+\newcommand\sdju@lastafter{0pt}
+\newcommand\sdju@headstart[4]{%
+  \if@nobreak
+    \par\nobreak
+    \@tempdima=\dimexpr#3-\sdju@lastafter\relax
+    \ifdim\@tempdima<\z@ \@tempdima=\z@ \fi
+    \vskip\dimexpr\@tempdima+\sdju@pre{#1}{#2}\relax
+    \noindent
+  \fi
+  \gdef\sdju@lastafter{#4}}
+
+% ===============================================================
+% 断行：与 Word 一致，英文单词不用连字符拆开；排不下时放宽词距。
+%   网址、长标识符可在 / . - _ 等符号处换行。
+% ===============================================================
+\hyphenpenalty=10000
+\tolerance=1000
+\setlength{\emergencystretch}{3em}
+\urlstyle{same}
+\g@addto@macro\UrlBreaks{\do\-\do\_\do\&}
+\Urlmuskip=0mu plus 1mu
+\setcounter{biburlnumpenalty}{100}
+\setcounter{biburlucpenalty}{100}
+\setcounter{biburllcpenalty}{100}
+
+% ===============================================================
+% 图表题与表格
+%   表名在表正上方，图名在图正下方，均为宋体小五号加粗；表格为三线表，线粗 0.5 磅。
+%   表内文字默认小四号、单倍行距；列数多、排不下时可改小：\sdjutablesize{10.5bp}（五号），
+%   写在表格之前，对其后的表格有效（放在花括号里则只对这一个表有效）。
+%   跨页表格：在 longtable 的续页表头中用 \sdjucontinued{<列数>}，右上方显示「续表x-x」。
+% ===============================================================
+\DeclareCaptionFont{sdjucap}{\songti\sdjufont{9bp}{\sdju@grid}\bfseries}
+\captionsetup{font=sdjucap,labelsep=space,justification=centering,singlelinecheck=false}
+\captionsetup[table]{position=top,skip=4bp}
+\captionsetup[figure]{position=bottom,skip=6bp}
+\newcommand\sdjutablefont{\sdjufont{12bp}{\sdju@grid}}
+\newcommand\sdjutablesize[1]{\renewcommand\sdjutablefont{\sdjufont{#1}{\sdju@grid}}}
+\newcommand\sdju@tablerules{%
+  \renewcommand\arraystretch{1}%
+  \setlength\heavyrulewidth{0.5bp}\setlength\lightrulewidth{0.5bp}}
+\newcommand\sdjutablesetup{\sdjutablefont\sdju@tablerules}
+\AtBeginEnvironment{table}{\sdju@tablerules}
+% longtable 之前先结束上一段，免得那一段被排成表内的单倍行距
+\AtBeginEnvironment{longtable}{\par\sdjutablesetup}
+% 浮动体开头 LaTeX 会恢复正文字号行距，这里再设回单倍行距（表格用表内字号）
+\def\sdju@tablecaptype{table}
+\appto\@floatboxreset{%
+  \ifx\@captype\sdju@tablecaptype \sdjutablefont \else \sdjufont{12bp}{\sdju@grid}\fi}
+\newcommand\sdjucontinued[1]{%
+  \multicolumn{#1}{r}{\sdjutablefont 续表\thetable}\\}
+% 公式编号使用全角括号
+\renewcommand\tagform@[1]{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
+
+% ===============================================================
+% 参考文献：GB/T 7714-2005 顺序编码制（与学校样本一致），\cite 为上标中括号；
+%   条目悬挂缩进 2 字符。字号、行距与标题在后面「参考文献」一节设定。
+% ===============================================================
+\AtBeginBibliography{\renewcommand*{\bibpagespunct}{\addcolon}}% 页码前用冒号：1998:11-12
+\AtBeginBibliography{\hyphenpenalty=10000 }% 文献样式会重设断词，这里改回不拆单词
+\defbibenvironment{bibliography}
+  {\list{}{%
+     \setlength{\leftmargin}{2\ccwd}\setlength{\itemindent}{-2\ccwd}%
+     \setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}%
+     \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}}}
+  {\endlist}
+  {\item\printfield[labelnumberwidth]{labelnumber}\space}
+
+% 手工录入的参考文献表（不用 .bib 文献库时）：条目自动编号 [1]、[2]…，格式同上。
+%   \begin{sdju@reflist} \item 作者. 题名[J]. 刊名, 年, 卷(期): 页码. \end{sdju@reflist}
+%   标题、字号、行距由 references 环境设定；正文中用 \sdjucite{1} 标注上标 [1]，
+%   也可给条目加 \label{...}，再写 \sdjucite{\ref{...}}。
+\newcounter{sdjuref}
+\newenvironment{sdju@reflist}
+  {\list{[\arabic{sdjuref}]\space}{\usecounter{sdjuref}%
+     \setlength{\leftmargin}{2\ccwd}\setlength{\itemindent}{-2\ccwd}%
+     \setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}%
+     \setlength{\topsep}{0pt}\setlength{\partopsep}{0pt}%
+     \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}%
+     \let\makelabel\@firstofone}%
+   \hbadness=5000 }% 文献条目里不可拆的长串多，词距偏松时不必逐条警告（与 .bib 方式一致）
+  {\endlist}
+\newcommand\sdjucite[1]{\textsuperscript{[#1]}}
 
 % 页面：上 2.8cm，下、左、右 2.5cm，页眉 2cm
 \geometry{a4paper,top=28mm,bottom=25mm,left=25mm,right=25mm,
@@ -66,7 +248,7 @@
 \renewcommand\backmatter{\clearpage}
 
 % ===============================================================
-% 标题（字号、行框高、段前、段后四个参数；行框与间距的换算见 sdjubase.sty）
+% 标题（字号、行框高、段前、段后四个参数；行框与间距的换算见前文）
 %   一级：小二号黑体加粗，居中，行框 31.2 磅（两格），段前 0、段后 12 磅，每章另起页
 %   二级：四号宋体，左对齐（首行缩进 2 字符），行框 31.2 磅（两格），段前 12、段后 0 磅
 %   三级：小四号黑体，左对齐（首行缩进 2 字符），行框 15.6 磅（一格），段前 12、段后 0 磅
@@ -141,7 +323,7 @@
   \clearpage}
 
 % ===============================================================
-% 图、表、公式：按章编号（图2-1、表2-1、（2-1））；图表题与表格格式见 sdjubase.sty
+% 图、表、公式：按章编号（图2-1、表2-1、（2-1））；图表题与表格格式见前文
 % ===============================================================
 \renewcommand\thefigure{\thechapter-\arabic{figure}}
 \renewcommand\thetable{\thechapter-\arabic{table}}

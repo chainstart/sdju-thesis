@@ -8,7 +8,7 @@
 | [`proposal/`](proposal/) | 开题报告模板及示例 | 附件13《毕业设计（论文）开题报告》 |
 | [`word-templates/`](word-templates/) | 学校下发的 Word 原始模板 | — |
 
-两个模板目录各自独立，复制其中一个目录就可以开始写。示例的排版效果见 [`thesis/main.pdf`](thesis/main.pdf) 和 [`proposal/proposal.pdf`](proposal/proposal.pdf)。
+两个模板目录各自独立、互不依赖，每个模板只有一个类文件，复制其中一个目录就可以开始写。示例的排版效果见 [`thesis/main.pdf`](thesis/main.pdf) 和 [`proposal/proposal.pdf`](proposal/proposal.pdf)。
 
 ## 文件
 
@@ -16,8 +16,7 @@
 
 | 文件 | 说明 |
 |---|---|
-| `sdjuthesis.cls` | 论文模板类，格式参数都在这里 |
-| `sdjubase.sty` | 公共设定：字体、字号与行距、Word 行框换算、图表题与表格、断行、参考文献样式 |
+| `sdjuthesis.cls` | 论文模板类，全部格式设定都在这一个文件里 |
 | `main.tex` | 论文主文件：论文信息、各部分顺序 |
 | `chapters/` | 摘要、各章、致谢（示例文字取自学校样本） |
 | `refs.bib` | 参考文献库（含样本中 10 类文献示例） |
@@ -31,8 +30,7 @@
 
 | 文件 | 说明 |
 |---|---|
-| `sdjuproposal.cls` | 开题报告模板类 |
-| `sdjubase.sty` | 公共设定，与 `thesis/` 下的那份内容相同 |
+| `sdjuproposal.cls` | 开题报告模板类，全部格式设定都在这一个文件里 |
 | `proposal.tex` | 开题报告示例（文字取自学校模板） |
 | `refs-proposal.bib` | 示例的参考文献库 |
 | `latexmkrc` | latexmk 配置 |
@@ -75,7 +73,7 @@ latexmk -c                            # 清理中间文件
 
 行距按 Word 的文档网格换算：单倍 = 15.6 磅，1.25 倍 = 19.5 磅，2 倍 = 31.2 磅。
 
-标题、目录等处的间距按 Word 的「行框」算法换算（实现见 `sdjubase.sty` 的 `\sdju@pre`、`\sdju@post`）：
+标题、目录等处的间距按 Word 的「行框」算法换算（实现见 `sdjuthesis.cls` 的 `\sdju@pre`、`\sdju@post`）：
 
 - 每行占一个行框，行框高即行距；四号、小二号字高于一格网格，单倍行距时占两格（31.2 磅）。
 - 文字在行框内上下居中，段前、段后加在行框之外。
@@ -148,7 +146,7 @@ latexmk -c                            # 清理中间文件
 
 ## 开题报告（proposal/sdjuproposal.cls）
 
-依据《附件13 毕业设计（论文）开题报告》，字体、字号、行距、参考文献著录的设定与论文模板相同，都在 `sdjubase.sty` 中。
+依据《附件13 毕业设计（论文）开题报告》。附件13 的 Word 模板中没有图表，也没有规定图表的格式，模板在这方面采用与学位论文格式规范（附件17）相同的做法：三线表，表名在上、图名在下，宋体小五号加粗。
 
 | 部分 | 格式 |
 |---|---|
@@ -188,5 +186,5 @@ latexmk -c                            # 清理中间文件
 
 ## 维护说明
 
-- `sdjubase.sty` 在 `thesis/` 和 `proposal/` 下各有一份，为的是两个目录都能单独复制使用。**两份的内容必须相同**，修改时要同时改，可用 `diff thesis/sdjubase.sty proposal/sdjubase.sty` 检查。
+- 两个模板各依据各的 Word 原件，类文件互相独立。字体检测、断行、参考文献列表等写法相同的部分在两个类文件里各有一份，修改这些部分时两边都要看一下。
 - 模板按统一的格式参数排版，不逐像素模仿 Word 的输出；与样本的差异见上一节。
