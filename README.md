@@ -1,28 +1,58 @@
-# 上海电机学院学士学位论文 LaTeX 模板
+# 上海电机学院毕业设计（论文）LaTeX 模板
 
-依据学校的《附件15 学士学位论文封面》《附件17 毕业设计（论文）格式规范》和《论文格式-无红色标注.pdf》制作。
-格式参数全部集中在 `sdjuthesis.cls`，写论文时只需改 `main.tex` 和 `chapters/`。
+上海电机学院本科毕业设计的两套 LaTeX 模板：**学士学位论文**和**开题报告**，依据学校下发的 Word 模板制作。
+
+| 目录 | 内容 | 依据 |
+|---|---|---|
+| [`thesis/`](thesis/) | 学士学位论文模板及示例 | 附件15《学士学位论文封面》、附件17《毕业设计（论文）格式规范》、《论文格式-无红色标注.pdf》 |
+| [`proposal/`](proposal/) | 开题报告模板及示例 | 附件13《毕业设计（论文）开题报告》 |
+| [`word-templates/`](word-templates/) | 学校下发的 Word 原始模板 | — |
+
+两个模板目录各自独立，复制其中一个目录就可以开始写。示例的排版效果见 [`thesis/main.pdf`](thesis/main.pdf) 和 [`proposal/proposal.pdf`](proposal/proposal.pdf)。
 
 ## 文件
 
+**`thesis/`——学士学位论文**
+
 | 文件 | 说明 |
 |---|---|
-| `sdjubase.sty` | 公共设定：字体、字号与行距、Word 行框换算、图表题与表格、断行、参考文献样式（论文与开题报告共用） |
-| `sdjuthesis.cls` | 论文模板类 |
+| `sdjuthesis.cls` | 论文模板类，格式参数都在这里 |
+| `sdjubase.sty` | 公共设定：字体、字号与行距、Word 行框换算、图表题与表格、断行、参考文献样式 |
 | `main.tex` | 论文主文件：论文信息、各部分顺序 |
-| `sdjuproposal.cls` | 开题报告模板类 |
-| `proposal.tex` / `refs-proposal.bib` | 开题报告示例（文字取自学校模板）及其文献库 |
 | `chapters/` | 摘要、各章、致谢（示例文字取自学校样本） |
 | `refs.bib` | 参考文献库（含样本中 10 类文献示例） |
 | `figures/` | 图片；`sdju-logo.jpg` 为封面校徽 |
 | `latexmkrc` | latexmk 配置（XeLaTeX + Biber） |
+| `main.pdf` | 示例的编译结果 |
+
+写论文时只需改 `main.tex` 和 `chapters/`。
+
+**`proposal/`——开题报告**
+
+| 文件 | 说明 |
+|---|---|
+| `sdjuproposal.cls` | 开题报告模板类 |
+| `sdjubase.sty` | 公共设定，与 `thesis/` 下的那份内容相同 |
+| `proposal.tex` | 开题报告示例（文字取自学校模板） |
+| `refs-proposal.bib` | 示例的参考文献库 |
+| `latexmkrc` | latexmk 配置 |
+| `proposal.pdf` | 示例的编译结果 |
+
+**`word-templates/`——学校的 Word 原始模板**
+
+| 文件 | 说明 |
+|---|---|
+| `附件13 毕业设计（论文）开题报告.doc` | 开题报告模板 |
+| `附件15 学士学位论文封面.docx` | 论文封面 |
+| `附件17 毕业设计（论文）格式规范.doc`、`.pdf` | 论文格式规范，红色批注为格式要求 |
+| `论文格式-无红色标注.pdf` | 去掉批注后的论文样本，本模板核对版面时以它为准 |
 
 ## 编译
 
 ```bash
-latexmk main.tex       # 论文：xelatex -> biber -> xelatex -> xelatex
-latexmk proposal.tex   # 开题报告
-latexmk -c             # 清理中间文件
+cd thesis   && latexmk main.tex       # 论文：xelatex -> biber -> xelatex -> xelatex
+cd proposal && latexmk proposal.tex   # 开题报告
+latexmk -c                            # 清理中间文件
 ```
 
 需要 TeX Live 2020 及以上（含 ctex、biblatex-gb7714-2015、biber）。
@@ -41,7 +71,7 @@ latexmk -c             # 清理中间文件
 
 然后运行 `fc-cache -f`。
 
-## 格式规定（统一参数）
+## 论文的格式规定（thesis/sdjuthesis.cls）
 
 行距按 Word 的文档网格换算：单倍 = 15.6 磅，1.25 倍 = 19.5 磅，2 倍 = 31.2 磅。
 
@@ -116,9 +146,9 @@ latexmk -c             # 清理中间文件
 - `longtable` 不是浮动体。它和 `[t]`、`[htbp]` 的图表落在同一页时，版心可能被撑破（内容超出下边距）。所以一页放得下的表一律用 `table` + `tabular`；确实要跨页的长表才用 `longtable`，必要时在它前面加 `\clearpage`。
 - 列数多的表在小四号下排不开时，用 `{\sdjutablesize{10.5bp} \begin{table} … \end{table}}` 把这一个表改成五号。
 
-## 开题报告（sdjuproposal.cls）
+## 开题报告（proposal/sdjuproposal.cls）
 
-依据《附件13 毕业设计（论文）开题报告》，字体、字号、行距、参考文献著录与论文模板共用 `sdjubase.sty`。
+依据《附件13 毕业设计（论文）开题报告》，字体、字号、行距、参考文献著录的设定与论文模板相同，都在 `sdjubase.sty` 中。
 
 | 部分 | 格式 |
 |---|---|
@@ -155,3 +185,8 @@ latexmk -c             # 清理中间文件
 - **表格**：三线表的线与文字之间用 booktabs 的默认间距，比样本略松；样本表格撑满版心，模板按内容宽度居中。
 - **页眉页码**：样本的页码右侧留了约 3 个字符的空，模板的页码贴齐右边距。
 - **开题报告**：学校只提供了 Word 文件，没有 PDF 样本；封面与正文按 Word 文件中的格式参数排版。封面的华文中宋字体需自行安装（没有时用宋体代替）。
+
+## 维护说明
+
+- `sdjubase.sty` 在 `thesis/` 和 `proposal/` 下各有一份，为的是两个目录都能单独复制使用。**两份的内容必须相同**，修改时要同时改，可用 `diff thesis/sdjubase.sty proposal/sdjubase.sty` 检查。
+- 模板按统一的格式参数排版，不逐像素模仿 Word 的输出；与样本的差异见上一节。
