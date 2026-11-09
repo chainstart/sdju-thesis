@@ -75,14 +75,16 @@
 \setcounter{tocdepth}{1}
 % 一级标题开头：行框顶紧贴版心上沿加段前（不受上一页末行的影响），并记下段后 12 磅
 \newcommand\sdju@chapstart{\par\nointerlineskip\noindent\gdef\sdju@lastafter{12bp}}
+\newcommand\sdju@chapbefore{0bp}%  一级标题段前
+\newcommand\sdju@chapafter{12bp}%  一级标题段后
 \ctexset{
   chapter={
     format=\sdju@chapstart\centering\heiti\bfseries\sdjufont{18bp}{31.2bp}%
       \rule{0pt}{\sdju@above{18bp}{31.2bp}},
     nameformat={}, titleformat={},
     name={,}, number=\arabic{chapter}, aftername=\enspace,
-    beforeskip=\dimexpr 0bp-\topskip\relax,
-    afterskip=\dimexpr 12bp+\sdju@post{18bp}{31.2bp}\relax,
+    beforeskip=\dimexpr\sdju@chapbefore-\topskip\relax,
+    afterskip=\dimexpr\sdju@chapafter+\sdju@post{18bp}{31.2bp}\relax,
     afterindent=true, pagestyle=sdju,
   },
   section={
@@ -105,11 +107,12 @@
 }
 % 不编号的一级标题；可选参数为目录中显示的文字（省略或留空则不进目录）
 % 第二个可选参数为标题的段前距离（默认 0）
+% （不能把 \chapter* 放进分组：标题之后「紧跟标题、不得分页」的状态要靠其后第一段解除，
+%   分组会使这一机制失效，造成超过一页的目录无法分页）
 \NewDocumentCommand\sdjuchapter{o O{0bp} m}{%
-  \begingroup
-    \ctexset{chapter/beforeskip={\dimexpr#2-\topskip\relax}}%
-    \chapter*{#3}%
-  \endgroup
+  \def\sdju@chapbefore{#2}%
+  \chapter*{#3}%
+  \def\sdju@chapbefore{0bp}%
   \IfValueT{#1}{\if\relax\detokenize{#1}\relax\else\addcontentsline{toc}{chapter}{#1}\fi}%
   \markboth{}{}}
 
@@ -201,11 +204,10 @@
 %   空一行；正文四号宋体，首行缩进 2 字符；签名前空三行（AI 声明内容多，空一行）；签名与日期间空一行
 % ===============================================================
 \newcommand\sdju@decltitle[1]{%
-  \begingroup
-    \ctexset{chapter/beforeskip={\dimexpr 62.4bp-\topskip\relax},
-      chapter/afterskip={\dimexpr 31.2bp+\sdju@post{18bp}{31.2bp}+\sdju@pre{14bp}{31.2bp}\relax}}%
-    \chapter*{上海电机学院\\#1}%
-  \endgroup}
+  \def\sdju@chapbefore{62.4bp}%
+  \def\sdju@chapafter{31.2bp+\sdju@pre{14bp}{31.2bp}}%
+  \chapter*{上海电机学院\\#1}%
+  \def\sdju@chapbefore{0bp}\def\sdju@chapafter{12bp}}
 \newenvironment{sdju@declbody}
   {\par\sdjufont{14bp}{31.2bp}\setlength\parindent{2\ccwd}}
   {\par}
