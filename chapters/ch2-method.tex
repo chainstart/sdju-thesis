@@ -22,29 +22,40 @@
   \label{eq:taylor}
 \end{equation}
 
-% 表格：三线表，表名在上方。跨页时用 longtable，续页自动重复表头并在右上方标「续表」
-\begin{longtable}{cccc}
-  \caption{选取组分的热力学性质}\label{tab:thermo}\\
-  \toprule
-  组分 & H\textsubscript{f}(kcal/mol) & S\textsubscript{f}(kcal/mol) & C\textsubscript{p}(kcal/mol) \\
-  \midrule
-  \endfirsthead
-  \sdjucontinued{4}
-  \toprule
-  组分 & H\textsubscript{f}(kcal/mol) & S\textsubscript{f}(kcal/mol) & C\textsubscript{p}(kcal/mol) \\
-  \midrule
-  \endhead
-  \bottomrule
-  \endlastfoot
-  A1 & 100 & 100 & 100 \\
-  A2 &     &     &     \\
-  A3 &     &     &     \\
-  A4 & 100 & 100 & 100 \\
-  A5 &     &     &     \\
-  A6 &     &     &     \\
-  A7 &     &     &     \\
-  A8 &     &     &     \\
-\end{longtable}
+% 表格：三线表，表名在上方。一页放得下的表用 table + tabular（浮动体）
+\begin{table}[htbp]
+  \centering
+  \caption{选取组分的热力学性质}\label{tab:thermo}
+  \begin{tabular}{cccc}
+    \toprule
+    组分 & H\textsubscript{f}(kcal/mol) & S\textsubscript{f}(kcal/mol) & C\textsubscript{p}(kcal/mol) \\
+    \midrule
+    A1 & 100 & 100 & 100 \\
+    A2 &     &     &     \\
+    A3 &     &     &     \\
+    A4 & 100 & 100 & 100 \\
+    A5 &     &     &     \\
+    A6 &     &     &     \\
+    A7 &     &     &     \\
+    A8 &     &     &     \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% 一页放不下、需要跨页的长表才用 longtable：续页自动重复表头，并在右上方标「续表」。
+% longtable 不是浮动体，不要让它与 [t]、[htbp] 的图表挤在同一页（必要时在它前面加 \clearpage）。
+% \begin{longtable}{cccc}
+%   \caption{表名}\label{tab:long}\\
+%   \toprule 组分 & A & B & C \\ \midrule
+%   \endfirsthead
+%   \sdjucontinued{4}
+%   \toprule 组分 & A & B & C \\ \midrule
+%   \endhead
+%   \bottomrule
+%   \endlastfoot
+%   A1 & 100 & 100 & 100 \\
+%   ……
+% \end{longtable}
 
 % 图：图名在正下方
 \begin{figure}[htbp]

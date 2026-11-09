@@ -2,7 +2,7 @@
 % 上海电机学院 学士学位论文 示例
 % 编译：latexmk（已配置 latexmkrc），或 xelatex -> biber -> xelatex -> xelatex
 \documentclass{sdjuthesis}
-% 可选项：fontset=windows|fandol|mac（默认自动检测）、nodeclaration（不输出声明页）
+% 可选项：nodeclaration（不输出声明页）。字体自动检测：有宋体、黑体等 Windows 字体就用，没有则用 Fandol
 
 \addbibresource{refs.bib}
 
@@ -21,7 +21,7 @@
 \makecover        % 封面（无页眉页码）
 
 \frontmatter      % 页码：I, II, III ...（声明页、摘要、目录）
-\makedeclaration  % 学术诚信声明、版权使用授权书
+\makedeclaration  % 学术诚信声明、AI 使用情况声明、版权使用授权书
 \input{chapters/abstract}
 \sdjutableofcontents
 
@@ -32,7 +32,7 @@
 
 \backmatter
 \nocite{*}        % 样本中 [3]–[10] 在正文中未引用，这里一并列出
-\sdjubibliography
+\sdjubibliography  % 由 refs.bib 生成；手工录入文献表见 README 的 references 环境
 \input{chapters/acknowledgements}
 
 \end{document}

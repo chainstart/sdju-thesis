@@ -3,7 +3,7 @@
 %% 依据：附件13《毕业设计（论文）开题报告》；字体、字号、行距与论文模板共用 sdjubase.sty
 %% 编译：xelatex -> biber -> xelatex -> xelatex（或直接 latexmk proposal.tex）
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjuproposal}[2026/11/01 v1.0 SDJU Thesis Proposal Template]
+\ProvidesClass{sdjuproposal}[2026/11/09 v1.1 SDJU Thesis Proposal Template]
 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ctexart}}
 \ProcessOptions\relax
@@ -12,10 +12,14 @@
 \RequirePackage{sdjubase}
 
 % ===============================================================
-% 页面：上 2.54cm，下 2cm，左、右 2.5cm；页码在页脚右侧（小五号），封面无页码
+% 页面：上 2.54cm，下 2cm，左、右 2.5cm；页脚距纸边 1.25cm；
+%   页码在页脚右侧（小五号），封面无页码
+%   footskip 为版心下沿到页码基线的距离：下边距 20mm 减页脚距纸边 12.5mm，
+%   再减页码行框（小五号，11.7 磅）中基线以下的部分
 % ===============================================================
 \geometry{a4paper,top=25.4mm,bottom=20mm,left=25mm,right=25mm,
-  headheight=0pt,headsep=0pt,footskip=12.5mm}
+  headheight=0pt,headsep=0pt,
+  footskip=\dimexpr 20mm-12.5mm-\sdju@below{9bp}{11.7bp}\relax}
 \fancypagestyle{sdjuproposal}{%
   \fancyhf{}%
   \fancyfoot[R]{\sdjufont{9bp}{11.7bp}\thepage}%
@@ -46,35 +50,75 @@
 \newcommand\finaldate[1]{\renewcommand\sdju@finaldate{#1}}
 
 % ===============================================================
-% 封面：边框内居中排版
-%   校名、「毕业设计（论文）开题报告」：一号华文中宋加粗
-%   各栏目：小二号宋体加粗，内容写在下划线上；定稿日期：小三号宋体加粗
+% 封面：边框内自上而下逐行排，每行占一个 Word 行框（1.5 倍行距，行框高 = 1.5 × 1.3 × 字号）
+%   段前 18 磅；校名、「毕业设计（论文）开题报告」：一号华文中宋加粗，居中
+%   空两行（三号）；各栏目：小二号宋体加粗，内容（小三号）写在下划线上；
+%   课题名称占两行下划线，一行写不下时自动转到第二行（两行约 34 个汉字，再长则自动缩小字号）
+%   空两行（三号）；定稿日期：小三号宋体加粗
 % ===============================================================
+\newlength\sdju@coverw \setlength\sdju@coverw{92mm}% 下划线长度
+% 一行：#1 字号（bp 数值），#2 内容。行框高 1.95 × 字号，基线在行框顶下 1 个字号处
+\newcommand\sdju@coverrow[2]{%
+  \hbox to\hsize{\vrule width\z@ height #1bp depth 0.95\dimexpr#1bp\relax
+    \sdjufont{#1bp}{#1bp}#2}}
+% 一条下划线及写在上面的内容（居中，小三号）
+\newcommand\sdju@coverline[1]{%
+  \rlap{\rule[-3bp]{\sdju@coverw}{0.6bp}}%
+  \hbox to\sdju@coverw{\hss\sdjufont{15bp}{15bp}#1\hss}}
+% 栏目行：#1 栏目名（占 4 字宽），#2 内容；栏目名留空则只有下划线
 \newcommand\sdju@coverfield[2]{%
-  \makebox[4em][s]{#1}\hspace{0.5em}%
-  \underline{\makebox[92mm]{\sdjufont{15bp}{18bp}#2}}\par}
+  \sdju@coverrow{18}{\hskip 19mm\makebox[4em][s]{#1}\hskip 0.5em\sdju@coverline{#2}\hfil}}
+% 课题名称按下划线宽度分成两行（\sdju@tla、\sdju@tlb）；小三号排不下时逐级缩小字号
+\newbox\sdju@tla \newbox\sdju@tlb
+\newcommand\sdju@striptail{% 去掉行与行之间的间距和惩罚，露出上一行
+  \unskip\unpenalty\unskip\unpenalty\unskip\unpenalty\unskip\unpenalty\unskip}
+\newcommand\sdju@splittitle[1]{%
+  \setbox\z@\vbox{\hsize=\sdju@coverw \centering \parindent=\z@
+    \sdjufont{#1}{#1}\baselineskip=1.5\dimexpr#1\relax \lineskiplimit=\z@ \lineskip=\z@
+    \sdju@title\par
+    \sdju@striptail \global\setbox\sdju@tlb\lastbox
+    \sdju@striptail \global\setbox\sdju@tla\lastbox
+    \sdju@striptail \setbox\tw@\lastbox
+    \ifvoid\tw@ \global\@tempswafalse \else \global\@tempswatrue \fi}}
+\newcommand\sdju@fittitle{%
+  \@tfor\sdju@tmp:={15bp}{14bp}{13bp}{12bp}{10.5bp}{9bp}\do{%
+    \sdju@splittitle{\sdju@tmp}%
+    \if@tempswa\else\@break@tfor\fi}%
+  \if@tempswa
+    \ClassWarningNoLine{sdjuproposal}{课题名称过长，封面上两行排不下，请缩短或用 \string\\ 手工分行}%
+  \fi}
 \newcommand\makecover{%
-  \thispagestyle{empty}%
+  \clearpage\thispagestyle{empty}%
+  \begingroup
+  \songti\bfseries \sdju@fittitle
+  \noindent
   \begin{tikzpicture}[remember picture,overlay]
     \draw[line width=0.5bp]
       ([xshift=25mm,yshift=-25.3mm]current page.north west) rectangle
       ([xshift=180.7mm,yshift=-245.7mm]current page.north west);
   \end{tikzpicture}%
-  \null\vspace{2mm}%
-  {\centering\sdju@zhongsong\bfseries\sdjufont{26bp}{39bp}%
-   上海电机学院\par 毕业设计（论文）开题报告\par}%
-  \vspace{24mm}%
-  {\songti\bfseries\sdjufont{18bp}{27bp}\leftskip=19mm\parindent=0pt
-   \sdju@coverfield{课题名称}{\sdju@title}%
-   \vspace{4mm}%
-   \sdju@coverfield{学\hfill 院}{\sdju@school}%
-   \sdju@coverfield{专\hfill 业}{\sdju@major}%
-   \sdju@coverfield{班\hfill 级}{\sdju@classname}%
-   \sdju@coverfield{学\hfill 号}{\sdju@studentid}%
-   \sdju@coverfield{姓\hfill 名}{\sdju@author}%
-   \sdju@coverfield{指导教师}{\sdju@supervisor}}%
-  \vspace{20mm}%
-  {\hspace*{37mm}\songti\bfseries\sdjufont{15bp}{22.5bp}定稿日期：\sdju@finaldate\par}%
+  \vbox to\z@{\offinterlineskip
+    \vskip\dimexpr 18bp-\topskip\relax
+    \sdju@coverrow{26}{\hfil\sdju@zhongsong 上海电机学院\hfil}%
+    \sdju@coverrow{26}{\hfil\sdju@zhongsong 毕业设计（论文）开题报告\hfil}%
+    \vskip 62.4bp
+    \ifvoid\sdju@tla
+      \sdju@coverfield{课题名称}{\box\sdju@tlb}%
+      \sdju@coverfield{}{}%
+    \else
+      \sdju@coverfield{课题名称}{\box\sdju@tla}%
+      \sdju@coverfield{}{\box\sdju@tlb}%
+    \fi
+    \sdju@coverfield{学\hfill 院}{\sdju@school}%
+    \sdju@coverfield{专\hfill 业}{\sdju@major}%
+    \sdju@coverfield{班\hfill 级}{\sdju@classname}%
+    \sdju@coverfield{学\hfill 号}{\sdju@studentid}%
+    \sdju@coverfield{姓\hfill 名}{\sdju@author}%
+    \sdju@coverfield{指导教师}{\sdju@supervisor}%
+    \vskip 62.4bp
+    \sdju@coverrow{15}{\hskip 37mm 定稿日期：\sdju@finaldate\hfil}%
+    \vss}%
+  \par\endgroup
   \clearpage
   \setcounter{page}{1}}
 
@@ -82,7 +126,7 @@
 % 正文
 %   课题名称：小一号宋体加粗居中；副标题右对齐
 %   「摘要：」「关键词：」小四号加粗，内容小四号宋体；首行缩进 2 字符，1.25 倍行距
-%   一级标题：四号宋体加粗，左对齐，段前段后 13 磅（「1 文献综述」）
+%   一级标题：四号宋体加粗，左对齐，行框 31.2 磅，段前段后 13 磅（「1 文献综述」）
 %   二级标题：小四号宋体，首行缩进 2 字符（「3.1 …」）
 %   正文：小四号宋体 / Times New Roman，首行缩进 2 字符，1.25 倍行距
 % ===============================================================
@@ -101,14 +145,16 @@
 \setcounter{secnumdepth}{2}
 \ctexset{
   section={
-    format=\raggedright\songti\bfseries\sdjufont{14bp}{\sdju@grid},
+    format=\sdju@headstart{14bp}{31.2bp}{13bp}{13bp}\raggedright\songti\bfseries\sdjufont{14bp}{31.2bp},
     name={,}, number=\arabic{section}, aftername=\enspace,
-    beforeskip=13bp, afterskip=13bp, indent=0pt, afterindent=true,
+    beforeskip=\dimexpr 13bp+\sdju@pre{14bp}{31.2bp}\relax,
+    afterskip=\dimexpr 13bp+\sdju@post{14bp}{31.2bp}\relax,
+    indent=0pt, afterindent=true,
   },
   subsection={
-    format=\raggedright\songti\sdjufont{12bp}{19.5bp},
+    format=\sdju@headstart{12bp}{19.5bp}{0bp}{0bp}\raggedright\songti\sdjufont{12bp}{19.5bp},
     aftername=\enspace, indent=2em,
-    beforeskip=0pt, afterskip=1sp, afterindent=true,
+    beforeskip=0pt, afterskip=0pt, afterindent=true,
   },
 }
 
@@ -127,20 +173,13 @@
 \setlist[itemize,1]{leftmargin=0pt,labelindent=2em,itemindent=*,
   labelsep=0.5em,listparindent=2em}
 
-% 图、表、公式：按节编号，格式同论文
+% 图、表、公式：按节编号；图表题与表格格式见 sdjubase.sty
 \renewcommand\thefigure{\arabic{section}-\arabic{figure}}
 \renewcommand\thetable{\arabic{section}-\arabic{table}}
 \renewcommand\theequation{\arabic{section}-\arabic{equation}}
 \counterwithin*{figure}{section}
 \counterwithin*{table}{section}
 \counterwithin*{equation}{section}
-\DeclareCaptionFont{sdjucap}{\songti\sdjufont{9bp}{\sdju@grid}\bfseries}
-\captionsetup{font=sdjucap,labelsep=space,justification=centering,singlelinecheck=false}
-\captionsetup[table]{position=top,skip=4bp}
-\captionsetup[figure]{position=bottom,skip=6bp}
-\AtBeginEnvironment{table}{\sdjufont{12bp}{\sdju@grid}%
-  \setlength\heavyrulewidth{0.5bp}\setlength\lightrulewidth{0.5bp}}
-\renewcommand\tagform@[1]{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
 
 % ===============================================================
 % 参考文献：另起一页；标题「参考文献：」小二号黑体加粗居中；
@@ -151,6 +190,13 @@
   {\centering\heiti\bfseries\sdjufont{18bp}{23.4bp}#1\par}\vspace{6bp}}
 \AtBeginBibliography{\sdjufont{12bp}{\sdju@grid}}
 \newcommand\sdjubibliography{\printbibliography[heading=sdjuproposal]}
+% 不用 .bib 文献库时，手工录入：\begin{references} \item 作者. 题名[J]. …… \end{references}
+% 条目自动编号 [1]、[2]…；正文中用 \sdjucite{1} 标注
+\newenvironment{references}
+  {\clearpage
+   {\centering\heiti\bfseries\sdjufont{18bp}{23.4bp}参考文献：\par}\vspace{6bp}%
+   \sdjufont{12bp}{\sdju@grid}\begin{sdju@reflist}}
+  {\end{sdju@reflist}}
 
 % ===============================================================
 % 意见页（每张表占一页）：左侧为竖排栏目名，右侧为填写区

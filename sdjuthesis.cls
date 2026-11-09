@@ -4,9 +4,9 @@
 %% 编译：xelatex -> biber -> xelatex -> xelatex（或直接 latexmk）
 %%
 %% 行距约定：Word 文档网格为 15.6 磅，「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp，「2 倍」= 31.2bp。
-%% 本文件中的格式参数集中在「格式参数」一节，修改格式只需改那里。
+%% 标题、目录等处的间距按 Word 的行框算法换算（见 sdjubase.sty 中 \sdju@pre、\sdju@post 的说明）。
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjuthesis}[2026/11/01 v2.1 SDJU Bachelor Thesis Template]
+\ProvidesClass{sdjuthesis}[2026/11/09 v2.2 SDJU Bachelor Thesis Template]
 
 % ---------------------------------------------------------------
 % 选项：nodeclaration 不输出声明页
@@ -66,40 +66,48 @@
 \renewcommand\backmatter{\clearpage}
 
 % ===============================================================
-% 标题
-%   一级：小二号黑体加粗，居中，段前 0、段后 12 磅，每章另起页
-%   二级：四号宋体，左对齐（首行缩进 2 字符），段前 12、段后 0 磅
-%   三级：小四号黑体，左对齐（首行缩进 2 字符），段前 12、段后 0 磅
+% 标题（字号、行框高、段前、段后四个参数；行框与间距的换算见 sdjubase.sty）
+%   一级：小二号黑体加粗，居中，行框 31.2 磅（两格），段前 0、段后 12 磅，每章另起页
+%   二级：四号宋体，左对齐（首行缩进 2 字符），行框 31.2 磅（两格），段前 12、段后 0 磅
+%   三级：小四号黑体，左对齐（首行缩进 2 字符），行框 15.6 磅（一格），段前 12、段后 0 磅
 % ===============================================================
 \setcounter{secnumdepth}{2}
 \setcounter{tocdepth}{1}
+% 一级标题开头：行框顶紧贴版心上沿加段前（不受上一页末行的影响），并记下段后 12 磅
+\newcommand\sdju@chapstart{\par\nointerlineskip\noindent\gdef\sdju@lastafter{12bp}}
 \ctexset{
   chapter={
-    format=\centering\heiti\bfseries\sdjufont{18bp}{31.2bp}\rule{0pt}{0.7\baselineskip},% 小二号超过一格网格，按两格（2×15.6）排行
+    format=\sdju@chapstart\centering\heiti\bfseries\sdjufont{18bp}{31.2bp}%
+      \rule{0pt}{\sdju@above{18bp}{31.2bp}},
     nameformat={}, titleformat={},
     name={,}, number=\arabic{chapter}, aftername=\enspace,
-    beforeskip=0pt, afterskip=12bp, fixskip=true,
+    beforeskip=\dimexpr 0bp-\topskip\relax,
+    afterskip=\dimexpr 12bp+\sdju@post{18bp}{31.2bp}\relax,
     afterindent=true, pagestyle=sdju,
   },
   section={
-    format=\raggedright\songti\sdjufont{14bp}{\sdju@grid},
+    format=\sdju@headstart{14bp}{31.2bp}{12bp}{0bp}\raggedright\songti\sdjufont{14bp}{31.2bp},
     aftername=\enspace, indent=2em,
-    beforeskip=12bp, afterskip=1sp, afterindent=true,
+    beforeskip=\dimexpr 12bp+\sdju@pre{14bp}{31.2bp}\relax,
+    afterskip=\dimexpr 0bp+\sdju@post{14bp}{31.2bp}\relax,
+    afterindent=true,
   },
   subsection={
-    format=\raggedright\heiti\sdjufont{12bp}{\sdju@grid},
+    format=\sdju@headstart{12bp}{15.6bp}{12bp}{0bp}\raggedright\heiti\sdjufont{12bp}{15.6bp},
     aftername=\enspace, indent=2em,
-    beforeskip=12bp, afterskip=1sp, afterindent=true,
+    beforeskip=\dimexpr 12bp+\sdju@pre{12bp}{15.6bp}\relax,
+    afterskip=\dimexpr 0bp+\sdju@post{12bp}{15.6bp}\relax,
+    afterindent=true,
   },
   bibname={参考文献},
   figurename={图},
   tablename={表},
 }
 % 不编号的一级标题；可选参数为目录中显示的文字（省略或留空则不进目录）
-% 第二个可选参数为标题前的段前距离（默认 0）
-\NewDocumentCommand\sdjuchapter{o O{0pt} m}{%
+% 第二个可选参数为标题的段前距离（默认 0）
+\NewDocumentCommand\sdjuchapter{o O{0bp} m}{%
   \begingroup
-    \ctexset{chapter/beforeskip={#2}}%
+    \ctexset{chapter/beforeskip={\dimexpr#2-\topskip\relax}}%
     \chapter*{#3}%
   \endgroup
   \IfValueT{#1}{\if\relax\detokenize{#1}\relax\else\addcontentsline{toc}{chapter}{#1}\fi}%
@@ -107,47 +115,34 @@
 
 % ===============================================================
 % 目录：标题小二号黑体加粗居中，段前 31.2 磅、段后 12 磅；列出一、二级标题
-%   一级：黑体四号；二级：黑体小四号，缩进 2 字符；引导线为短横线；页码统一为五号 Times New Roman
+%   一级：黑体四号，单倍行距（行框 31.2 磅）；二级：黑体小四号，单倍行距（行框 15.6 磅），缩进 2 字符
+%   引导线为短横线；页码统一为五号 Times New Roman
 % ===============================================================
 \newcommand\sdju@tocpage[1]{{\sdjufont{10.5bp}{10.5bp}\rmfamily #1}}
 \newcommand\sdju@tocdots{\leaders\hbox{\sdjufont{10.5bp}{10.5bp}\rmfamily -}\hfill}% 引导线：短横线
 \contentsmargin{0pt}
 \titlecontents{chapter}[0pt]
-  {\heiti\sdjufont{14bp}{19.5bp}}
+  {\vskip\sdju@pre{14bp}{31.2bp}\heiti\sdjufont{14bp}{31.2bp}}
   {\thecontentslabel\enspace}{}
   {\sdju@tocdots\sdju@tocpage{\thecontentspage}}
+  [\vskip\sdju@post{14bp}{31.2bp}]
 \titlecontents{section}[2\ccwd]
-  {\heiti\sdjufont{12bp}{19.5bp}}
+  {\vskip\sdju@pre{12bp}{15.6bp}\heiti\sdjufont{12bp}{15.6bp}}
   {\thecontentslabel\enspace}{}
   {\sdju@tocdots\sdju@tocpage{\thecontentspage}}
+  [\vskip\sdju@post{12bp}{15.6bp}]
 \newcommand\sdjutableofcontents{%
   \sdjuchapter[][31.2bp]{目\hspace{1em}录}%
-  \begingroup\setlength\parindent{0pt}\@starttoc{toc}\endgroup
+  % 各级条目行框高不同，行距一律按基线距离计算（不因上下两行挨得近而另加行间距）
+  \begingroup\setlength\parindent{0pt}\lineskiplimit=-\maxdimen \@starttoc{toc}\endgroup
   \clearpage}
 
 % ===============================================================
-% 图、表、公式：按章编号（图2-1、表2-1、（2-1））
-%   表名在表正上方，图名在图正下方，均为宋体小五号加粗；表格为三线表
+% 图、表、公式：按章编号（图2-1、表2-1、（2-1））；图表题与表格格式见 sdjubase.sty
 % ===============================================================
 \renewcommand\thefigure{\thechapter-\arabic{figure}}
 \renewcommand\thetable{\thechapter-\arabic{table}}
 \renewcommand\theequation{\thechapter-\arabic{equation}}
-\DeclareCaptionFont{sdjucap}{\songti\sdjufont{9bp}{\sdju@grid}\bfseries}
-\captionsetup{font=sdjucap,labelsep=space,justification=centering,singlelinecheck=false}
-\captionsetup[table]{position=top,skip=4bp}
-\captionsetup[figure]{position=bottom,skip=6bp}
-\newcommand\sdjutablesetup{%
-  \sdjufont{12bp}{\sdju@grid}%
-  \renewcommand\arraystretch{1}%
-  \setlength\heavyrulewidth{0.5bp}\setlength\lightrulewidth{0.5bp}}
-\AtBeginEnvironment{table}{\sdjutablesetup}
-\AtBeginEnvironment{longtable}{\sdjutablesetup}
-\AtBeginEnvironment{figure}{\sdjufont{12bp}{\sdju@grid}}
-% 公式编号使用全角括号
-\renewcommand\tagform@[1]{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
-% 跨页表格：在 longtable 的续页表头中使用 \sdjucontinued{<列数>}，右上方显示「续表x-x」
-\newcommand\sdjucontinued[1]{%
-  \multicolumn{#1}{r}{\sdjufont{12bp}{\sdju@grid}续表\thetable}\\}
 
 % ===============================================================
 % 列表：分项用 (1)、(2)、(3)…，与正文段落同样首行缩进 2 字符
@@ -165,6 +160,11 @@
 \defbibheading{sdju}[\bibname]{\sdjuchapter[#1]{#1}}
 \AtBeginBibliography{\sdjufont{12bp}{19.5bp}}
 \newcommand\sdjubibliography{\printbibliography[heading=sdju]}
+% 不用 .bib 文献库时，手工录入：\begin{references} \item 作者. 题名[J]. …… \end{references}
+% 条目自动编号 [1]、[2]…；正文中用 \sdjucite{1} 标注
+\newenvironment{references}
+  {\sdjuchapter[\bibname]{\bibname}\sdjufont{12bp}{19.5bp}\begin{sdju@reflist}}
+  {\end{sdju@reflist}}
 
 % ===============================================================
 % 封面（附件15）：各元素位置取自 Word 封面模板
@@ -197,13 +197,15 @@
 
 % ===============================================================
 % 声明页（学术诚信声明、AI 使用情况声明、版权使用授权书）
-%   标题：小二号黑体加粗居中（两行：上海电机学院 / 声明名称）
-%   正文：四号宋体，首行缩进 2 字符，2 倍行距
+%   全页按 2 倍行距（31.2 磅）排：空两行；标题两行（上海电机学院 / 声明名称），小二号黑体加粗居中；
+%   空一行；正文四号宋体，首行缩进 2 字符；签名前空三行（AI 声明内容多，空一行）；签名与日期间空一行
 % ===============================================================
 \newcommand\sdju@decltitle[1]{%
-  \null\vspace{1.5\baselineskip}%
-  {\centering\heiti\bfseries\sdjufont{18bp}{31.2bp}上海电机学院\par #1\par}%
-  \vspace{18bp}}
+  \begingroup
+    \ctexset{chapter/beforeskip={\dimexpr 62.4bp-\topskip\relax},
+      chapter/afterskip={\dimexpr 31.2bp+\sdju@post{18bp}{31.2bp}+\sdju@pre{14bp}{31.2bp}\relax}}%
+    \chapter*{上海电机学院\\#1}%
+  \endgroup}
 \newenvironment{sdju@declbody}
   {\par\sdjufont{14bp}{31.2bp}\setlength\parindent{2\ccwd}}
   {\par}
@@ -213,17 +215,15 @@
 \newcommand\makedeclaration{%
   \ifsdju@opt@nodeclaration\else
   % ---- 学术诚信声明 ----
-  \clearpage
   \sdju@decltitle{毕业设计（论文）学术诚信声明}%
   \begin{sdju@declbody}
    本人郑重声明：所呈交的毕业设计（论文），是本人在导师的指导下，独立进行研究工作所取得的成果。除文中已经注明引用的内容外，本论文不包含任何其他个人或集体已经发表或撰写过的作品成果。对本文的研究做出重要贡献的个人和集体，均已在文中以明确方式标明。本人完全意识到本声明的法律结果由本人承担。\par
-   \vspace{2\baselineskip}
+   \vspace{3\baselineskip}
    \sdju@signpair{}{作者签名：}
-   \vspace{0.5\baselineskip}
+   \vspace{\baselineskip}
    \sdju@signpair{}{\sdju@date}
   \end{sdju@declbody}
   % ---- AI 使用情况声明 ----
-  \clearpage
   \sdju@decltitle{毕业设计（论文）AI使用情况声明}%
   \begin{sdju@declbody}
    如果在撰写毕业设计（论文）的过程中，辅助使用了AI工具。本人将做好原始材料与数据的保留工作。本人承诺如下：\par
@@ -235,24 +235,20 @@
    本人承诺所提交论文的原创性，完全符合《上海电机学院本科毕业设计（论文）过程管理实施细则》及《上海电机学院本科毕业设计（论文）使用AI工具的指导性意见》及相关学术诚信要求。\par
    \vspace{\baselineskip}
    \sdju@signpair{\hspace{2\ccwd}作者签名：}{指导教师签名：}
-   \vspace{0.5\baselineskip}
+   \vspace{\baselineskip}
    \sdju@signpair{\hspace{2\ccwd}\sdju@date}{\sdju@date}
   \end{sdju@declbody}
   % ---- 版权使用授权书 ----
-  \clearpage
   \sdju@decltitle{毕业设计（论文）版权使用授权书}%
   \begin{sdju@declbody}
    本毕业设计（论文）作者同意学校保留并向国家有关部门或机构送交论文的复印件和电子版，允许论文被查阅和借阅。本人授权上海电机学院可以将本毕业设计（论文）的全部或部分内容编入有关数据库进行检索，可以采用影印、缩印或扫描等复制手段保存和汇编本毕业设计（论文）。\par
-   \sdjuspacing{1.5}%
-   \hspace*{2\ccwd}\begin{tabular}{@{}l@{\hspace{1\ccwd}}l@{}}
-     \multirow{2}{*}{本论文属于} & \textbf{保密}□，在\underline{\hspace{2\ccwd}}年解密后适用本授权书。\\
-                                & \textbf{不保密}□。
-   \end{tabular}\par
-   \hspace*{2\ccwd}（请在以上方框内打“√”）\par
-   \sdjuspacing{2}%
-   \vspace{2\baselineskip}
+   \hphantom{本论文属于}\hspace{2\ccwd}\textbf{保密}□，在\underline{\hspace{2\ccwd}}年解密后适用本授权书。\par
+   本论文属于\par
+   \hphantom{本论文属于}\hspace{2\ccwd}\textbf{不保密}□。\par
+   （请在以上方框内打“√”）\par
+   \vspace{3\baselineskip}
    \sdju@signpair{作者签名：}{指导教师签名：}
-   \vspace{0.5\baselineskip}
+   \vspace{\baselineskip}
    \sdju@signpair{\sdju@date}{\sdju@date}
   \end{sdju@declbody}
   \clearpage
@@ -260,7 +256,8 @@
 
 % ===============================================================
 % 摘要
-%   中文：标题小二号黑体居中；正文小四号宋体，首行缩进 2 字符，段前段后 12 磅，1.25 倍行距；
+%   中文：标题小二号黑体居中；正文小四号宋体，首行缩进 2 字符，段前段后 12 磅，1.25 倍行距
+%         （标题的段后 12 磅与首段的段前 12 磅取较大者，不叠加）；
 %         「关键词：」五号黑体，关键词小四号宋体，逗号分开，最后一个后面无标点
 %   英文：标题小二号 Times New Roman 加粗居中，段前 31.2 磅；正文同上；「Key words:」五号加粗
 % ===============================================================
@@ -273,11 +270,11 @@
   \hangindent=\@tempdima\hangafter=1
   #1#2\par}
 \newenvironment{abstract}
-  {\sdjuchapter{摘\hspace{1em}要}\setlength{\parskip}{12bp}}
+  {\sdjuchapter{摘\hspace{1em}要}\setlength{\parskip}{12bp}\vspace{-\parskip}}
   {\sdju@kwline{{\heiti\sdjufont{10.5bp}{19.5bp}关键词：}}{\sdju@keywords}%
    \setlength{\parskip}{0pt}}
 \newenvironment{abstracten}
-  {\sdjuchapter[][31.2bp]{\rmfamily\bfseries ABSTRACT}\setlength{\parskip}{12bp}}
+  {\sdjuchapter[][31.2bp]{\rmfamily\bfseries ABSTRACT}\setlength{\parskip}{12bp}\vspace{-\parskip}}
   {\sdju@kwline{{\rmfamily\bfseries\sdjufont{10.5bp}{19.5bp}Key words: }}{\sdju@keywordsen}%
    \setlength{\parskip}{0pt}}
 
@@ -285,7 +282,7 @@
 % 致谢：标题小二号黑体居中；正文五号宋体，首行缩进 2 字符，单倍行距
 % ===============================================================
 \newenvironment{acknowledgements}
-  {\sdjuchapter[致谢]{致\hspace{1em}谢}\sdjufont{10.5bp}{\sdju@grid}}
+  {\sdjuchapter[致谢]{致\hspace{1em}谢}\vspace{\sdju@pre{10.5bp}{15.6bp}}\sdjufont{10.5bp}{\sdju@grid}}
   {\par}
 
 \RequirePackage[hidelinks,bookmarksnumbered,unicode]{hyperref}
