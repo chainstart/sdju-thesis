@@ -8,9 +8,12 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{sdjuproposal}[2026/11/20 v2.0 SDJU Thesis Proposal Template]
 
-% 选项 pagenumright：页码放在页脚右侧（附件23 样本的位置）；默认按学校形式审核要点放在页脚居中
+% 页码默认在页脚右侧（2026 版附件23 样本的位置）；选项 pagenumcenter 改为页脚居中。
+% pagenumright 为旧选项，保留以兼容，效果与默认相同
 \newif\ifsdju@pagenumright
+\sdju@pagenumrighttrue
 \DeclareOption{pagenumright}{\sdju@pagenumrighttrue}
+\DeclareOption{pagenumcenter}{\sdju@pagenumrightfalse}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ctexart}}
 \ProcessOptions\relax
 \LoadClass[UTF8,a4paper,oneside,zihao=-4,linespread=1,fontset=none]{ctexart}
@@ -205,8 +208,8 @@
 
 % ===============================================================
 % 页面：上 2.54cm，下 2cm，左、右 2.5cm；页脚距纸边 1.25cm；
-%   页码小五号，默认在页脚居中（学校《形式审核关键点内容》：「页码无误在底部居中」）；
-%   附件23 样本中页码在页脚右侧，可用 pagenumright 选项改回。封面无页码
+%   页码小五号，默认在页脚右侧（以 2026 版附件23 样本为准；去年的形式审核要点写「底部居中」，
+%   与 2026 版冲突时以 2026 版为准），可用 pagenumcenter 选项改为居中。封面无页码
 %   footskip 为版心下沿到页码基线的距离：下边距 20mm 减页脚距纸边 12.5mm，
 %   再减页码行框（小五号，11.7 磅）中基线以下的部分
 % ===============================================================
