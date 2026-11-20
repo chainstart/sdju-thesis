@@ -1,14 +1,17 @@
 # 上海电机学院毕业设计（论文）LaTeX 模板
 
-上海电机学院本科毕业设计的两套 LaTeX 模板：**学士学位论文**和**开题报告**，依据学校下发的 Word 模板制作。
+上海电机学院本科毕业设计的 LaTeX 模板：**学士学位论文**、**开题报告**、**任务书**、**中期检查报告**和**指导记录**，依据学校下发的模板制作。
 
 | 目录 | 内容 | 依据 |
 |---|---|---|
 | [`thesis/`](thesis/) | 学士学位论文模板及示例 | 附件15《学士学位论文封面》、附件17《毕业设计（论文）格式规范》、《论文格式-无红色标注.pdf》 |
 | [`proposal/`](proposal/) | 开题报告模板及示例 | 附件13《毕业设计（论文）开题报告》 |
+| [`taskbook/`](taskbook/) | 任务书模板及示例 | 《教学归档材料及质量评价要素（2026 版）》附件22《毕业设计（论文）任务书》 |
+| [`midterm/`](midterm/) | 中期检查报告模板及示例 | 同上，附件24《毕业设计（论文）中期检查报告》 |
+| [`logbook/`](logbook/) | 指导记录模板及示例 | 同上，附件32《毕业设计（论文）指导记录》 |
 | [`word-templates/`](word-templates/) | 学校下发的 Word 原始模板 | — |
 
-两个模板目录各自独立、互不依赖，每个模板只有一个类文件，复制其中一个目录就可以开始写。示例的排版效果见 [`thesis/main.pdf`](thesis/main.pdf) 和 [`proposal/proposal.pdf`](proposal/proposal.pdf)。
+各模板目录各自独立、互不依赖，每个模板只有一个类文件，复制其中一个目录就可以开始写。示例的排版效果见 [`thesis/main.pdf`](thesis/main.pdf)、[`proposal/proposal.pdf`](proposal/proposal.pdf)、[`taskbook/taskbook.pdf`](taskbook/taskbook.pdf)、[`midterm/midterm.pdf`](midterm/midterm.pdf) 和 [`logbook/logbook.pdf`](logbook/logbook.pdf)。
 
 ## 文件
 
@@ -36,6 +39,15 @@
 | `latexmkrc` | latexmk 配置 |
 | `proposal.pdf` | 示例的编译结果 |
 
+**`taskbook/`——任务书**、**`midterm/`——中期检查报告**、**`logbook/`——指导记录**
+
+| 文件 | 说明 |
+|---|---|
+| `sdjutaskbook.cls`、`sdjumidterm.cls`、`sdjulogbook.cls` | 各自的模板类，全部格式设定都在这一个文件里 |
+| `taskbook.tex`、`midterm.tex`、`logbook.tex` | 示例（文字为中性占位） |
+| `latexmkrc` | latexmk 配置 |
+| `taskbook.pdf`、`midterm.pdf`、`logbook.pdf` | 示例的编译结果 |
+
 **`word-templates/`——学校的 Word 原始模板**
 
 | 文件 | 说明 |
@@ -50,6 +62,7 @@
 ```bash
 cd thesis   && latexmk main.tex       # 论文：xelatex -> biber -> xelatex -> xelatex
 cd proposal && latexmk proposal.tex   # 开题报告
+cd taskbook && latexmk taskbook.tex   # 任务书（midterm、logbook 同理）
 latexmk -c                            # 清理中间文件
 ```
 
@@ -169,6 +182,44 @@ latexmk -c                            # 清理中间文件
 \sdjubibliography  \supervisoropinion{}  \committeeopinion
 ```
 
+## 任务书、中期检查报告、指导记录
+
+三套表格类模板依据《教学归档材料及质量评价要素（2026 版）》中的附件22、24、32（该文件只有 PDF；2026 版中「学生工作及教师指导记录本」已改为一页表格的「毕业设计（论文）指导记录」）。页面均为 A4，上下 2.54 cm、左右 3.17 cm，不印页码；表格的宽度、伸出版心的位置、行高按 2026 版 PDF 量取。表格内填写的文字为小四号宋体、1.25 倍行距、首行缩进 2 字符。
+
+表格中的大栏目（任务书的四个栏目、中期报告、指导教师意见）可以跨页：内容少时按原表的行高留白，写不下时在页底断开、下一页接着排；签名栏总在栏目底部。栏目内可用 `\subsection`（小四号加粗，编号 1、2…）、`enumerate`、`schedule`。
+
+**任务书（taskbook/sdjutaskbook.cls）**：封面方框内为校名（小初号华文中宋，无则宋体加粗）、「毕业设计（论文）任务书」（一号），各栏目小三号、行距 40 磅：课题（两行，过长自动缩小字号）、专业、班级、姓名、学号、学院院长（签字）、校内指导教师（签字）、企业指导教师（签字）、日期；框外「注」。反面为竖排栏目名（四号仿宋）的四栏表格。
+
+```latex
+\title{课题} \major{} \classname{} \author{} \studentid{}
+\school{} \supervisor{} \companysupervisor{}   % 封面上没有这几栏或须手签，只作记录
+\taskdate{20XX 年 XX 月 XX 日}
+\makecover
+\section{课题来源} ... \section{课题的目的、意义} ... \section{要求} ...
+\section{课题主要内容及进度} ... \begin{schedule} \item{时间段}{工作内容} \end{schedule}
+\section[60mm]{要求}   % 可选参数改栏目最小高度
+```
+
+**中期检查报告（midterm/sdjumidterm.cls）**：标题两行三号黑体；基本信息表（姓名、学号、校内指导教师、企业指导教师、专业、学院、毕业设计(论文)题目、课题来源/项目编号、课题有无变化）；「中期报告（已完成的研究内容，所取得阶段性成果，下一步工作计划和研究内容等）」通栏大格，底部学生签名；第 2 页指导教师意见、答辩小组结论（建议、答辩结论、等第评定、组长和组员签名）。外框线 1 磅，其余 0.5 磅。
+
+```latex
+\title{题目} \author{} \studentid{} \supervisor{} \companysupervisor{} \major{} \school{}
+\projectsource{课题来源/项目编号}  \topicchange{无}  % 或 \topicchange[变化原因]{有}
+\maketitle
+\section{中期报告} \subsection{已完成的研究内容} ...
+\supervisoropinion{意见，可留空}  \committeeconclusion{建议，可留空}
+```
+
+**指导记录（logbook/sdjulogbook.cls）**：标题小二号方正大标宋（无则宋体加粗）；基本信息（学院、专业、班级、学号、姓名、指导教师、题目）与记录表均为四号，行高至少 31.7 磅；每条记录一行（日期 | 内容），内容多时行高自动增加，跨页时重复表头；不足 15 行时补空行（只补到本页排满）；表后为原表的「注」。
+
+```latex
+\title{题目} \school{} \major{} \classname{} \studentid{} \author{} \supervisor{}
+\recordrows{15}
+\maketitle
+\section{指导记录}
+\record{20XX.03.01}{记录内容}
+```
+
 ## 与学校样本（WPS 输出）的已知差异
 
 模板按统一参数排版，不逐像素模仿 WPS。下列差异属于排版引擎不同或样本本身的不一致：
@@ -183,8 +234,9 @@ latexmk -c                            # 清理中间文件
 - **表格**：三线表的线与文字之间用 booktabs 的默认间距，比样本略松；样本表格撑满版心，模板按内容宽度居中。
 - **页眉页码**：样本的页码右侧留了约 3 个字符的空，模板的页码贴齐右边距。
 - **开题报告**：学校只提供了 Word 文件，没有 PDF 样本；封面与正文按 Word 文件中的格式参数排版。封面的华文中宋字体需自行安装（没有时用宋体代替）。
+- **任务书、中期检查报告、指导记录**：依据 2026 版 PDF 量取的参数排版，不逐点照搬。封面各行按 40 磅等距排（样本中「课题」一行比等距位置高约 2.5 磅）；竖排栏目名统一字距 22 磅（样本各栏 18～25 磅不等），顿号「、」居中（样本靠右）；样本中的「指导教师意见:」为半角冒号，模板用全角「：」；表格内填写文字的格式（小四号宋体、1.25 倍行距）是模板的约定，样本表格是空的，没有规定；没有方正大标宋、华文中宋时分别用宋体加粗代替。
 
 ## 维护说明
 
-- 两个模板各依据各的 Word 原件，类文件互相独立。字体检测、断行、参考文献列表等写法相同的部分在两个类文件里各有一份，修改这些部分时两边都要看一下。
+- 各模板各依据各的原件，类文件互相独立。字体检测、断行、表格行（`\sdju@row`、`\sdju@formrow`）等写法相同的部分在几个类文件里各有一份，修改这些部分时要逐个看一下。
 - 模板按统一的格式参数排版，不逐像素模仿 Word 的输出；与样本的差异见上一节。
