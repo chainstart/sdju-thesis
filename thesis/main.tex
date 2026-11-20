@@ -2,18 +2,20 @@
 % 上海电机学院 学士学位论文 示例
 % 编译：latexmk（已配置 latexmkrc），或 xelatex -> biber -> xelatex -> xelatex
 \documentclass{sdjuthesis}
-% 可选项：nodeclaration（不输出声明页）。字体自动检测：有宋体、黑体等 Windows 字体就用，没有则用 Fandol
+% 可选项：nodeclaration（不输出声明页）、noaideclaration（不输出 AI 使用情况声明页）。字体自动检测：有宋体、黑体等 Windows 字体就用，没有则用 Fandol
 
 \addbibresource{refs.bib}
 
 % ---------------- 论文信息 ----------------
 % \title[页眉中的题目]{封面题目，过长可用 \\ 换行}
 \title{二甲醚清洁燃料均质压燃燃烧数值模拟研究}
+\titleen{Numerical Simulation of HCCI Combustion of Dimethyl Ether Clean Fuel}  % 封面上的英文题目
 \author{张三}
 \studentid{202012345678}
 \school{机械学院}
 \major{机械设计制造及其自动化}
-\supervisor{李四\quad 教授}
+\supervisor{李四\quad 教授}          % 校内指导教师
+\companysupervisor{王五\quad 高级工程师}  % 企业指导教师（无则删去，封面该栏留空）
 \coverdate{二〇二七年五月}
 
 \begin{document}

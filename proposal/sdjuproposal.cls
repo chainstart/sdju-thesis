@@ -1,12 +1,16 @@
 %% sdjuproposal.cls
 %% 上海电机学院 毕业设计（论文）开题报告 LaTeX 模板
-%% 依据：附件13《毕业设计（论文）开题报告》
+%% 依据：《教学归档材料及质量评价要素（2026 版）》附件23《毕业设计（论文）开题报告》、
+%%       学校《形式审核关键点内容（26 年 5 月及之后答辩）》
 %%
 %% 行距约定：「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp，「2 倍」= 31.2bp。
 %% 编译：xelatex -> biber -> xelatex -> xelatex（或直接 latexmk proposal.tex）
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjuproposal}[2026/11/09 v1.2 SDJU Thesis Proposal Template]
+\ProvidesClass{sdjuproposal}[2026/11/20 v2.0 SDJU Thesis Proposal Template]
 
+% 选项 pagenumright：页码放在页脚右侧（附件23 样本的位置）；默认按学校形式审核要点放在页脚居中
+\newif\ifsdju@pagenumright
+\DeclareOption{pagenumright}{\sdju@pagenumrighttrue}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ctexart}}
 \ProcessOptions\relax
 \LoadClass[UTF8,a4paper,oneside,zihao=-4,linespread=1,fontset=none]{ctexart}
@@ -93,20 +97,22 @@
 
 % ===============================================================
 % Word 行框与 TeX 基线间距的换算
-%   Word 把每一行排在一个「行框」里：行框高即行距（单倍 15.6 磅的倍数；四号、小二号字
-%   高于一格，单倍行距时占两格 31.2 磅），文字在行框内上下居中；段前、段后加在行框之外，
-%   相邻两段的段后与段前取较大者。TeX 则直接规定相邻两行基线的距离。
-%   在字号或行距变化的地方（标题与正文之间、目录各级条目之间）两种算法结果不同，
-%   下面的命令按 Word 的算法补上差值，使这些间距只由「字号、行框高、段前、段后」决定。
-%   （附件13 的 Word 文件没有启用文档网格，其行距同样按 15.6 磅的倍数计算，这里用同一种换算。）
+%   Word 把每一行排在一个「行框」里，段前、段后加在行框之外，相邻两段的段后与段前取较大者。
+%   TeX 则直接规定相邻两行基线的距离。
+%   附件23 的 Word 文件没有启用文档网格：单倍行距的行框高为 1.3 × 字号（宋体、黑体），文字在其中
+%   上下居中；「x 倍行距」的行框高为 x × 1.3 × 字号，多出的部分全部加在文字下方
+%   （按 2026 版 PDF 中标题、正文、参考文献各处的基线位置核对过）。所以基线到行框顶的距离
+%   总是 0.65 × 字号 + 字面中心高（0.359 × 字号），与行距无关。
+%   在字号或行距变化的地方（标题与正文之间）两种算法结果不同，下面的命令按 Word 的算法补上差值，
+%   使这些间距只由「字号、行框高、段前、段后」决定：
 %     \sdju@above{字号}{行框高}  行框中基线以上的高度
 %     \sdju@below{字号}{行框高}  行框中基线以下的高度
 %     \sdju@pre{字号}{行框高}    从正文行（小四号、19.5 磅）转入这种行之前应补的距离
 %     \sdju@post{字号}{行框高}   从这种行回到正文行之后应补的距离
 % ===============================================================
 \def\sdju@emcenter{0.359}% 宋体、黑体的字面中心在基线上方 0.359 个字高处
-\def\sdju@above#1#2{\dimexpr(#2)/2+\sdju@emcenter\dimexpr#1\relax\relax}
-\def\sdju@below#1#2{\dimexpr(#2)/2-\sdju@emcenter\dimexpr#1\relax\relax}
+\def\sdju@above#1#2{\dimexpr 0.65\dimexpr#1\relax+\sdju@emcenter\dimexpr#1\relax\relax}
+\def\sdju@below#1#2{\dimexpr(#2)-\sdju@above{#1}{#2}\relax}
 \def\sdju@pre#1#2{\dimexpr\sdju@below{12bp}{19.5bp}-\sdju@below{#1}{#2}\relax}
 \def\sdju@post#1#2{\dimexpr\sdju@below{#1}{#2}-\sdju@below{12bp}{19.5bp}\relax}
 % 标题紧跟在上一个标题之后时，LaTeX 不加段前距离；Word 取「上一标题的段后」与
@@ -139,7 +145,7 @@
 
 % ===============================================================
 % 图表题与表格
-%   附件13 的 Word 模板中没有图表，没有规定其格式；这里采用与学位论文格式规范（附件17）相同的做法：
+%   附件23 中没有图表，没有规定其格式；这里采用与学位论文格式规范（附件26）相同的做法：
 %   表名在表正上方，图名在图正下方，均为宋体小五号加粗；表格为三线表，线粗 0.5 磅。
 %   表内文字默认小四号、单倍行距；列数多、排不下时可改小：\sdjutablesize{10.5bp}（五号），
 %   写在表格之前，对其后的表格有效（放在花括号里则只对这一个表有效）。
@@ -168,14 +174,14 @@
 \renewcommand\tagform@[1]{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
 
 % ===============================================================
-% 参考文献：GB/T 7714-2005 顺序编码制（附件13 中的参考文献示例也是按顺序编号），\cite 为上标中括号；
-%   条目悬挂缩进 2 字符。字号、行距与标题在后面「参考文献」一节设定。
+% 参考文献：GB/T 7714-2005 顺序编码制（附件23 中的参考文献示例也是按顺序编号），\cite 为上标中括号；
+%   条目不缩进：编号顶格，转行后也顶格（与附件23 一致）。字号、行距与标题在后面「参考文献」一节设定。
 % ===============================================================
 \AtBeginBibliography{\renewcommand*{\bibpagespunct}{\addcolon}}% 页码前用冒号：1998:11-12
 \AtBeginBibliography{\hyphenpenalty=10000 }% 文献样式会重设断词，这里改回不拆单词
 \defbibenvironment{bibliography}
   {\list{}{%
-     \setlength{\leftmargin}{2\ccwd}\setlength{\itemindent}{-2\ccwd}%
+     \setlength{\leftmargin}{\z@}\setlength{\itemindent}{\z@}%
      \setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}%
      \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}}}
   {\endlist}
@@ -188,7 +194,7 @@
 \newcounter{sdjuref}
 \newenvironment{sdju@reflist}
   {\list{[\arabic{sdjuref}]\space}{\usecounter{sdjuref}%
-     \setlength{\leftmargin}{2\ccwd}\setlength{\itemindent}{-2\ccwd}%
+     \setlength{\leftmargin}{\z@}\setlength{\itemindent}{\z@}%
      \setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}%
      \setlength{\topsep}{0pt}\setlength{\partopsep}{0pt}%
      \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}%
@@ -199,7 +205,8 @@
 
 % ===============================================================
 % 页面：上 2.54cm，下 2cm，左、右 2.5cm；页脚距纸边 1.25cm；
-%   页码在页脚右侧（小五号），封面无页码
+%   页码小五号，默认在页脚居中（学校《形式审核关键点内容》：「页码无误在底部居中」）；
+%   附件23 样本中页码在页脚右侧，可用 pagenumright 选项改回。封面无页码
 %   footskip 为版心下沿到页码基线的距离：下边距 20mm 减页脚距纸边 12.5mm，
 %   再减页码行框（小五号，11.7 磅）中基线以下的部分
 % ===============================================================
@@ -208,7 +215,11 @@
   footskip=\dimexpr 20mm-12.5mm-\sdju@below{9bp}{11.7bp}\relax}
 \fancypagestyle{sdjuproposal}{%
   \fancyhf{}%
-  \fancyfoot[R]{\sdjufont{9bp}{11.7bp}\thepage}%
+  \ifsdju@pagenumright
+    \fancyfoot[R]{\sdjufont{9bp}{11.7bp}\thepage}%
+  \else
+    \fancyfoot[C]{\sdjufont{9bp}{11.7bp}\thepage}%
+  \fi
   \renewcommand\headrulewidth{0pt}\renewcommand\footrulewidth{0pt}}
 \pagestyle{sdjuproposal}
 \raggedbottom
@@ -224,6 +235,7 @@
 \newcommand\sdju@studentid{}
 \newcommand\sdju@author{}
 \newcommand\sdju@supervisor{}
+\newcommand\sdju@companysupervisor{}
 \newcommand\sdju@finaldate{20\hspace{1em}年\hspace{1em}月\hspace{1em}日}
 \renewcommand\title[1]{\renewcommand\sdju@title{#1}}
 \newcommand\subtitle[1]{\renewcommand\sdju@subtitle{#1}}
@@ -232,28 +244,49 @@
 \newcommand\classname[1]{\renewcommand\sdju@classname{#1}}
 \newcommand\studentid[1]{\renewcommand\sdju@studentid{#1}}
 \renewcommand\author[1]{\renewcommand\sdju@author{#1}}
-\newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}
+\newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}% 校内指导教师
+\newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}% 企业指导教师（无则不写，封面该栏留空）
 \newcommand\finaldate[1]{\renewcommand\sdju@finaldate{#1}}
 
 % ===============================================================
-% 封面：边框内自上而下逐行排，每行占一个 Word 行框（1.5 倍行距，行框高 = 1.5 × 1.3 × 字号）
+% 封面（附件23 第 1 页）：边框内自上而下逐行排，每行占一个 Word 行框（1.5 倍行距）
 %   段前 18 磅；校名、「毕业设计（论文）开题报告」：一号华文中宋加粗，居中
+%     （行框按附件23 中华文中宋的实际行高 1.482 × 字号计，基线在行框顶下 1.081 × 字号，
+%      没有华文中宋、用宋体代替时位置不变）
 %   空两行（三号）；各栏目：小二号宋体加粗，内容（小三号）写在下划线上；
-%   课题名称占两行下划线，一行写不下时自动转到第二行（两行约 34 个汉字，再长则自动缩小字号）
+%     课题名称占两行下划线（第二行为小三号行），一行写不下时自动转到第二行（两行约 34 个汉字，
+%     再长则自动缩小字号）
+%   栏目依次为课题名称、学院、专业、班级、学号、姓名、校内指导教师、企业指导教师；
+%     两字栏目名撑满 4 字宽，其余按实际宽度；下划线右端对齐（距纸边 469.5 磅）
 %   空两行（三号）；定稿日期：小三号宋体加粗
 % ===============================================================
-\newlength\sdju@coverw \setlength\sdju@coverw{92mm}% 下划线长度
-% 一行：#1 字号（bp 数值），#2 内容。行框高 1.95 × 字号，基线在行框顶下 1 个字号处
+\newcommand\sdju@coverindent{19mm}%   栏目名距版心左边
+\newcommand\sdju@coverend{398.6bp}%   下划线右端距版心左边（距纸边 469.5 磅）
+\newlength\sdju@coverw % 课题名称下划线长度（与两字、四字栏目的下划线等长；4 字宽与 0.5 字按小二号计）
+\setlength\sdju@coverw{\dimexpr\sdju@coverend-\sdju@coverindent-4\dimexpr18bp\relax-9bp\relax}
+\newlength\sdju@ulinew
+% 一行：#1 字号（bp 数值），#2 内容。行框高 1.5 × 1.3 × 字号（1.95 × 字号），
+%   基线在行框顶下 0.65 × 字号 + 0.359 × 字号（约 1 个字号）处
 \newcommand\sdju@coverrow[2]{%
-  \hbox to\hsize{\vrule width\z@ height #1bp depth 0.95\dimexpr#1bp\relax
+  \hbox to\hsize{\vrule width\z@ height \sdju@above{#1bp}{0bp} depth \dimexpr1.95\dimexpr#1bp\relax-\sdju@above{#1bp}{0bp}\relax
     \sdjufont{#1bp}{#1bp}#2}}
-% 一条下划线及写在上面的内容（居中，小三号）
-\newcommand\sdju@coverline[1]{%
-  \rlap{\rule[-3bp]{\sdju@coverw}{0.6bp}}%
-  \hbox to\sdju@coverw{\hss\sdjufont{15bp}{15bp}#1\hss}}
-% 栏目行：#1 栏目名（占 4 字宽），#2 内容；栏目名留空则只有下划线
+% 校名行（华文中宋）：行框高 1.5 × 1.482 × 字号，基线在行框顶下 1.081 × 字号
+\newcommand\sdju@coverheadrow[2]{%
+  \hbox to\hsize{\vrule width\z@ height 1.081\dimexpr#1bp\relax depth 1.142\dimexpr#1bp\relax
+    \sdjufont{#1bp}{#1bp}#2}}
+% 一条下划线及写在上面的内容（居中，小三号）：#1 长度，#2 内容
+\newcommand\sdju@coverline[2]{%
+  \rlap{\rule[-3bp]{#1}{0.6bp}}%
+  \hbox to#1{\hss\sdjufont{15bp}{15bp}#2\hss}}
+% 栏目行：#1 栏目名（盒子），#2 内容；下划线从栏目名后 0.5 字起，到右端为止
 \newcommand\sdju@coverfield[2]{%
-  \sdju@coverrow{18}{\hskip 19mm\makebox[4em][s]{#1}\hskip 0.5em\sdju@coverline{#2}\hfil}}
+  \sdju@coverrow{18}{\hskip\sdju@coverindent\setbox\z@\hbox{#1\hskip 0.5em}%
+    \sdju@ulinew=\dimexpr\sdju@coverend-\sdju@coverindent-\wd\z@\relax
+    \box\z@\sdju@coverline{\sdju@ulinew}{#2}\hfil}}
+% 课题名称第二行：小三号行，只有下划线（与第一行的下划线对齐）
+\newcommand\sdju@covertitle[1]{%
+  \sdju@coverrow{15}{\hskip\dimexpr\sdju@coverend-\sdju@coverw\relax\sdju@coverline{\sdju@coverw}{#1}\hfil}}
+\newcommand\sdju@twochar[2]{\makebox[4em][s]{#1\hfill #2}}
 % 课题名称按下划线宽度分成两行（\sdju@tla、\sdju@tlb）；小三号排不下时逐级缩小字号
 \newbox\sdju@tla \newbox\sdju@tlb
 \newcommand\sdju@striptail{% 去掉行与行之间的间距和惩罚，露出上一行
@@ -279,28 +312,29 @@
   \songti\bfseries \sdju@fittitle
   \noindent
   \begin{tikzpicture}[remember picture,overlay]
-    \draw[line width=0.5bp]
-      ([xshift=25mm,yshift=-25.3mm]current page.north west) rectangle
-      ([xshift=180.7mm,yshift=-245.7mm]current page.north west);
+    \draw[line width=0.4bp]
+      ([xshift=70.7bp,yshift=-71.8bp]current page.north west) rectangle
+      ([xshift=512.1bp,yshift=-696.2bp]current page.north west);
   \end{tikzpicture}%
   \vbox to\z@{\offinterlineskip
     \vskip\dimexpr 18bp-\topskip\relax
-    \sdju@coverrow{26}{\hfil\sdju@zhongsong 上海电机学院\hfil}%
-    \sdju@coverrow{26}{\hfil\sdju@zhongsong 毕业设计（论文）开题报告\hfil}%
+    \sdju@coverheadrow{26}{\hfil\sdju@zhongsong 上海电机学院\hfil}%
+    \sdju@coverheadrow{26}{\hfil\sdju@zhongsong 毕业设计（论文）开题报告\hfil}%
     \vskip 62.4bp
     \ifvoid\sdju@tla
       \sdju@coverfield{课题名称}{\box\sdju@tlb}%
-      \sdju@coverfield{}{}%
+      \sdju@covertitle{}%
     \else
       \sdju@coverfield{课题名称}{\box\sdju@tla}%
-      \sdju@coverfield{}{\box\sdju@tlb}%
+      \sdju@covertitle{\box\sdju@tlb}%
     \fi
-    \sdju@coverfield{学\hfill 院}{\sdju@school}%
-    \sdju@coverfield{专\hfill 业}{\sdju@major}%
-    \sdju@coverfield{班\hfill 级}{\sdju@classname}%
-    \sdju@coverfield{学\hfill 号}{\sdju@studentid}%
-    \sdju@coverfield{姓\hfill 名}{\sdju@author}%
-    \sdju@coverfield{指导教师}{\sdju@supervisor}%
+    \sdju@coverfield{\sdju@twochar 学院}{\sdju@school}%
+    \sdju@coverfield{\sdju@twochar 专业}{\sdju@major}%
+    \sdju@coverfield{\sdju@twochar 班级}{\sdju@classname}%
+    \sdju@coverfield{\sdju@twochar 学号}{\sdju@studentid}%
+    \sdju@coverfield{\sdju@twochar 姓名}{\sdju@author}%
+    \sdju@coverfield{校内指导教师}{\sdju@supervisor}%
+    \sdju@coverfield{企业指导教师}{\sdju@companysupervisor}%
     \vskip 62.4bp
     \sdju@coverrow{15}{\hskip 37mm 定稿日期：\sdju@finaldate\hfil}%
     \vss}%
@@ -312,16 +346,18 @@
 % 正文
 %   课题名称：小一号宋体加粗居中；副标题右对齐
 %   「摘要：」「关键词：」小四号加粗，内容小四号宋体；首行缩进 2 字符，1.25 倍行距
-%   一级标题：四号宋体加粗，左对齐，行框 31.2 磅，段前段后 13 磅（「1 文献综述」）
+%   一级标题：四号宋体加粗，左对齐，1.73 倍行距（行框 31.55 磅），段前段后 13 磅（「1 文献综述」）
 %   二级标题：小四号宋体，首行缩进 2 字符（「3.1 …」）
 %   正文：小四号宋体 / Times New Roman，首行缩进 2 字符，1.25 倍行距
 % ===============================================================
 \renewcommand\maketitle{%
-  {\centering\songti\bfseries\sdjufont{24bp}{31.2bp}\sdju@title\par}%
+  \par
+  {\centering\songti\bfseries\sdjufont{24bp}{31.2bp}%
+   \rule{\z@}{\sdju@above{24bp}{31.2bp}}\sdju@title\par}%
   \ifx\sdju@subtitle\@empty\else
     {\raggedleft\songti\bfseries\sdjufont{24bp}{31.2bp}——\sdju@subtitle\par}%
   \fi
-  \vspace{6bp}}
+  \vskip\sdju@post{24bp}{31.2bp}}
 \newcommand\sdju@keywords{}
 \newcommand\keywords[1]{\renewcommand\sdju@keywords{#1}}
 \renewenvironment{abstract}
@@ -329,12 +365,13 @@
   {\par\textbf{关键词：}\sdju@keywords\par}
 
 \setcounter{secnumdepth}{2}
+\def\sdju@secbox{31.55bp}% 一级标题行框：Word 中为 1.73 倍行距（416/240），1.733 × 1.3 × 14 磅
 \ctexset{
   section={
-    format=\sdju@headstart{14bp}{31.2bp}{13bp}{13bp}\raggedright\songti\bfseries\sdjufont{14bp}{31.2bp},
+    format=\sdju@headstart{14bp}{\sdju@secbox}{13bp}{13bp}\raggedright\songti\bfseries\sdjufont{14bp}{\sdju@secbox},
     name={,}, number=\arabic{section}, aftername=\enspace,
-    beforeskip=\dimexpr 13bp+\sdju@pre{14bp}{31.2bp}\relax,
-    afterskip=\dimexpr 13bp+\sdju@post{14bp}{31.2bp}\relax,
+    beforeskip=\dimexpr 13bp+\sdju@pre{14bp}{\sdju@secbox}\relax,
+    afterskip=\dimexpr 13bp+\sdju@post{14bp}{\sdju@secbox}\relax,
     indent=0pt, afterindent=true,
   },
   subsection={
@@ -368,85 +405,113 @@
 \counterwithin*{equation}{section}
 
 % ===============================================================
-% 参考文献：另起一页；标题「参考文献：」小二号黑体加粗居中；
-%   条目小四号，单倍行距，悬挂缩进 2 字符（著录格式与论文相同）
+% 参考文献：另起一页；标题「参考文献：」小二号黑体加粗居中，1.5 倍行距（行框 35.1 磅）；
+%   条目小四号，单倍行距（15.6 磅），不缩进（著录格式与论文相同）
 % ===============================================================
-\defbibheading{sdjuproposal}[参考文献：]{%
+\newcommand\sdju@refheading[1]{%
   \clearpage
-  {\centering\heiti\bfseries\sdjufont{18bp}{23.4bp}#1\par}\vspace{6bp}}
+  {\centering\heiti\bfseries\sdjufont{18bp}{35.1bp}\rule{\z@}{\sdju@above{18bp}{35.1bp}}#1\par}%
+  % 标题行框底到第一条文献基线：标题行框中基线以下的部分 + 文献行框中基线以上的部分
+  \vskip\dimexpr\sdju@below{18bp}{35.1bp}+\sdju@above{12bp}{\sdju@grid}-\sdju@grid\relax}
+\defbibheading{sdjuproposal}[参考文献：]{\sdju@refheading{#1}}
 \AtBeginBibliography{\sdjufont{12bp}{\sdju@grid}}
 \newcommand\sdjubibliography{\printbibliography[heading=sdjuproposal]}
 % 不用 .bib 文献库时，手工录入：\begin{references} \item 作者. 题名[J]. …… \end{references}
 % 条目自动编号 [1]、[2]…；正文中用 \sdjucite{1} 标注
 \newenvironment{references}
-  {\clearpage
-   {\centering\heiti\bfseries\sdjufont{18bp}{23.4bp}参考文献：\par}\vspace{6bp}%
+  {\sdju@refheading{参考文献：}%
    \sdjufont{12bp}{\sdju@grid}\begin{sdju@reflist}}
   {\end{sdju@reflist}}
 
 % ===============================================================
-% 意见页（每张表占一页）：左侧为竖排栏目名，右侧为填写区
+% 意见页（每张表占一页）：左侧为竖排栏目名，右侧为填写区；尺寸按附件23 第 5、6 页量取
 %   \supervisoropinion{<意见内容，可留空>}：指导教师意见
+%     表格比版心左右各宽 5.4 磅（Word 表格的单元格边距），高 622.9 磅；栏目名格宽 24.8 磅，
+%     栏目名小四号、每字一行、行距 31.2 磅，整体上下居中（按 Word 的行框，字在行框上部）
 %   \committeeopinion：答辩小组意见与结论
+%     这一页在附件23 中单独成节：左右边距 3.17cm，上下 2.54cm，页脚距纸边 1.75cm；
+%     表格宽 400.6 磅（左边线在版心左边内 5 磅），三行高 241.0、239.7、172.1 磅；
+%     栏目名格宽 41.7 磅，栏目名五号、每行两字、行距 31.2 磅，在格内上下居中；
+%     评议项目五号、行距 20 磅；结论各行小四号、行距 31.2 磅
 % ===============================================================
-\newlength\sdju@formw \newlength\sdju@labelw
-\setlength\sdju@labelw{12mm}
-\newcommand\sdju@vlabel[1]{\parbox{1em}{\centering\sdjufont{12bp}{24bp}#1}}
+\newlength\sdju@formw \newlength\sdju@formx \newlength\sdju@formy
 \tikzset{sdjuform/.style={line width=0.5bp}}
+\newcommand\sdju@cellpad{5.4bp}% 单元格左右内边距
+% 竖排栏目名：#1 格宽，#2 字号，#3 行距，#4 基线到行框顶的距离，#5 各行（逗号分开）
+\newcommand\sdju@vlabel[5]{%
+  \vbox{\offinterlineskip
+    \@for\sdju@ln:=#5\do{%
+      \hbox to#1{\hss\vrule width\z@ height #4 depth\dimexpr#3-#4\relax
+        \sdjufont{#2}{#2}\sdju@ln\hss}}}}
 \newcommand\supervisoropinion[1]{%
   \clearpage
-  \setlength\sdju@formw{\linewidth-0.5bp}%
-  \noindent\begin{tikzpicture}[sdjuform]
-    \def\H{220mm}
-    \draw (0,0) rectangle (\sdju@formw,-\H);
-    \draw (\sdju@labelw,0) -- (\sdju@labelw,-\H);
-    \node at (0.5\sdju@labelw,-0.5*\H) {\sdju@vlabel{指导教师意见}};
-    \node[anchor=north west,inner sep=4mm,text width=\sdju@formw-\sdju@labelw-8mm,align=justify]
-      at (\sdju@labelw,0) {\sdjufont{12bp}{19.5bp}\setlength\parindent{2em}#1};
-    \node[anchor=west] at ([xshift=55mm]\sdju@labelw,-\H+40mm) {\sdjufont{12bp}{15.6bp}指导教师签名：};
-    \node[anchor=west] at ([xshift=100mm]\sdju@labelw,-\H+28mm)
+  \setlength\sdju@formw{\dimexpr\textwidth+2\dimexpr\sdju@cellpad\relax\relax}%
+  % 表格左上角：版心左边外 5.4 磅，版心上边下 0.3 磅
+  \setlength\sdju@formx{\dimexpr1in+\oddsidemargin+\hoffset-\sdju@cellpad\relax}%
+  \setlength\sdju@formy{\dimexpr1in+\topmargin+\voffset+\headheight+\headsep+0.3bp\relax}%
+  \noindent\begin{tikzpicture}[remember picture,overlay,sdjuform]
+    \coordinate (O) at ([xshift=\sdju@formx,yshift=-\sdju@formy]current page.north west);
+    \draw (O) rectangle ++(\sdju@formw,-622.9bp);
+    \draw ([xshift=24.8bp]O) -- ++(0,-622.9bp);
+    \node[inner sep=0pt] at ([xshift=12.4bp,yshift=-311.45bp]O)
+      {\sdju@vlabel{24.8bp}{12bp}{31.2bp}{\sdju@above{12bp}{31.2bp}}{指,导,教,师,意,见}};
+    \node[anchor=north west,inner sep=0pt,align=justify,
+        text width=\sdju@formw-24.8bp-2*\sdju@cellpad]
+      at ([xshift=24.8bp+\sdju@cellpad]O)
+      {\sdjufont{12bp}{19.5bp}\setlength\parindent{2em}%
+       \rule{\z@}{\sdju@above{12bp}{19.5bp}}#1\par};
+    \node[anchor=base west,inner sep=0pt] at ([xshift=267.1bp,yshift=-507.4bp]O)
+      {\sdjufont{12bp}{15.6bp}指导教师签名：};
+    \node[anchor=base west,inner sep=0pt] at ([xshift=336.1bp,yshift=-534.9bp]O)
       {\sdjufont{12bp}{15.6bp}年\hspace{2em}月\hspace{2em}日};
   \end{tikzpicture}\par}
 \newcommand\sdju@box{□}
 \newcommand\committeeopinion{%
-  \clearpage
-  \setlength\sdju@formw{\linewidth-0.5bp}%
-  \noindent\begin{tikzpicture}[sdjuform]
-    \def\Ha{95mm}\def\Hb{70mm}\def\Hc{55mm}
-    \pgfmathsetlengthmacro\Hab{\Ha+\Hb}
-    \pgfmathsetlengthmacro\H{\Ha+\Hb+\Hc}
-    \draw (0,0) rectangle (\sdju@formw,-\H);
-    \draw (\sdju@labelw,0) -- (\sdju@labelw,-\H);
-    \draw (0,-\Ha) -- (\sdju@formw,-\Ha);
-    \draw (\sdju@labelw,-\Hab) -- (\sdju@formw,-\Hab);
-    \node at (0.5\sdju@labelw,-0.5*\Ha) {\sdju@vlabel{答辩小组意见}};
-    \node at (0.5\sdju@labelw,-\Ha-0.5*\Hb-0.5*\Hc) {\sdju@vlabel{答辩小组结论}};
-    % 答辩小组意见
-    \node[anchor=north west,inner sep=4mm,text width=\sdju@formw-\sdju@labelw-8mm]
-      at (\sdju@labelw,0) {\sdjufont{10.5bp}{23.4bp}\setlength\parindent{0pt}%
-      1、论文选题：\sdju@box 有理论意义；\sdju@box 有工程背景；\sdju@box 有实用价值；\sdju@box 意义不大。\par
+  \newgeometry{top=72bp,bottom=72bp,left=90bp,right=90bp,headheight=0pt,headsep=0pt,
+    footskip=\dimexpr 72bp-49.6bp-\sdju@below{9bp}{11.7bp}\relax}%
+  \setlength\headwidth{\textwidth}% 页码随本页的版心右边对齐
+  \noindent\begin{tikzpicture}[remember picture,overlay,sdjuform]
+    \def\Ha{241bp}\def\Hb{239.7bp}\def\Hc{172.1bp}\def\Wl{41.7bp}\def\W{400.6bp}
+    \coordinate (O) at ([xshift=95bp,yshift=-72.3bp]current page.north west);% 表格左上角
+    \coordinate (B) at ([yshift=-\Ha]O);% 第二行（建议）顶
+    \coordinate (C) at ([yshift=-\Ha-\Hb]O);% 第三行（结论）顶
+    \draw (O) rectangle ++(\W,-\Ha-\Hb-\Hc);
+    \draw ([xshift=\Wl]O) -- ++(0,-\Ha-\Hb-\Hc);
+    \draw (B) -- ++(\W,0);
+    \draw ([xshift=\Wl]C) -- ++(\W-\Wl,0);
+    \node[inner sep=0pt] at ([xshift=0.5*\Wl,yshift=-0.5*\Ha]O)
+      {\sdju@vlabel{\Wl}{10.5bp}{31.2bp}{\dimexpr15.6bp+0.359\dimexpr10.5bp\relax\relax}{答辩,小组,意见}};
+    \node[inner sep=0pt] at ([xshift=0.5*\Wl,yshift=-0.5*\Hb-0.5*\Hc]B)
+      {\sdju@vlabel{\Wl}{10.5bp}{31.2bp}{\dimexpr15.6bp+0.359\dimexpr10.5bp\relax\relax}{答辩,小组,结论}};
+    % 答辩小组意见：五号，行距 20 磅，首行基线在表顶下 16.2 磅
+    \node[anchor=north west,inner sep=0pt,text width=\W-\Wl-2*\sdju@cellpad]
+      at ([xshift=\Wl+\sdju@cellpad]O) {\sdjufont{10.5bp}{20bp}\setlength\parindent{0pt}%
+      \rule{\z@}{16.2bp}1、论文选题：\sdju@box 有理论意义；\sdju@box 有工程背景；\sdju@box 有实用价值；\sdju@box 意义不大。\par
       2、论文的难度：\sdju@box 偏高；\sdju@box 适当；\sdju@box 偏低。\par
       3、论文的工作量：\sdju@box 偏大；\sdju@box 适当；\sdju@box 偏小。\par
       4、设计或研究方案的可行性：\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 不可行。\par
       5、学生对文献资料及课题的了解程度：\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 较差。\par
       6、学生在论文选题报告中反映出的综合能力和表达能力：\par
-      \hspace*{2em}\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 较差。\par
+      \hspace*{3.5em}\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 较差。\par
       7、学生在论文选题报告中反映出的创新能力：\par
-      \hspace*{2em}\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 较差。\par
+      \hspace*{3.5em}\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 较差。\par
       8、对论文选题报告的总体评价：\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 较差\par
-      （在相应的方块内作记号“√”）\par};
-    % 建议
-    \node[anchor=north west,inner sep=4mm] at (\sdju@labelw,-\Ha)
+      \vskip 11.2bp（在相应的方块内作记号“√”）\par};
+    % 建议：小四号，基线在本行顶下 12.4 磅
+    \node[anchor=base west,inner sep=0pt] at ([xshift=\Wl+\sdju@cellpad,yshift=-12.4bp]B)
       {\sdjufont{12bp}{15.6bp}建议：};
-    % 结论
-    \node[anchor=north west,inner sep=4mm,text width=\sdju@formw-\sdju@labelw-8mm]
-      at (\sdju@labelw,-\Hab) {\sdjufont{12bp}{27bp}\setlength\parindent{0pt}%
-      答辩结论：\hspace{1em}通过\sdju@box\hspace{3em}不通过\sdju@box\par
-      等第评定：\hspace{1em}优秀\sdju@box\hspace{1em}良好\sdju@box\hspace{1em}及格\sdju@box\par
-      答辩小组组长签名：\par
-      答辩小组组员签名：\par
-      \hspace*{80mm}年\hspace{2em}月\hspace{2em}日\par};
-  \end{tikzpicture}\par}
+    % 结论：小四号，首行基线在本行顶下 28.1 磅，行距 31.2 磅（组员签名前多空半行）
+    \begin{scope}[every node/.style={anchor=base west,inner sep=0pt,font=\sdjufont{12bp}{15.6bp}}]
+      \node at ([xshift=\Wl+\sdju@cellpad,yshift=-28.1bp]C)
+        {答辩结论：\hspace{1.5em}通过\sdju@box\hspace{5em}不通过\sdju@box};
+      \node at ([xshift=\Wl+\sdju@cellpad,yshift=-28.1bp-31.2bp]C)
+        {等第评定：\hspace{1.5em}优秀\sdju@box\hspace{1.5em}良好\sdju@box\hspace{1.5em}及格\sdju@box};
+      \node at ([xshift=\Wl+\sdju@cellpad,yshift=-28.1bp-2*31.2bp]C) {答辩小组组长签名：};
+      \node at ([xshift=\Wl+\sdju@cellpad,yshift=-28.1bp-3.5*31.2bp]C) {答辩小组组员签名：};
+      \node at ([xshift=293.8bp,yshift=-28.1bp-4.5*31.2bp]C) {年\hspace{2em}月\hspace{2em}日};
+    \end{scope}
+  \end{tikzpicture}\par
+  \clearpage\restoregeometry\setlength\headwidth{\textwidth}}
 
 \RequirePackage[hidelinks,unicode]{hyperref}
 \graphicspath{{figures/}}

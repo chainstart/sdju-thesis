@@ -1,19 +1,22 @@
 %% sdjuthesis.cls
 %% 上海电机学院 学士学位论文 LaTeX 模板
-%% 依据：附件15《学士学位论文封面》、附件17《毕业设计（论文）格式规范》、《论文格式-无红色标注.pdf》
+%% 依据：《教学归档材料及质量评价要素（2026 版）》附件25《学士学位论文封面》、附件26《毕业设计（论文）格式规范》
+%%       、学校《形式审核关键点内容（26 年 5 月及之后答辩的插入 AI 使用情况声明页）》
+%%       （AI 使用情况声明页不在 2026 版样本中，按用户要求及形式审核要点保留，可用 noaideclaration 选项去掉）
 %% 编译：xelatex -> biber -> xelatex -> xelatex（或直接 latexmk）
 %%
 %% 行距约定：Word 文档网格为 15.6 磅，「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp，「2 倍」= 31.2bp。
 %% 标题、目录等处的间距按 Word 的行框算法换算（见下文 \sdju@pre、\sdju@post 的说明）。
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjuthesis}[2026/11/09 v2.3 SDJU Bachelor Thesis Template]
+\ProvidesClass{sdjuthesis}[2026/11/20 v3.0 SDJU Bachelor Thesis Template]
 
 % ---------------------------------------------------------------
-% 选项：nodeclaration 不输出声明页
+% 选项：nodeclaration 不输出声明页；noaideclaration 不输出 AI 使用情况声明页
 % ---------------------------------------------------------------
 \RequirePackage{kvoptions}
 \SetupKeyvalOptions{family=sdju,prefix=sdju@opt@}
 \DeclareBoolOption{nodeclaration}
+\DeclareBoolOption{noaideclaration}
 \DeclareDefaultOption{\PassOptionsToClass{\CurrentOption}{ctexbook}}
 \ProcessKeyvalOptions*
 
@@ -72,9 +75,11 @@
      ItalicFont=*-italic,BoldItalicFont=*-bolditalic]}
 \RequirePackage{unicode-math}
 \setmathfont{texgyretermes-math.otf}
+% 封面的「学士学位论文」和中英文题目：中西文都用微软雅黑（无则用黑体与无衬线西文字体）
 \IfFontExistsTF{Microsoft YaHei}
-  {\setCJKfamilyfont{sdjuyahei}{Microsoft YaHei}\newcommand\sdju@yahei{\CJKfamily{sdjuyahei}}}
-  {\newcommand\sdju@yahei{\heiti}}
+  {\setCJKfamilyfont{sdjuyahei}{Microsoft YaHei}\newfontfamily\sdju@yaheilatin{Microsoft YaHei}%
+   \newcommand\sdju@yahei{\CJKfamily{sdjuyahei}\sdju@yaheilatin}}
+  {\newcommand\sdju@yahei{\heiti\sffamily}}
 \xeCJKDeclareCharClass{CJK}{"25A1,"221A}   % □ √ 用中文字体
 
 % ===============================================================
@@ -218,6 +223,8 @@
 \newcommand\sdju@school{}
 \newcommand\sdju@major{}
 \newcommand\sdju@supervisor{}
+\newcommand\sdju@companysupervisor{}
+\newcommand\sdju@titleen{}
 \newcommand\sdju@coverdate{二〇\hspace{1.5em}年\hspace{1.5em}月}
 \RenewDocumentCommand\title{om}{%
   \renewcommand\sdju@title{#2}%
@@ -228,7 +235,9 @@
 \newcommand\studentid[1]{\renewcommand\sdju@studentid{#1}}
 \newcommand\school[1]{\renewcommand\sdju@school{#1}}
 \newcommand\major[1]{\renewcommand\sdju@major{#1}}
-\newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}
+\newcommand\titleen[1]{\renewcommand\sdju@titleen{#1}}% 封面上的英文题目
+\newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}% 校内指导教师
+\newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}% 企业指导教师（无则不写，封面该栏留空）
 \newcommand\coverdate[1]{\renewcommand\sdju@coverdate{#1}}
 
 % ===============================================================
@@ -352,36 +361,87 @@
   {\end{sdju@reflist}}
 
 % ===============================================================
-% 封面（附件15）：各元素位置取自 Word 封面模板
+% 封面（附件25）：各元素位置按《教学归档材料及质量评价要素（2026 版）》附件25 量取
+%   校徽：宽 97.1mm，顶边距纸边 156 磅，居中
+%   「学士学位论文」：40 磅微软雅黑居中，基线距纸边 329.7 磅
+%   中文题目、英文题目：小一号（24 磅）微软雅黑居中，首行基线距纸边 385.7 磅，行距 46.8 磅（1.5 倍）；
+%     题目过长时自动换行，下面的栏目随之下移
+%   栏目：三号（16 磅）宋体，左端距纸边 116.6 磅，栏目名按实际宽度，下划线右端距纸边 452.7 磅；
+%     自上而下为学生姓名、学生学号、专业、校内指导教师、企业指导教师、学院，行距 31.2 磅，
+%     首行基线距纸边 514.6 磅（样本中题目末行基线之下 82.1 磅）
+%   题目超过两行时，题目末行与第一个栏目仍保持 82.1 磅：多出的高度一半由题目及其以上部分上移、
+%     一半由栏目及日期下移
+%   日期：三号宋体居中，在最后一个栏目下两行（62.4 磅）
 % ===============================================================
 \definecolor{sdjucover}{HTML}{231815}
+\newcommand\sdju@coverleft{116.6bp}%    栏目左端
+\newcommand\sdju@coverright{452.7bp}%   下划线右端
+\newcommand\sdju@coverpitch{31.2bp}%    栏目行距
+\newcommand\sdju@titlepitch{46.8bp}%    题目行距
+\newcommand\sdju@titletop{385.7bp}%     题目首行基线
+\newcommand\sdju@fieldtop{514.6bp}%     第一个栏目的基线（题目不长时）
+\newcommand\sdju@fieldgap{82.1bp}%      题目末行基线到第一个栏目基线的最小距离
+\newlength\sdju@fieldy
+\newlength\sdju@covershift
+\newlength\sdju@ulinew
+\newbox\sdju@titlebox
+% 栏目行：#1 栏目名，#2 内容（写在下划线上，居中）
 \newcommand\sdju@coverfield[2]{%
-  \makebox[4em][s]{#1}：\underline{\makebox[16em]{#2}}}
+  \setbox\z@\hbox{#1：}%
+  \sdju@ulinew=\dimexpr\sdju@coverright-\sdju@coverleft-\wd\z@\relax
+  \box\z@\rlap{\rule[-2.5bp]{\sdju@ulinew}{0.6bp}}%
+  \hbox to\sdju@ulinew{\hss#2\hss}}
+% 题目块：中文题目、英文题目各自居中，可自动换行；盒子深度 = 首行到末行基线的距离
+\newcommand\sdju@covertitles{%
+  \vtop{\hsize=170mm \parindent=\z@ \centering
+    \sdju@yahei\fontsize{24bp}{\sdju@titlepitch}\selectfont
+    \lineskiplimit=-\maxdimen
+    \sdju@title\par
+    \ifx\sdju@titleen\@empty\else\sdju@titleen\par\fi
+    \kern-\prevdepth}}
 \newcommand\makecover{%
   \begin{titlepage}
   \thispagestyle{empty}%
+  \setbox\sdju@titlebox\hbox{\sdju@covertitles}%
+  % 题目超出样本中的两行时，多出的高度上下各分一半
+  \sdju@covershift=\dimexpr(\sdju@titletop+\dp\sdju@titlebox+\sdju@fieldgap-\sdju@fieldtop)/2\relax
+  \ifdim\sdju@covershift<\z@ \sdju@covershift=\z@ \fi
+  \ifdim\sdju@covershift>50bp
+    \ClassWarningNoLine{sdjuthesis}{封面题目过长（中英文合计超过 4 行），请缩短}%
+  \fi
+  \sdju@fieldy=\dimexpr\sdju@fieldtop+\sdju@covershift\relax
   \begin{tikzpicture}[remember picture,overlay]
-    \coordinate (T) at (current page.north);
-    \node[anchor=north,inner sep=0pt] at ([yshift=-49mm]T)
+    \coordinate (T) at ([yshift=\sdju@covershift]current page.north);% 题目及其以上部分
+    \coordinate (F) at (current page.north);
+    \coordinate (L) at (current page.north west);
+    \node[anchor=north,inner sep=0pt] at ([yshift=-156bp]T)
       {\includegraphics[width=97.1mm]{sdju-logo}};
-    \node[anchor=north,inner sep=0pt] at ([yshift=-91mm]T)
+    \node[anchor=base,inner sep=0pt] at ([yshift=-329.7bp]T)
       {\sdju@yahei\fontsize{40bp}{52bp}\selectfont 学士学位论文};
-    \node[anchor=north,inner sep=0pt,text width=170mm,align=center] at ([yshift=-125mm]T)
-      {\sdju@yahei\fontsize{24bp}{34bp}\selectfont\sdju@title};
-    \begin{scope}[every node/.style={anchor=north,inner sep=0pt,
+    \node[anchor=base,inner sep=0pt] at ([yshift=-\sdju@titletop]T) {\box\sdju@titlebox};
+    \begin{scope}[every node/.style={anchor=base west,inner sep=0pt,
         font=\songti\fontsize{16bp}{20.8bp}\selectfont\color{sdjucover}}]
-      \node at ([yshift=-191mm]T) {\sdju@coverfield{学生姓名}{\sdju@author}};
-      \node at ([yshift=-204mm]T) {\sdju@coverfield{学生学号}{\sdju@studentid}};
-      \node at ([yshift=-217mm]T) {\sdju@coverfield{专\hfill 业}{\sdju@major}};
-      \node at ([yshift=-230mm]T) {\sdju@coverfield{指导教师}{\sdju@supervisor}};
-      \node at ([yshift=-243mm]T) {\sdju@coverfield{学\hfill 院}{\sdju@school}};
-      \node at ([yshift=-267mm]T) {\sdju@coverdate};
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy]L)
+        {\sdju@coverfield{学生姓名}{\sdju@author}};
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-\sdju@coverpitch]L)
+        {\sdju@coverfield{学生学号}{\sdju@studentid}};
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-2*\sdju@coverpitch]L)
+        {\sdju@coverfield{专业}{\sdju@major}};
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-3*\sdju@coverpitch]L)
+        {\sdju@coverfield{校内指导教师}{\sdju@supervisor}};
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-4*\sdju@coverpitch]L)
+        {\sdju@coverfield{企业指导教师}{\sdju@companysupervisor}};
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-5*\sdju@coverpitch]L)
+        {\sdju@coverfield{学院}{\sdju@school}};
+      \node[anchor=base] at ([yshift=-\sdju@fieldy-7*\sdju@coverpitch]F) {\sdju@coverdate};
     \end{scope}
   \end{tikzpicture}
   \end{titlepage}}
 
 % ===============================================================
 % 声明页（学术诚信声明、AI 使用情况声明、版权使用授权书）
+%   附件26（2026 版）只有学术诚信声明和版权使用授权书两页，标题高度一致；
+%   AI 使用情况声明按用户要求保留在两者之间（选项 noaideclaration 可去掉）
 %   全页按 2 倍行距（31.2 磅）排：空两行；标题两行（上海电机学院 / 声明名称），小二号黑体加粗居中；
 %   空一行；正文四号宋体，首行缩进 2 字符；签名前空三行（AI 声明内容多，空一行）；签名与日期间空一行
 % ===============================================================
@@ -394,6 +454,19 @@
   {\par\sdjufont{14bp}{31.2bp}\setlength\parindent{2\ccwd}}
   {\par}
 % 签名、日期行
+% 版权使用授权书的「保密」「不保密」：默认两项都空着，打印后手工勾选；
+%   也可在导言区写 \confidential{<年数>}（保密，并填上解密年限）或 \notconfidential（不保密）
+\newcommand\sdju@box{□}
+\newcommand\sdju@checkedbox{\makebox[1em]{\rlap{□}\hbox to 1em{\hss √\hss}}}
+\newcommand\sdju@secretbox{\sdju@box}
+\newcommand\sdju@publicbox{\sdju@box}
+\newcommand\sdju@secretyears{\hspace{2\ccwd}}
+\newcommand\confidential[1]{%
+  \renewcommand\sdju@secretbox{\sdju@checkedbox}\renewcommand\sdju@publicbox{\sdju@box}%
+  \renewcommand\sdju@secretyears{\makebox[2\ccwd]{#1}}}
+\newcommand\notconfidential{%
+  \renewcommand\sdju@secretbox{\sdju@box}\renewcommand\sdju@publicbox{\sdju@checkedbox}%
+  \renewcommand\sdju@secretyears{\hspace{2\ccwd}}}
 \newcommand\sdju@date{日期：\hspace{3\ccwd}年\hspace{1.5\ccwd}月\hspace{1.5\ccwd}日}
 \newcommand\sdju@signpair[2]{\noindent\makebox[0.5\linewidth][l]{#1}#2\par}
 \newcommand\makedeclaration{%
@@ -407,7 +480,8 @@
    \vspace{\baselineskip}
    \sdju@signpair{}{\sdju@date}
   \end{sdju@declbody}
-  % ---- AI 使用情况声明 ----
+  % ---- AI 使用情况声明（2026 版样本中没有这一页，按用户要求保留）----
+  \ifsdju@opt@noaideclaration\else
   \sdju@decltitle{毕业设计（论文）AI使用情况声明}%
   \begin{sdju@declbody}
    如果在撰写毕业设计（论文）的过程中，辅助使用了AI工具。本人将做好原始材料与数据的保留工作。本人承诺如下：\par
@@ -422,13 +496,14 @@
    \vspace{\baselineskip}
    \sdju@signpair{\hspace{2\ccwd}\sdju@date}{\sdju@date}
   \end{sdju@declbody}
+  \fi
   % ---- 版权使用授权书 ----
   \sdju@decltitle{毕业设计（论文）版权使用授权书}%
   \begin{sdju@declbody}
    本毕业设计（论文）作者同意学校保留并向国家有关部门或机构送交论文的复印件和电子版，允许论文被查阅和借阅。本人授权上海电机学院可以将本毕业设计（论文）的全部或部分内容编入有关数据库进行检索，可以采用影印、缩印或扫描等复制手段保存和汇编本毕业设计（论文）。\par
-   \hphantom{本论文属于}\hspace{2\ccwd}\textbf{保密}□，在\underline{\hspace{2\ccwd}}年解密后适用本授权书。\par
+   \hphantom{本论文属于}\hspace{2\ccwd}\textbf{保密}\sdju@secretbox，在\underline{\sdju@secretyears}年解密后适用本授权书。\par
    本论文属于\par
-   \hphantom{本论文属于}\hspace{2\ccwd}\textbf{不保密}□。\par
+   \hphantom{本论文属于}\hspace{2\ccwd}\textbf{不保密}\sdju@publicbox。\par
    （请在以上方框内打“√”）\par
    \vspace{3\baselineskip}
    \sdju@signpair{作者签名：}{指导教师签名：}
@@ -468,6 +543,16 @@
 \newenvironment{acknowledgements}
   {\sdjuchapter[致谢]{致\hspace{1em}谢}\vspace{\sdju@pre{10.5bp}{15.6bp}}\sdjufont{10.5bp}{\sdju@grid}}
   {\par}
+
+% ===============================================================
+% 附录（可选，放在致谢之后）：\appendix 之后的 \chapter 编为「附录A」「附录B」…，
+%   标题格式与一级标题相同，进入目录；附录中的图、表、公式编为 A-1、A-2…
+% ===============================================================
+\renewcommand\appendix{%
+  \clearpage
+  \setcounter{chapter}{0}\setcounter{section}{0}%
+  \renewcommand\thechapter{\Alph{chapter}}%
+  \ctexset{chapter/name={附录,},chapter/number=\thechapter,chapter/aftername=\enspace}}
 
 \RequirePackage[hidelinks,bookmarksnumbered,unicode]{hyperref}
 \graphicspath{{figures/}}
