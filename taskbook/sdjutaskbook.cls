@@ -232,15 +232,27 @@
 \newlength\sdju@padx       \setlength\sdju@padx{5.4bp}%     单元格左右内边距
 \newlength\sdju@pady       \setlength\sdju@pady{4bp}%       单元格上下内边距
 \newlength\sdju@cw         % 内容格中文字的宽度
-\newlength\sdju@avail \newlength\sdju@minh \newlength\sdju@tmpa
+\newlength\sdju@avail \newlength\sdju@minh \newlength\sdju@tmpa \newlength\sdju@tmpb
+\newdimen\sdju@reserve % 栏目最后一段之下须与它留在同一页的高度（「以上各项由指导教师填写」一行）
 \newbox\sdju@body \newbox\sdju@tail \newbox\sdju@piece \newbox\sdju@label
 \newif\ifsdju@firstpiece
 \newcommand\sdju@labelfont{\fangsong\sdjufont{14bp}{22bp}}
-% 竖排栏目名：每字一行，居中
-\newcommand\sdju@makelabel[1]{%
+% 竖排栏目名：每字一行，居中。
+%   标点（如「课题的目的、意义」中的「、」）按附件22 的排法单独占一行，但横排字体中标点的字形
+%   在字身左下角，整字居中时看上去偏左、像是漏排；这里把标点的字身右移 \sdju@punctshift
+%   （附件22 中为 3.8 磅，即 0.27 字），使字形落在栏目中线上，与上下文字对齐。
+\newcommand\sdju@punctshift{0.27em}
+%   字距（行距）通常为 \sdju@labelpitch；整张表需要收缩才能排进一页时，可减到 \sdju@labelpitchmin
+%   （附件22 各栏的字距在 18～25 磅之间）。可选参数为字距。
+\newcommand\sdju@labelpitch{22bp}
+\newcommand\sdju@labelpitchmin{18bp}
+\newcommand\sdju@makelabel[2][\sdju@labelpitch]{%
   \setbox\sdju@label\vbox{\hsize=\dimexpr\sdju@labelw-\sdju@rule\relax
-    \sdju@labelfont \baselineskip=22bp \lineskip=\z@ \lineskiplimit=\z@
-    \@tfor\sdju@ch:=#1\do{\hbox to\hsize{\hss\sdju@ch\hss}}}}
+    \sdju@labelfont \baselineskip=#1\relax \lineskip=\z@ \lineskiplimit=\z@
+    \@tfor\sdju@ch:=#2\do{%
+      \expandafter\in@\expandafter{\sdju@ch}{、，。；：！？}%
+      \ifin@ \hbox to\hsize{\hss\hbox to 1em{\kern\sdju@punctshift\rlap{\sdju@ch}\hss}\hss}%
+      \else \hbox to\hsize{\hss\sdju@ch\hss}\fi}}}
 \newcommand\sdju@setcw{%
   \setlength\sdju@cw{\sdju@formw-2\sdju@orule-2\sdju@padx}%
   \ifdim\sdju@labelw>\z@ \addtolength\sdju@cw{-\sdju@labelw}\fi}
@@ -290,17 +302,25 @@
   \ifdim\sdju@avail<40mm \ifdim\sdju@tmpa>\sdju@avail
     \newpage\sdju@getavail \fi\fi
   % 内容少于最小高度：留白到最小高度；但本页放得下内容、放不下最小高度时，只留白到本页底
+  % （扣除须留在同一页的 \sdju@reserve）
   \ifdim\sdju@tmpa<\sdju@minh
-    \ifdim\sdju@minh>\sdju@avail \setlength\sdju@minh{\sdju@avail}\fi
+    \setlength\sdju@tmpb{\sdju@avail-\sdju@reserve}%
+    \ifdim\sdju@minh>\sdju@tmpb
+      \ifdim\sdju@tmpa>\sdju@tmpb \setlength\sdju@minh{\sdju@tmpa}%
+      \else \setlength\sdju@minh{\sdju@tmpb}\fi
+    \fi
     \setbox\sdju@body\vbox to\sdju@minh{\unvbox\sdju@body\vfil}%
     \setlength\sdju@tmpa{\sdju@minh}%
   \fi
   \sdju@firstpiecetrue
   \splittopskip=14bp \splitmaxdepth=\maxdimen \vbadness=\@M
   \loop
-    \ifdim\sdju@tmpa>\sdju@avail
-      \setbox\sdju@piece\vsplit\sdju@body to\sdju@avail
-      \sdju@outpiece{\sdju@avail}%
+    \ifdim\sdju@tmpa>\dimexpr\sdju@avail-\sdju@reserve\relax
+      % 放不下就在本页底断开；全部放得下、只是放不下其后的一行时，少排一点，把那一行带到下一页
+      \ifdim\sdju@tmpa>\sdju@avail \setlength\sdju@tmpb{\sdju@avail}%
+      \else \setlength\sdju@tmpb{\sdju@avail-\sdju@reserve}\fi
+      \setbox\sdju@piece\vsplit\sdju@body to\sdju@tmpb
+      \sdju@outpiece{\sdju@tmpb}%
       \sdju@firstpiecefalse
       \newpage\sdju@getavail
       \setlength\sdju@tmpa{\ht\sdju@body+\dp\sdju@body}%
@@ -308,7 +328,8 @@
   \setbox\sdju@piece\box\sdju@body
   \sdju@outpiece{\sdju@tmpa}%
   \global\setbox\sdju@label\box\voidb@x
-  \global\setbox\sdju@tail\box\voidb@x}
+  \global\setbox\sdju@tail\box\voidb@x
+  \sdju@reserve=\z@}
 
 % ===============================================================
 % 正文栏目（由指导教师填写）
@@ -316,21 +337,95 @@
 %   每个 \section 开始一个栏目，写到下一个 \section（或文档结束）为止；
 %   可选参数为该栏目的最小高度：\section[60mm]{要求}。
 %   第一个栏目之前印「任务书反面：」（小四号楷体），最后一个栏目之后印「以上各项由指导教师填写」（小四号仿宋）。
+%   各栏目先排好存起来，到文档结束时一起输出，以便按整张表统一安排高度：
+%     (1)「以上各项由指导教师填写」与表格末尾在同一页，不单独换页；
+%     (2) 各栏目的内容本来一页放得下、只因最小高度（留白）放不下时，各栏目的留白按同一比例收缩，
+%         使整张表与末行排在一页；内容本身超过一页时，按最小高度排，在页底断开、下一页接着排。
 % ===============================================================
 \newif\ifsdju@rowopen
 \newif\ifsdju@formstarted
 \newcommand\sdju@rowminh{30mm}
+\newcount\sdju@nrows \newcount\sdju@i
+\newbox\sdju@note
+\newlength\sdju@sumneed \newlength\sdju@sumfloor \newlength\sdju@fit
+% 第 \sdju@i 个栏目的内容高度 \sdju@tmpa、留白下限 \sdju@tmpb（竖排栏目名的高度）与最小高度 \sdju@minh
+%   （均为格内文字区的高度，不含内边距和框线）
+%   竖排栏目名按正常字距的高度记在 \sdju@labmax，按最小字距的高度记在 \sdju@labmin；
+%   下限 \sdju@tmpb 取内容高度与 \sdju@labmin 的较大者
+\newdimen\sdju@labmax \newdimen\sdju@labmin
+\newcommand\sdju@rowdims{%
+  \setlength\sdju@tmpa{\ht\csname sdju@rowbox\the\sdju@i\endcsname
+    +\dp\csname sdju@rowbox\the\sdju@i\endcsname}%
+  \sdju@labmax=\ht\csname sdju@rowlab\the\sdju@i\endcsname
+  \begingroup
+    \sdju@relabel{\sdju@labelpitchmin}%
+    \global\sdju@labmin=\ht\sdju@label
+  \endgroup
+  \setlength\sdju@tmpb{\sdju@labmin}%
+  \ifdim\sdju@tmpb<\sdju@tmpa \setlength\sdju@tmpb{\sdju@tmpa}\fi
+  \setlength\sdju@minh{\csname sdju@rowminh\the\sdju@i\endcsname}%
+  \addtolength\sdju@minh{-2\sdju@pady-2\sdju@rule}%
+  \ifdim\sdju@minh<\sdju@labmax \setlength\sdju@minh{\sdju@labmax}\fi
+  \ifdim\sdju@minh<\sdju@tmpb \setlength\sdju@minh{\sdju@tmpb}\fi}
+% 按字距 #1 重排第 \sdju@i 个栏目的竖排栏目名（放在 \sdju@label 中）
+\newcommand\sdju@relabel[1]{%
+  \expandafter\let\expandafter\sdju@labeltext\csname sdju@rowtext\the\sdju@i\endcsname
+  \expandafter\sdju@relabel@i\expandafter{\sdju@labeltext}{#1}}
+\newcommand\sdju@relabel@i[2]{\sdju@makelabel[#2]{#1}}
 \newcommand\sdju@closerow{%
   \ifsdju@rowopen
     \par\egroup
     \global\sdju@rowopenfalse
-    \sdju@formrow{\sdju@rowminh}%
+    \global\advance\sdju@nrows\@ne
+    \ifcsname sdju@rowbox\the\sdju@nrows\endcsname\else
+      \expandafter\newbox\csname sdju@rowbox\the\sdju@nrows\endcsname
+      \expandafter\newbox\csname sdju@rowlab\the\sdju@nrows\endcsname
+    \fi
+    \global\setbox\csname sdju@rowbox\the\sdju@nrows\endcsname\box\sdju@body
+    \global\setbox\csname sdju@rowlab\the\sdju@nrows\endcsname\box\sdju@label
+    \expandafter\xdef\csname sdju@rowminh\the\sdju@nrows\endcsname{\sdju@rowminh}%
+    \global\expandafter\let\csname sdju@rowtext\the\sdju@nrows\endcsname\sdju@curlabel
   \fi}
 \newcommand\sdju@closeform{%
   \sdju@closerow
   \ifsdju@formstarted
     \global\sdju@formstartedfalse
-    \par\vskip 4bp\noindent{\fangsong\sdjufont{12bp}{15.6bp}以上各项由指导教师填写}\par
+    \par
+    \setbox\sdju@note\hbox{\fangsong\sdjufont{12bp}{15.6bp}以上各项由指导教师填写}%
+    % 本页能给各栏目文字区的总高度
+    \sdju@getavail
+    \sdju@fit=\dimexpr\sdju@avail-4bp-\baselineskip-\dp\sdju@note
+      -(2\sdju@pady+\sdju@rule)*(\sdju@nrows-1)\relax\relax
+    \setlength\sdju@sumneed{\z@}\setlength\sdju@sumfloor{\z@}%
+    \sdju@i=\z@
+    \@whilenum\sdju@i<\sdju@nrows\do{\advance\sdju@i\@ne \sdju@rowdims
+      \addtolength\sdju@sumneed{\sdju@minh}\addtolength\sdju@sumfloor{\sdju@tmpb}}%
+    \sdju@i=\z@
+    \@whilenum\sdju@i<\sdju@nrows\do{\advance\sdju@i\@ne \sdju@rowdims
+      % 留白按比例收缩：最小高度 = 下限 + 留白 × (可用 - 下限之和) / (需要 - 下限之和)
+      \ifdim\sdju@sumneed>\sdju@fit \ifdim\sdju@sumfloor<\sdju@fit
+        \sdju@minh=\dimexpr\sdju@tmpb+(\sdju@minh-\sdju@tmpb)
+          *(\sdju@fit-\sdju@sumfloor)/(\sdju@sumneed-\sdju@sumfloor)\relax\relax
+      \fi\fi
+      \begingroup
+      \setbox\sdju@body\box\csname sdju@rowbox\the\sdju@i\endcsname
+      \global\setbox\sdju@label\box\csname sdju@rowlab\the\sdju@i\endcsname
+      % 收缩后比竖排栏目名矮时，栏目名的字距按同一比例在正常与最小字距之间减小
+      \ifdim\sdju@minh<\sdju@labmax
+        \ifdim\sdju@labmax>\sdju@labmin
+          \edef\sdju@pitch{\the\dimexpr\sdju@labelpitch-(\sdju@labelpitch-\sdju@labelpitchmin)
+            *(\sdju@labmax-\sdju@minh)/(\sdju@labmax-\sdju@labmin)\relax}%
+          \sdju@relabel{\sdju@pitch}%
+          \global\setbox\sdju@label\box\sdju@label
+        \fi
+      \fi
+      \ifnum\sdju@i=\sdju@nrows
+        \sdju@reserve=\dimexpr 4bp+\baselineskip+\dp\sdju@note\relax
+      \fi
+      \sdju@formrow{\sdju@minh+2\sdju@pady+2\sdju@rule}%
+      \endgroup}%
+    \global\sdju@nrows=\z@
+    \nobreak\vskip 4bp\noindent\copy\sdju@note\par
   \fi}
 \AtEndDocument{\sdju@closeform}
 % 各栏目的默认最小高度（附件22 中各行的高度）
@@ -351,6 +446,7 @@
     {\def\sdju@rowminh{#2}}%
   \sdju@setcw
   \sdju@makelabel{#3}%
+  \def\sdju@curlabel{#3}%
   \setcounter{subsection}{0}%
   \global\sdju@rowopentrue
   \setbox\sdju@body\vbox\bgroup\sdju@bodysetup}
@@ -366,6 +462,52 @@
    \def\item##1##2{\par\settowidth\@tempdima{\hspace*{2em}##1：}%
      \hangindent\@tempdima\hangafter1 ##1：##2\par}}
   {\par}
+
+% ===============================================================
+% 图表题注
+%   栏目内容排在表格的格子里（盒子中），不能用浮动体；这里把 table、figure 环境改为不浮动、
+%   就地排出（可选的位置参数 [htbp] 等被忽略），环境内照常用 \caption、\label，正文用 \ref 引用。
+%   不在环境内时也可用 \sdjutablecaption{…}、\sdjufigurecaption{…}（即 \captionof{table}、
+%   \captionof{figure}）。格式与学位论文模板（附件26）一致：表名在表正上方、图名在图正下方，
+%   宋体小五号加粗，「表1 …」「图1 …」顺序编号；表格建议用三线表（booktabs，线粗 0.5 磅），
+%   表内文字小四号、单倍行距，列多时可用 \sdjutablesize{10.5bp} 改为五号。
+%   图表连同题注不会被拆到两页；上下各留 8 磅。
+% ===============================================================
+\RequirePackage{booktabs}
+\RequirePackage{caption}
+\DeclareCaptionFont{sdjucap}{\songti\sdjufont{9bp}{\sdju@grid}\bfseries}
+\captionsetup{font=sdjucap,labelsep=space,justification=centering,singlelinecheck=false,hypcap=false}
+\captionsetup[table]{position=top,skip=4bp}
+\captionsetup[figure]{position=bottom,skip=6bp}
+\renewcommand\tablename{表}
+\renewcommand\figurename{图}
+\renewcommand\thetable{\arabic{table}}
+\renewcommand\thefigure{\arabic{figure}}
+\newcommand\sdjutablefont{\sdjufont{12bp}{\sdju@grid}}
+\newcommand\sdjutablesize[1]{\renewcommand\sdjutablefont{\sdjufont{#1}{\sdju@grid}}}
+\newcommand\sdju@tablerules{%
+  \renewcommand\arraystretch{1}%
+  \setlength\heavyrulewidth{0.5bp}\setlength\lightrulewidth{0.5bp}}
+\NewDocumentCommand\sdjutablecaption{o m}
+  {\IfNoValueTF{#1}{\captionof{table}{#2}}{\captionof{table}[#1]{#2}}}
+\NewDocumentCommand\sdjufigurecaption{o m}
+  {\IfNoValueTF{#1}{\captionof{figure}{#2}}{\captionof{figure}[#1]{#2}}}
+\newbox\sdju@floatbox
+% 不浮动的图表：#1 类型（table / figure）
+\newcommand\sdju@nonfloat[1]{%
+  \par\addvspace{8bp}%
+  \setbox\sdju@floatbox\vbox\bgroup
+    \hsize=\linewidth \parindent=\z@ \centering
+    \def\@captype{#1}%
+    \ifx\@captype\sdju@tablecaptype \sdjutablefont\sdju@tablerules
+    \else \sdjufont{12bp}{\sdju@grid}\fi}
+\newcommand\sdju@endnonfloat{%
+  \par\egroup
+  \box\sdju@floatbox
+  \addvspace{8bp}}
+\def\sdju@tablecaptype{table}
+\RenewDocumentEnvironment{table}{o}{\sdju@nonfloat{table}}{\sdju@endnonfloat}
+\RenewDocumentEnvironment{figure}{o}{\sdju@nonfloat{figure}}{\sdju@endnonfloat}
 
 \RequirePackage[hidelinks,unicode]{hyperref}
 \graphicspath{{figures/}}

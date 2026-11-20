@@ -412,6 +412,52 @@
   \sdju@thickrule
   \endgroup}
 
+% ===============================================================
+% 图表题注
+%   栏目内容排在表格的格子里（盒子中），不能用浮动体；这里把 table、figure 环境改为不浮动、
+%   就地排出（可选的位置参数 [htbp] 等被忽略），环境内照常用 \caption、\label，正文用 \ref 引用。
+%   不在环境内时也可用 \sdjutablecaption{…}、\sdjufigurecaption{…}（即 \captionof{table}、
+%   \captionof{figure}）。格式与学位论文模板（附件26）一致：表名在表正上方、图名在图正下方，
+%   宋体小五号加粗，「表1 …」「图1 …」顺序编号；表格建议用三线表（booktabs，线粗 0.5 磅），
+%   表内文字小四号、单倍行距，列多时可用 \sdjutablesize{10.5bp} 改为五号。
+%   图表连同题注不会被拆到两页；上下各留 8 磅。
+% ===============================================================
+\RequirePackage{booktabs}
+\RequirePackage{caption}
+\DeclareCaptionFont{sdjucap}{\songti\sdjufont{9bp}{\sdju@grid}\bfseries}
+\captionsetup{font=sdjucap,labelsep=space,justification=centering,singlelinecheck=false,hypcap=false}
+\captionsetup[table]{position=top,skip=4bp}
+\captionsetup[figure]{position=bottom,skip=6bp}
+\renewcommand\tablename{表}
+\renewcommand\figurename{图}
+\renewcommand\thetable{\arabic{table}}
+\renewcommand\thefigure{\arabic{figure}}
+\newcommand\sdjutablefont{\sdjufont{12bp}{\sdju@grid}}
+\newcommand\sdjutablesize[1]{\renewcommand\sdjutablefont{\sdjufont{#1}{\sdju@grid}}}
+\newcommand\sdju@tablerules{%
+  \renewcommand\arraystretch{1}%
+  \setlength\heavyrulewidth{0.5bp}\setlength\lightrulewidth{0.5bp}}
+\NewDocumentCommand\sdjutablecaption{o m}
+  {\IfNoValueTF{#1}{\captionof{table}{#2}}{\captionof{table}[#1]{#2}}}
+\NewDocumentCommand\sdjufigurecaption{o m}
+  {\IfNoValueTF{#1}{\captionof{figure}{#2}}{\captionof{figure}[#1]{#2}}}
+\newbox\sdju@floatbox
+% 不浮动的图表：#1 类型（table / figure）
+\newcommand\sdju@nonfloat[1]{%
+  \par\addvspace{8bp}%
+  \setbox\sdju@floatbox\vbox\bgroup
+    \hsize=\linewidth \parindent=\z@ \centering
+    \def\@captype{#1}%
+    \ifx\@captype\sdju@tablecaptype \sdjutablefont\sdju@tablerules
+    \else \sdjufont{12bp}{\sdju@grid}\fi}
+\newcommand\sdju@endnonfloat{%
+  \par\egroup
+  \box\sdju@floatbox
+  \addvspace{8bp}}
+\def\sdju@tablecaptype{table}
+\RenewDocumentEnvironment{table}{o}{\sdju@nonfloat{table}}{\sdju@endnonfloat}
+\RenewDocumentEnvironment{figure}{o}{\sdju@nonfloat{figure}}{\sdju@endnonfloat}
+
 \RequirePackage[hidelinks,unicode]{hyperref}
 \graphicspath{{figures/}}
 \endinput

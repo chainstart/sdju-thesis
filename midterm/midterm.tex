@@ -24,9 +24,32 @@
 
 \subsection{所取得的阶段性成果}
 \begin{enumerate}
-  \item XXXXXXXXXXXXXXXXXXX。
-  \item XXXXXXXXXXXXXXXXXXX。
+  \item 主要元件的选型结果见表~\ref{tab:select}。
+  \item 液压系统的总体结构见图~\ref{fig:scheme}。
 \end{enumerate}
+
+% 栏目在表格格子里，table、figure 不浮动，就地排出；用法与论文相同（表名在上、图名在下）
+\begin{table}
+  \caption{主要元件选型结果}\label{tab:select}
+  \begin{tabular}{lll}
+    \toprule
+    元件 & 型号 & 主要参数 \\
+    \midrule
+    液压泵 & XXXX & 排量 XX mL/r \\
+    比例阀 & XXXX & 额定流量 XX L/min \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}
+  \begin{tikzpicture}[every node/.style={draw,minimum height=6mm,inner sep=4pt}]
+    \node (a) at (0,0) {油箱};   \node (b) at (2.6,0) {液压泵};
+    \node (c) at (5.4,0) {比例阀}; \node (d) at (8.4,0) {变桨油缸};
+    \draw[->] (a) -- (b); \draw[->] (b) -- (c); \draw[->] (c) -- (d);
+  \end{tikzpicture}
+  \caption{液压系统总体结构（示意）}\label{fig:scheme}
+\end{figure}
+% 不用环境时也可写：\sdjutablecaption{表名}、\sdjufigurecaption{图名}，后跟 \label
 
 \subsection{下一步工作计划和研究内容}
 \begin{schedule}

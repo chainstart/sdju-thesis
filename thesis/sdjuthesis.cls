@@ -369,20 +369,38 @@
 %   栏目：三号（16 磅）宋体，左端距纸边 116.6 磅，栏目名按实际宽度，下划线右端距纸边 452.7 磅；
 %     自上而下为学生姓名、学生学号、专业、校内指导教师、企业指导教师、学院，行距 31.2 磅，
 %     首行基线距纸边 514.6 磅（样本中题目末行基线之下 82.1 磅）
-%   题目超过两行时，题目末行与第一个栏目仍保持 82.1 磅：多出的高度一半由题目及其以上部分上移、
-%     一半由栏目及日期下移
 %   日期：三号宋体居中，在最后一个栏目下两行（62.4 磅）
+%   题目超过样本的两行（中英文各一行）时，按下面的统一规则让整页仍在版心之内（上 2.8cm、下 2.5cm）：
+%     (1) 多出的高度一半由题目及其以上部分（校徽、「学士学位论文」）上移、一半由栏目及日期下移；
+%         上移以校徽顶边到版心上沿为限，下移以日期到版心下沿为限，一边到限后由另一边承担；
+%     (2) 仍放不下时，按同一比例压缩两处弹性间距：题目末行到第一个栏目的距离 82.1 → 62.4 磅，
+%         栏目行距 31.2 → 26 磅（日期仍在最后一个栏目下两行）；
+%     (3) 压缩到下限仍放不下时，题目字号逐级缩小（24、22、20、18、16 磅，行距保持 1.95 倍字号），
+%         并给出警告，提示缩短题目。
 % ===============================================================
 \definecolor{sdjucover}{HTML}{231815}
 \newcommand\sdju@coverleft{116.6bp}%    栏目左端
 \newcommand\sdju@coverright{452.7bp}%   下划线右端
 \newcommand\sdju@coverpitch{31.2bp}%    栏目行距
-\newcommand\sdju@titlepitch{46.8bp}%    题目行距
+\newcommand\sdju@coverpitchmin{26bp}%   栏目行距的下限（题目过长时压缩）
+\newcommand\sdju@titlesize{24bp}%       题目字号（小一号）
 \newcommand\sdju@titletop{385.7bp}%     题目首行基线
+\newcommand\sdju@titlespan{46.8bp}%     样本中题目首行到末行基线的距离（中英文各一行）
 \newcommand\sdju@fieldtop{514.6bp}%     第一个栏目的基线（题目不长时）
-\newcommand\sdju@fieldgap{82.1bp}%      题目末行基线到第一个栏目基线的最小距离
-\newlength\sdju@fieldy
-\newlength\sdju@covershift
+\newcommand\sdju@fieldgap{82.1bp}%      题目末行基线到第一个栏目基线的距离
+\newcommand\sdju@fieldgapmin{62.4bp}%   上项的下限（题目过长时压缩）
+\newcommand\sdju@logotop{156bp}%        校徽顶边
+\newcommand\sdju@datebase{733bp}%       日期基线（题目不长时）= 514.6 + 7 × 31.2
+\newdimen\sdju@fieldy
+\newdimen\sdju@covershift
+\newdimen\sdju@coverdown
+\newdimen\sdju@coverextra
+\newdimen\sdju@coverupmax
+\newdimen\sdju@coverdownmax
+\newdimen\sdju@coversqueeze
+\newdimen\sdju@coverrest
+\newdimen\sdju@coverpitchlen
+\newdimen\sdju@fieldgaplen
 \newlength\sdju@ulinew
 \newbox\sdju@titlebox
 % 栏目行：#1 栏目名，#2 内容（写在下划线上，居中）
@@ -394,27 +412,65 @@
 % 题目块：中文题目、英文题目各自居中，可自动换行；盒子深度 = 首行到末行基线的距离
 \newcommand\sdju@covertitles{%
   \vtop{\hsize=170mm \parindent=\z@ \centering
-    \sdju@yahei\fontsize{24bp}{\sdju@titlepitch}\selectfont
+    \dimen@=1.95\dimexpr\sdju@titlesize\relax
+    \sdju@yahei\fontsize{\sdju@titlesize}{\the\dimen@}\selectfont
     \lineskiplimit=-\maxdimen
     \sdju@title\par
     \ifx\sdju@titleen\@empty\else\sdju@titleen\par\fi
     \kern-\prevdepth}}
+% 封面能容纳的额外高度：上移 + 下移 + 两处弹性间距的压缩量
+\newcommand\sdju@coverroom{%
+  \dimexpr\sdju@coverupmax+\sdju@coverdownmax+\sdju@coversqueeze\relax}
 \newcommand\makecover{%
   \begin{titlepage}
   \thispagestyle{empty}%
-  \setbox\sdju@titlebox\hbox{\sdju@covertitles}%
-  % 题目超出样本中的两行时，多出的高度上下各分一半
-  \sdju@covershift=\dimexpr(\sdju@titletop+\dp\sdju@titlebox+\sdju@fieldgap-\sdju@fieldtop)/2\relax
-  \ifdim\sdju@covershift<\z@ \sdju@covershift=\z@ \fi
-  \ifdim\sdju@covershift>50bp
-    \ClassWarningNoLine{sdjuthesis}{封面题目过长（中英文合计超过 4 行），请缩短}%
+  % 上移、下移的限度（版心上沿 = 1in + \topmargin + \headheight + \headsep）
+  \sdju@coverupmax=\dimexpr\sdju@logotop-(1in+\voffset+\topmargin+\headheight+\headsep)\relax
+  \setbox\z@\hbox{\songti\fontsize{16bp}{20.8bp}\selectfont\strut\sdju@coverdate}% 日期行框的下沿
+  \sdju@coverdownmax=\dimexpr 1in+\voffset+\topmargin+\headheight+\headsep+\textheight
+    -\sdju@datebase-\dp\z@\relax
+  \ifdim\sdju@coverupmax<\z@ \sdju@coverupmax=\z@ \fi
+  \ifdim\sdju@coverdownmax<\z@ \sdju@coverdownmax=\z@ \fi
+  \sdju@coversqueeze=\dimexpr\sdju@fieldgap-\sdju@fieldgapmin
+    +7\dimexpr\sdju@coverpitch-\sdju@coverpitchmin\relax\relax
+  % 从小一号起逐级缩小题目字号，直到放得下
+  \@tfor\sdju@tmp:={24bp}{22bp}{20bp}{18bp}{16bp}\do{%
+    \edef\sdju@titlesize{\sdju@tmp}%
+    \setbox\sdju@titlebox\hbox{\sdju@covertitles}%
+    \sdju@coverextra=\dimexpr\dp\sdju@titlebox-\sdju@titlespan\relax
+    \ifdim\sdju@coverextra<\z@ \sdju@coverextra=\z@ \fi
+    \ifdim\sdju@coverextra>\sdju@coverroom\else\@break@tfor\fi}%
+  \ifdim\sdju@coverextra>\sdju@coverroom
+    \ClassWarningNoLine{sdjuthesis}{封面题目过长：题目缩小到 \sdju@titlesize\space 仍超出版心，请缩短中文或英文题目}%
+  \else\ifdim\sdju@titlesize<24bp
+    \ClassWarningNoLine{sdjuthesis}{封面题目过长：小一号（24bp）排不下，题目字号已缩小为 \sdju@titlesize；建议缩短题目}%
+  \fi\fi
+  % (1) 上下各分一半，一边到限后由另一边承担
+  \sdju@coverdown=\dimexpr\sdju@coverextra/2\relax
+  \ifdim\sdju@coverdown>\sdju@coverdownmax \sdju@coverdown=\sdju@coverdownmax \fi
+  \sdju@covershift=\dimexpr\sdju@coverextra-\sdju@coverdown\relax
+  \ifdim\sdju@covershift>\sdju@coverupmax \sdju@covershift=\sdju@coverupmax \fi
+  \sdju@coverdown=\dimexpr\sdju@coverextra-\sdju@covershift\relax
+  \ifdim\sdju@coverdown>\sdju@coverdownmax \sdju@coverdown=\sdju@coverdownmax \fi
+  % (2) 余下的高度按同一比例压缩两处弹性间距
+  \sdju@coverrest=\dimexpr\sdju@coverextra-\sdju@covershift-\sdju@coverdown\relax
+  \ifdim\sdju@coverrest>\sdju@coversqueeze \sdju@coverrest=\sdju@coversqueeze \fi
+  \ifdim\sdju@coverrest>\z@
+    \ClassInfo{sdjuthesis}{封面题目较长，已压缩题目与栏目之间的间距和栏目行距}%
+    \sdju@fieldgaplen=\dimexpr\sdju@fieldgap-(\sdju@fieldgap-\sdju@fieldgapmin)
+      *\sdju@coverrest/\sdju@coversqueeze\relax
+    \sdju@coverpitchlen=\dimexpr\sdju@coverpitch-(\sdju@coverpitch-\sdju@coverpitchmin)
+      *\sdju@coverrest/\sdju@coversqueeze\relax
+  \else
+    \sdju@fieldgaplen=\sdju@fieldgap\relax
+    \sdju@coverpitchlen=\sdju@coverpitch\relax
   \fi
-  \sdju@fieldy=\dimexpr\sdju@fieldtop+\sdju@covershift\relax
+  \sdju@fieldy=\dimexpr\sdju@titletop-\sdju@covershift+\dp\sdju@titlebox+\sdju@fieldgaplen\relax
   \begin{tikzpicture}[remember picture,overlay]
     \coordinate (T) at ([yshift=\sdju@covershift]current page.north);% 题目及其以上部分
     \coordinate (F) at (current page.north);
     \coordinate (L) at (current page.north west);
-    \node[anchor=north,inner sep=0pt] at ([yshift=-156bp]T)
+    \node[anchor=north,inner sep=0pt] at ([yshift=-\sdju@logotop]T)
       {\includegraphics[width=97.1mm]{sdju-logo}};
     \node[anchor=base,inner sep=0pt] at ([yshift=-329.7bp]T)
       {\sdju@yahei\fontsize{40bp}{52bp}\selectfont 学士学位论文};
@@ -423,17 +479,17 @@
         font=\songti\fontsize{16bp}{20.8bp}\selectfont\color{sdjucover}}]
       \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy]L)
         {\sdju@coverfield{学生姓名}{\sdju@author}};
-      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-\sdju@coverpitch]L)
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-\sdju@coverpitchlen]L)
         {\sdju@coverfield{学生学号}{\sdju@studentid}};
-      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-2*\sdju@coverpitch]L)
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-2\sdju@coverpitchlen]L)
         {\sdju@coverfield{专业}{\sdju@major}};
-      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-3*\sdju@coverpitch]L)
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-3\sdju@coverpitchlen]L)
         {\sdju@coverfield{校内指导教师}{\sdju@supervisor}};
-      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-4*\sdju@coverpitch]L)
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-4\sdju@coverpitchlen]L)
         {\sdju@coverfield{企业指导教师}{\sdju@companysupervisor}};
-      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-5*\sdju@coverpitch]L)
+      \node at ([xshift=\sdju@coverleft,yshift=-\sdju@fieldy-5\sdju@coverpitchlen]L)
         {\sdju@coverfield{学院}{\sdju@school}};
-      \node[anchor=base] at ([yshift=-\sdju@fieldy-7*\sdju@coverpitch]F) {\sdju@coverdate};
+      \node[anchor=base] at ([yshift=-\sdju@fieldy-7\sdju@coverpitchlen]F) {\sdju@coverdate};
     \end{scope}
   \end{tikzpicture}
   \end{titlepage}}
