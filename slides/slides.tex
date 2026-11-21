@@ -1,0 +1,127 @@
+% !TEX program = xelatex
+% 上海电机学院 毕业设计（论文）答辩示例。编译：latexmk slides.tex
+\documentclass{sdjuslides}
+\usetikzlibrary{positioning}
+\input{data/replay-counts}
+
+% 封面信息、术语、单位、数据和结论应与论文定稿一致。
+% 示例的身份和数据均为占位或合成内容。答辩时替换为本人信息和可核对的成果。
+\title[电机振动异常监测]{基于窗口判定的电机振动异常监测}
+\titleen{Window-Based Anomaly Monitoring of Motor Vibration}
+\author{测试学生甲}
+\studentid{XXXXXXXXXX}
+\major{电气工程及其自动化}
+\school{电气学院}
+\supervisor{XXX}
+\companysupervisor{XXX} % 没有企业指导教师时可省略，封面该栏留空
+\defensedate{20XX 年 XX 月 XX 日}
+
+\begin{document}
+
+\makecover
+\sdjutableofcontents
+
+\section{研究背景与问题}
+\begin{frame}{短时振动尖峰会触发误报}
+  电机在正常运行时也可能出现瞬时振动尖峰，单个窗口越限就告警会打断巡检。
+  \medskip
+  \begin{itemize}
+    \item 研究问题：要求连续越限，能否减少正常窗口的误报？
+    \item 完成工作：实现两种告警规则，并用同一批窗口回放对比。
+  \end{itemize}
+\end{frame}
+
+\section{方案与设计}
+\begin{frame}{同一评分，两种告警规则}
+  \begin{figure}
+    \centering
+    \input{figures/workflow}
+    \caption{窗口回放与告警流程}
+    \sdjusource{本示例绘制，\path{slides/figures/workflow.tex}}
+  \end{figure}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{.47\textwidth}
+      \textbf{单窗规则}\par
+      当前窗口评分越限即告警。
+    \end{column}
+    \begin{column}{.47\textwidth}
+      \textbf{双窗规则}\par
+      当前窗口和上一窗口均越限才告警。
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{实现与实验}
+\begin{frame}[fragile]{逐窗判定是否告警}
+  两种规则共用窗口评分和阈值。每轮开头将上一窗口的越限状态设为假。
+  \medskip
+  \begin{lstlisting}[language=Python]
+prev_above = False
+for score in scores:
+    above = score > threshold
+    single_alarm = above
+    double_alarm = prev_above and above
+    prev_above = above
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{用正常窗口回放评估误报}
+  回放三轮，每轮 \windowsPerTrial{} 个正常窗口。两种规则使用完全相同的输入。
+  \[
+    \mathrm{FPR} = \frac{N_{\mathrm{FP}}}{N_{\mathrm{normal}}} \times 100\%
+  \]
+  分子是触发告警的正常窗口数。分母是参与回放的正常窗口总数。
+\end{frame}
+
+\section{结果与数据}
+\begin{frame}{三轮回放均观察到误报减少}
+  \begin{table}
+    \centering
+    \caption{合成回放的误报窗口数}
+    \begin{tabular}{lrrr}
+      \toprule
+      轮次 & 正常窗口 & 单窗误报 & 双窗误报 \\
+      \midrule
+      第一轮 & \windowsPerTrial & \singleTrialA & \doubleTrialA \\
+      第二轮 & \windowsPerTrial & \singleTrialB & \doubleTrialB \\
+      第三轮 & \windowsPerTrial & \singleTrialC & \doubleTrialC \\
+      \bottomrule
+    \end{tabular}
+    \sdjusource{合成数据，\path{slides/data/replay-counts.tex}}
+  \end{table}
+\end{frame}
+
+\begin{frame}{合成回放的误报率由 11\% 降至 4\%}
+  \pgfmathsetmacro{\singleRate}{100*(\singleTrialA+\singleTrialB+\singleTrialC)/(3*\windowsPerTrial)}
+  \pgfmathsetmacro{\doubleRate}{100*(\doubleTrialA+\doubleTrialB+\doubleTrialC)/(3*\windowsPerTrial)}
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}[x=.05\textwidth,y=1.45em]
+      \foreach \tick in {0,4,8,12} {
+        \draw[sdjutext!18] (\tick,.58) -- (\tick,2.45);
+        \node[below,text=sdjumuted] at (\tick,.58) {\tick\%};
+      }
+      \fill[sdjumuted] (0,1.73) rectangle (\singleRate,2.27);
+      \fill[sdjuaccent] (0,.73) rectangle (\doubleRate,1.27);
+      \node[left] at (0,2) {单窗};
+      \node[left] at (0,1) {双窗};
+      \node[right] at (\singleRate,2) {\pgfmathprintnumber{\singleRate}\%};
+      \node[right] at (\doubleRate,1) {\pgfmathprintnumber{\doubleRate}\%};
+    \end{tikzpicture}
+    \caption{两种规则的合计误报率}
+    \sdjusource{由 \path{slides/data/replay-counts.tex} 的三轮计数计算}
+  \end{figure}
+\end{frame}
+
+\section{结论与不足}
+\begin{frame}{双窗规则降低误报，检出能力待验证}
+  \begin{itemize}
+    \item 三轮合成回放中，双窗规则的误报率低了 7 个百分点。
+    \item 回放仅含正常窗口，无法估计漏报率。持续越限时，双窗规则晚一个窗口告警。
+    \item 后续用带故障标签的实测数据验证检出率和告警延迟。
+  \end{itemize}
+\end{frame}
+
+\sdjuthanks{感谢指导教师和实验室同学的帮助，敬请各位老师批评指正。}
+
+\end{document}

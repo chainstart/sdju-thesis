@@ -1,0 +1,13 @@
+\begin{tikzpicture}[
+    workflow step/.style={draw=sdjuaccent,fill=sdjusurface,rounded corners=2pt,
+      minimum height=3em,inner xsep=.8em},
+    flow/.style={->,semithick,color=sdjuaccent},
+  ]
+  \node[workflow step] (replay) {窗口回放};
+  \node[workflow step,right=of replay] (score) {振动评分};
+  \node[workflow step,right=of score] (judge) {连续判定};
+  \node[workflow step,right=of judge] (log) {记录告警};
+  \draw[flow] (replay) -- (score);
+  \draw[flow] (score) -- (judge);
+  \draw[flow] (judge) -- (log);
+\end{tikzpicture}

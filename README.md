@@ -1,6 +1,6 @@
 # 上海电机学院毕业设计（论文）LaTeX 模板
 
-上海电机学院本科毕业设计的 LaTeX 模板：**学士学位论文**、**开题报告**、**任务书**、**中期检查报告**和**指导记录**，依据学校下发的模板制作。
+本仓库提供上海电机学院本科毕业设计的 LaTeX 模板，包括 **学士学位论文**、**开题报告**、**任务书**、**中期检查报告**、**指导记录**和**答辩幻灯片**。
 
 | 目录 | 内容 | 依据 |
 |---|---|---|
@@ -9,9 +9,10 @@
 | [`taskbook/`](taskbook/) | 任务书模板及示例 | 《教学归档材料及质量评价要素（2026 版）》附件22《毕业设计（论文）任务书》 |
 | [`midterm/`](midterm/) | 中期检查报告模板及示例 | 同上，附件24《毕业设计（论文）中期检查报告》 |
 | [`logbook/`](logbook/) | 指导记录模板及示例 | 同上，附件32《毕业设计（论文）指导记录》 |
+| [`slides/`](slides/) | Beamer 答辩幻灯片模板及示例 | 通用学术答辩风格 |
 | [`word-templates/`](word-templates/) | 学校下发的 Word 原始模板 | — |
 
-各模板目录各自独立、互不依赖，每个模板只有一个类文件，复制其中一个目录就可以开始写。示例的排版效果见 [`thesis/main.pdf`](thesis/main.pdf)、[`proposal/proposal.pdf`](proposal/proposal.pdf)、[`taskbook/taskbook.pdf`](taskbook/taskbook.pdf)、[`midterm/midterm.pdf`](midterm/midterm.pdf) 和 [`logbook/logbook.pdf`](logbook/logbook.pdf)。
+各模板目录可以独立复制使用，每个模板的版式设置都在一个类文件中。示例 PDF 见[论文](thesis/main.pdf)、[开题报告](proposal/proposal.pdf)、[任务书](taskbook/taskbook.pdf)、[中期检查报告](midterm/midterm.pdf)、[指导记录](logbook/logbook.pdf)和[答辩幻灯片](slides/slides.pdf)。
 
 ## 文件
 
@@ -48,6 +49,17 @@
 | `latexmkrc` | latexmk 配置 |
 | `taskbook.pdf`、`midterm.pdf`、`logbook.pdf` | 示例的编译结果 |
 
+**`slides/`——答辩幻灯片**
+
+| 文件 | 说明 |
+|---|---|
+| `sdjuslides.cls` | 16:9 Beamer 类，包含封面、目录、章节过渡页、短题目页脚与页码、致谢页 |
+| `slides.tex` | 答辩示例，演示图片、柱状图、三线表、代码、公式和两栏布局 |
+| `figures/` | 封面校徽及示例流程图源码 |
+| `data/replay-counts.tex` | 结果页共用的合成数据 |
+| `latexmkrc` | latexmk 配置（XeLaTeX） |
+| `slides.pdf` | 示例的编译结果 |
+
 **`word-templates/`——学校的 Word 原始模板**
 
 | 文件 | 说明 |
@@ -65,6 +77,7 @@
 cd thesis   && latexmk main.tex       # 论文：xelatex -> biber -> xelatex -> xelatex
 cd proposal && latexmk proposal.tex   # 开题报告
 cd taskbook && latexmk taskbook.tex   # 任务书（midterm、logbook 同理）
+cd slides   && latexmk slides.tex     # 答辩幻灯片
 latexmk -c                            # 清理中间文件
 ```
 
@@ -83,6 +96,36 @@ latexmk -c                            # 清理中间文件
 ```
 
 然后运行 `fc-cache -f`。
+
+## 答辩幻灯片（slides/sdjuslides.cls）
+
+《教学归档材料及质量评价要素（2026 版）》第 3.1 节列出答辩评分表和记录表，第 3.3.5 节规定答辩记录的写法。文件未列出幻灯片归档要求或版式。学校无统一版式，本模板为通用学术答辩风格，使用学校 Word 封面校徽中的深红色作为强调色。
+
+封面字段可从论文定稿迁移，答辩日期用 `\defensedate`。中文字体自动检测宋体、黑体，缺失时使用 Fandol 对应字体；幻灯片正文默认用黑体。Beamer 的 160 × 90 mm 页面上，11 pt 正文按相同宽度比例换算到 13⅓ × 7½ 英寸画布约为 23 pt。目录、章节过渡页和正文共用页码。
+
+```latex
+\documentclass{sdjuslides}
+\title[页脚短题目]{论文定稿的中文题目}
+\titleen{English Title}
+\author{测试学生甲} \studentid{XXXXXXXXXX}
+\major{XXX} \school{XXX}
+\supervisor{XXX} \companysupervisor{XXX} % 无企业指导教师时可省略
+\defensedate{20XX 年 XX 月 XX 日}
+
+\begin{document}
+\makecover
+\sdjutableofcontents
+\section{研究背景与问题} % 各节自动插入过渡页
+\begin{frame}{本页要讲清楚的结论}
+  ...
+\end{frame}
+\sdjuthanks{感谢指导教师和实验室同学的帮助。}
+\end{document}
+```
+
+按研究背景与问题、方案与设计、实现与实验、结果与数据、结论与不足、致谢组织内容。交代自己完成的工作、实验条件和证据的适用范围，核对术语、单位、数值和结论是否与论文定稿一致。示例中的结果为合成数据，使用时请替换为自己的成果。
+
+图片放在 `figure` 中，可用 `\includegraphics[width=.75\linewidth]{figures/文件名}` 插入。表题放在三线表上方，图题放在图下方。两者都可在题注后用 `\sdjusource{原始记录，\path{data/文件名}}` 标出仓库相对路径。代码页用 `\begin{frame}[fragile]{标题}` 和 `lstlisting`，两栏用 Beamer 的 `columns` 环境。
 
 ## 论文的格式规定（thesis/sdjuthesis.cls）
 
