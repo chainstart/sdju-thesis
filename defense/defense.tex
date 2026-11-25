@@ -1,0 +1,34 @@
+% !TEX program = xelatex
+% 上海电机学院 本科生毕业设计（论文）答辩记录表 示例（文字为中性占位）
+% 编译：latexmk defense.tex
+% 开题答辩、中期检查答辩、毕业设计（论文）答辩各填一份（2026 版要素 3.1 归档目录 (9)(10)(11)），
+% 三份表式相同，只改 \defensetype。答辩记录由答辩组成员填写，不得由学生填写（3.3.5(4)）。
+\documentclass{sdjudefense}
+
+% ---------------- 表头 ----------------
+\title{兆瓦级风力发电机控制系统设计——液压系统}
+\author{XXX}
+\studentid{XXXXXXXXX}
+\major{电气工程及其自动化}
+\classname{XXXXXXX}
+\defensetype{proposal}           % proposal 开题答辩 / midterm 中期检查答辩 / thesis 毕业设计（论文）答辩
+\committee{XXX（组长）、XXX、XXX}  % 专家组成员
+\recorder{XXX}                   % 记录人（可留空，打印后签名）
+\recorddate{20XX 年 XX 月 XX 日}   % 可留空，打印后手写
+
+\begin{document}
+
+\maketitle
+
+% 一问一答，只记问题，不记评价；答辩人的回答详细记录（3.3.5(3)）
+\section{答辩记录}
+\question{液压系统的工作压力是按什么工况确定的？}
+\answer{按变桨油缸在额定风速下所需的最大推力，结合油缸有效面积计算，再留出一定裕量……}
+
+\question{比例阀的选型依据是什么？}
+\answer{依据系统所需的最大流量和响应时间，对比了两种型号的额定流量与频响……}
+
+\question{下一阶段如何验证控制程序？}
+\answer{先在仿真平台上进行变桨距控制的闭环仿真，再在实验台上调试……}
+
+\end{document}
