@@ -193,7 +193,8 @@
 
 % ===============================================================
 % 参考文献：GB/T 7714-2005 顺序编码制（附件23 中的参考文献示例也是按顺序编号），\cite 为上标中括号；
-%   条目不缩进：编号顶格，转行后也顶格（与附件23 一致）。字号、行距与标题在后面「参考文献」一节设定。
+%   条目悬挂缩进 2 字符：编号顶格，转行后缩进 2 字符（按附件26「参考文献」的悬挂缩进，用户 2026-11-26
+%   决定；附件23 样表的条目转行顶格，不再照搬）。字号、行距与标题在后面「参考文献」一节设定。
 % ===============================================================
 % 正文中的上标引用：附件23 的 2026 版 PDF 中为 6 磅（小四号的一半），基线比正文基线高 6 磅
 \newcommand\sdju@supsize{6bp}
@@ -209,7 +210,7 @@
 \AtBeginBibliography{\hyphenpenalty=10000 }% 文献样式会重设断词，这里改回不拆单词
 \defbibenvironment{bibliography}
   {\list{}{%
-     \setlength{\leftmargin}{\z@}\setlength{\itemindent}{\z@}%
+     \setlength{\leftmargin}{2\ccwd}\setlength{\itemindent}{-2\ccwd}%
      \setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}%
      \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}}}
   {\endlist}
@@ -222,7 +223,7 @@
 \newcounter{sdjuref}
 \newenvironment{sdju@reflist}
   {\list{[\arabic{sdjuref}]\space}{\usecounter{sdjuref}%
-     \setlength{\leftmargin}{\z@}\setlength{\itemindent}{\z@}%
+     \setlength{\leftmargin}{2\ccwd}\setlength{\itemindent}{-2\ccwd}%
      \setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}%
      \setlength{\topsep}{0pt}\setlength{\partopsep}{0pt}%
      \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}%
@@ -475,7 +476,7 @@
 
 % ===============================================================
 % 参考文献：另起一页；标题「参考文献：」小二号黑体加粗居中，1.5 倍行距（行框 35.1 磅）；
-%   条目小四号，单倍行距（15.6 磅），不缩进（著录格式与论文相同）
+%   条目小四号，单倍行距（15.6 磅），悬挂缩进 2 字符（著录格式、缩进与论文相同）
 % ===============================================================
 \newcommand\sdju@refheading[1]{%
   \clearpage
