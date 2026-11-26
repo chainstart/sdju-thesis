@@ -418,13 +418,14 @@
      \hangindent\@tempdima\hangafter1 ##1：##2\par}}
   {\par}
 
-% 列表：（1）、（2）…（全角括号，附件23），与正文同样首行缩进 2 字符，编号后紧接内容，
-%   转行顶格（与正文段落相同）
+% 编号列表（各模板统一）：全角括号「（1）」「（2）」…，编号后紧接内容（全角括号自带半字空白），
+%   首行与正文同样缩进 \sdju@listindent，转行回到左边。依据与取舍见 README「编号列表」
+\newcommand\sdju@listindent{2em}
 \setlist{nosep}
-\setlist[enumerate,1]{label=（\arabic*）,leftmargin=0pt,labelindent=2em,
-  itemindent=*,labelsep=0pt,align=left,listparindent=2em}
-\setlist[itemize,1]{leftmargin=0pt,labelindent=2em,itemindent=*,
-  labelsep=0.5em,listparindent=2em}
+\setlist[enumerate,1]{label=（\arabic*）,leftmargin=0pt,labelindent=\sdju@listindent,
+  itemindent=*,labelsep=0pt,align=left,listparindent=\sdju@listindent}
+\setlist[itemize,1]{leftmargin=0pt,labelindent=\sdju@listindent,itemindent=*,
+  labelsep=0.5em,listparindent=\sdju@listindent}
 
 % 图、表、公式：按节编号；图表题与表格格式见前文
 \renewcommand\thefigure{\arabic{section}-\arabic{figure}}

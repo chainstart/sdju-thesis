@@ -111,12 +111,14 @@
 \tolerance=1000
 \setlength{\emergencystretch}{3em}
 
-% 列表：(1)、(2)…，与正文同样的首行缩进（\sdju@bodyindent，即不缩进），转行回到左边
+% 编号列表（各模板统一）：全角括号「（1）」「（2）」…，编号后紧接内容（全角括号自带半字空白），
+%   首行与正文同样缩进 \sdju@listindent（这里即不缩进），转行回到左边。依据与取舍见 README「编号列表」
+\newcommand\sdju@listindent{\sdju@bodyindent}
 \setlist{nosep}
-\setlist[enumerate,1]{label=(\arabic*),leftmargin=0pt,labelindent=\sdju@bodyindent,
-  itemindent=*,labelsep=0.5em,align=left,listparindent=\sdju@bodyindent}
-\setlist[itemize,1]{leftmargin=0pt,labelindent=\sdju@bodyindent,itemindent=*,
-  labelsep=0.5em,listparindent=\sdju@bodyindent}
+\setlist[enumerate,1]{label=（\arabic*）,leftmargin=0pt,labelindent=\sdju@listindent,
+  itemindent=*,labelsep=0pt,align=left,listparindent=\sdju@listindent}
+\setlist[itemize,1]{leftmargin=0pt,labelindent=\sdju@listindent,itemindent=*,
+  labelsep=0.5em,listparindent=\sdju@listindent}
 % 公式编号使用全角括号
 \renewcommand\tagform@[1]{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
 

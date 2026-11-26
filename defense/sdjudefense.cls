@@ -87,12 +87,14 @@
 \tolerance=1000
 \setlength{\emergencystretch}{3em}
 
-% 列表：(1)、(2)…，与正文同样首行缩进 2 字符
+% 编号列表（各模板统一）：全角括号「（1）」「（2）」…，编号后紧接内容（全角括号自带半字空白），
+%   首行与正文同样缩进 \sdju@listindent，转行回到左边。依据与取舍见 README「编号列表」
+\newcommand\sdju@listindent{2em}
 \setlist{nosep}
-\setlist[enumerate,1]{label=(\arabic*),leftmargin=0pt,labelindent=2em,
-  itemindent=*,labelsep=0.5em,align=left,listparindent=2em}
-\setlist[itemize,1]{leftmargin=0pt,labelindent=2em,itemindent=*,
-  labelsep=0.5em,listparindent=2em}
+\setlist[enumerate,1]{label=（\arabic*）,leftmargin=0pt,labelindent=\sdju@listindent,
+  itemindent=*,labelsep=0pt,align=left,listparindent=\sdju@listindent}
+\setlist[itemize,1]{leftmargin=0pt,labelindent=\sdju@listindent,itemindent=*,
+  labelsep=0.5em,listparindent=\sdju@listindent}
 
 % ===============================================================
 % 页面：A4；上、下 2.54cm，左、右 3.17cm（90 磅）；不印页眉页脚和页码（附件31 的表格本身没有页码）
