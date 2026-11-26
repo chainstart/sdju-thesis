@@ -448,6 +448,23 @@
 \renewcommand\floatpagefraction{.8}
 \setcounter{topnumber}{3}
 \setcounter{totalnumber}{4}
+% 图表不越过一级标题：一级标题之前，先排出前面尚未排出的图表（当前页放不下就另起一页，
+%   与 Word 中图片放不下时移到下一页相同），图表不会排到下一节；各级标题之后的图表不放到
+%   标题所在页的上方（否则图会排在自己的标题之前）。作用同 placeins 宏包的 [section,below]。
+%   二、三级标题前不强制排出（否则每遇到放不下的图表就留下半页空白）
+\newcommand\sdju@floatbarrier{%
+  \ifhmode\par\fi
+  \begingroup\let\@elt\relax
+  \edef\@tempa{\@botlist\@deferlist\@dbldeferlist}%
+  \ifx\@tempa\@empty\else
+    \ifx\sdju@fbagain\relax \clearpage
+    \else \newpage\let\sdju@fbagain\relax\sdju@floatbarrier \fi
+  \fi
+  \endgroup
+  \suppressfloats[t]}
+\AddToHook{cmd/section/before}{\sdju@floatbarrier}
+\AddToHook{cmd/subsection/before}{\suppressfloats[t]}
+\AddToHook{cmd/subsubsection/before}{\suppressfloats[t]}
 % 图、表、公式：按节编号；图表题与表格格式见前文
 \renewcommand\thefigure{\arabic{section}-\arabic{figure}}
 \renewcommand\thetable{\arabic{section}-\arabic{table}}
