@@ -95,6 +95,10 @@
 \newcommand\sdju@wstrut{\vrule height\sdju@ascent depth\dimexpr\baselineskip-\sdju@ascent\relax width\z@}
 % 格子中正文第一行：基线在格子上边线之下一个 \sdju@ascent（在竖直模式的开头使用）
 \newcommand\sdju@firstline{\prevdepth=\dimexpr\baselineskip-\sdju@ascent\relax}
+% 格子中正文最后一行：行框在基线之下还有 \sdju@desc（= 行距 - \sdju@ascent），补足到这个深度，
+%   使末行与下边线之间留出 Word 行框的下半部分（附件14 单元格下边距为 0，空白由行距自然留出）
+\newcommand\sdju@desc{\dimexpr\baselineskip-\sdju@ascent\relax}
+\newcommand\sdju@lastline{\par\ifdim\prevdepth<\sdju@desc\vskip\dimexpr\sdju@desc-\prevdepth\relax\fi}
 % Word 固定行距 #1 的一行：基线在行顶之下 0.8 × #1
 \newcommand\sdju@exactline[2]{\hbox to\hsize{\vrule height0.8\dimexpr#1\relax depth0.2\dimexpr#1\relax width\z@ #2}}
 % 按 Word 的「x 倍行距」设置当前字号的行距：\sdjuspacing{1.5}（x × 1.3 × 字号）
@@ -262,7 +266,7 @@
   \splittopskip=\sdju@ascent \splitmaxdepth=\maxdimen \vbadness=\@M
   \loop
     \ifdim\sdju@tmpa>\sdju@avail
-      \setbox\sdju@piece\vsplit\sdju@body to\sdju@avail
+      \setbox\sdju@piece\vsplit\sdju@body to\dimexpr\sdju@avail-\sdju@desc\relax% 断开处末行留出行框下半部分
       \sdju@outpiece{\sdju@avail}%
       \sdju@firstpiecefalse
       \newpage\sdju@getavail
@@ -341,7 +345,7 @@
 \newcommand\sdju@rowminh{60mm}
 \newcommand\sdju@closerow{%
   \ifsdju@rowopen
-    \par\egroup
+    \sdju@lastline\egroup
     \global\sdju@rowopenfalse
     \sdju@formrow{\sdju@rowminh}%
     \sdju@thickrule
@@ -393,7 +397,7 @@
   \sdju@signature{指导教师签名}{36bp}{35.1bp}%
   \let\sdju@curfont\sdju@opinionfont
   \setbox\sdju@body\vbox{\sdju@bodysetup
-    {\parindent=\z@ \noindent 指导教师意见：\par}#1\par}%
+    {\parindent=\z@ \noindent 指导教师意见：\par}#1\sdju@lastline}%
   \sdju@thickrule
   \sdju@formrow{254.2bp}}
 \newlength\sdju@cclabelw \setlength\sdju@cclabelw{33.45bp}% 「答辩小组结论」格宽（含其右侧竖线）
@@ -407,7 +411,7 @@
   \setlength\sdju@cw{\sdju@formw-2\sdju@orule-\sdju@cclabelw-2\sdju@padx}%
   % 上部：建议
   \setbox\sdju@body\vbox{\sdju@bodysetup
-    {\parindent=\z@ \noindent 建议：\par}#1\par}%
+    {\parindent=\z@ \noindent 建议：\par}#1\sdju@lastline}%
   \setlength\sdju@tmpa{203.9bp-\sdju@rule-2\sdju@pady}%
   \ifdim\dimexpr\ht\sdju@body+\dp\sdju@body\relax>\sdju@tmpa
     \setlength\sdju@tmpa{\ht\sdju@body+\dp\sdju@body}\fi

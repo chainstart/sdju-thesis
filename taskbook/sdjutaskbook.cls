@@ -96,6 +96,10 @@
 \newcommand\sdju@ascent{\dimexpr(\baselineskip-1em)/2+0.86em\relax}
 % 格子中正文第一行：基线在格子上边线之下一个 \sdju@ascent（在竖直模式的开头使用）
 \newcommand\sdju@firstline{\prevdepth=\dimexpr\baselineskip-\sdju@ascent\relax}
+% 格子中正文最后一行：行框在基线之下还有 \sdju@desc（= 行距 - \sdju@ascent），补足到这个深度，
+%   使末行与下边线之间留出 Word 行框的下半部分（附件16 单元格下边距为 0，空白由行距自然留出）
+\newcommand\sdju@desc{\dimexpr\baselineskip-\sdju@ascent\relax}
+\newcommand\sdju@lastline{\par\ifdim\prevdepth<\sdju@desc\vskip\dimexpr\sdju@desc-\prevdepth\relax\fi}
 % 按 Word 的「x 倍行距」设置当前字号的行距：\sdjuspacing{1.5}（x × 1.3 × 字号）
 \ExplSyntaxOn
 \NewDocumentCommand\sdjuspacing{m}
@@ -370,7 +374,8 @@
       % 放不下就在本页底断开；全部放得下、只是放不下其后的一行时，少排一点，把那一行带到下一页
       \ifdim\sdju@tmpa>\sdju@avail \setlength\sdju@tmpb{\sdju@avail}%
       \else \setlength\sdju@tmpb{\sdju@avail-\sdju@reserve}\fi
-      \setbox\sdju@piece\vsplit\sdju@body to\sdju@tmpb
+      % 断开处的末行同样留出行框的下半部分
+      \setbox\sdju@piece\vsplit\sdju@body to\dimexpr\sdju@tmpb-\sdju@desc\relax
       \sdju@outpiece{\sdju@tmpb}%
       \sdju@firstpiecefalse
       \newpage\sdju@getavail
@@ -422,7 +427,7 @@
 \newcommand\sdju@relabel@i[2]{\sdju@makelabel[#2]{#1}}
 \newcommand\sdju@closerow{%
   \ifsdju@rowopen
-    \par\egroup
+    \sdju@lastline\egroup
     \global\sdju@rowopenfalse
     \global\advance\sdju@nrows\@ne
     \ifcsname sdju@rowbox\the\sdju@nrows\endcsname\else
