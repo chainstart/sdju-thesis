@@ -333,7 +333,9 @@
 \newcommand\sdju@supervisor{}
 \newcommand\sdju@companysupervisor{}
 \newcommand\sdju@titleen{}
-\newcommand\sdju@coverdate{二〇\hspace{1.5em}年\hspace{1.5em}月}
+\newcommand\sdju@coverdatedefault{二〇\hspace{1.5em}年\hspace{1.5em}月}
+\newcommand\sdju@coverdatesrc{}
+\newcommand\sdju@coverdate{\ifdefempty\sdju@coverdatesrc{\sdju@coverdatedefault}{\sdju@coverdatesrc}}
 \RenewDocumentCommand\title{om}{%
   \renewcommand\sdju@title{#2}%
   \IfNoValueTF{#1}
@@ -346,7 +348,7 @@
 \newcommand\titleen[1]{\renewcommand\sdju@titleen{#1}}% 封面上的英文题目
 \newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}% 校内指导教师
 \newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}% 企业指导教师（无则不写，封面该栏留空）
-\newcommand\coverdate[1]{\renewcommand\sdju@coverdate{#1}}
+\newcommand\coverdate[1]{\renewcommand\sdju@coverdatesrc{#1}}% 留空：空白的「二〇 年 月」
 
 % ===============================================================
 % 页眉：左为论文题目（黑体小五号），右为页码（小五号，左端距右边距 17 磅，与样本一致；
@@ -694,8 +696,13 @@
   {\par\sdjufont{14bp}{31.2bp}\setlength\parindent{\sdju@declindent}}
   {\par}
 % 签名、日期行
-% 版权使用授权书的「保密」「不保密」：默认两项都空着，打印后手工勾选；
-%   也可在导言区写 \confidential{<年数>}（保密，并填上解密年限）或 \notconfidential（不保密）
+% 声明页的栏目（和封面一样，在导言区直接填写；留空时照样本留出空白）：
+%   \confidentiality{保密|不保密}：版权使用授权书中勾选「保密」或「不保密」；保密时可选参数写解密年限，
+%     如 \confidentiality[3]{保密}；留空则两项都不勾。旧写法 \confidential{<年数>}、\notconfidential 照旧可用
+%   日期（各签字处「日期： 年 月 日」，{年}{月}{日}）：\integritydate 学术诚信声明；\aistudentdate、
+%     \aisupervisordate AI 使用情况声明的作者、指导教师；\copyrightstudentdate、\copyrightsupervisordate
+%     版权使用授权书的作者、指导教师；\declarationdate 一次填好上述各处（单独写的以单独写的为准）。
+%     源码中没写的，用签名配置文件中的日期（作者 student、指导教师 supervisor）；都没有时留空待手写
 \newcommand\sdju@box{□}
 \newcommand\sdju@checkedbox{\makebox[1em]{\rlap{□}\hbox to 1em{\hss √\hss}}}
 \newcommand\sdju@secretbox{\sdju@box}
@@ -707,11 +714,33 @@
 \newcommand\notconfidential{%
   \renewcommand\sdju@secretbox{\sdju@box}\renewcommand\sdju@publicbox{\sdju@checkedbox}%
   \renewcommand\sdju@secretyears{\hspace{2\ccwd}}}
+\NewDocumentCommand\confidentiality{o m}{%
+  \ifstrequal{#2}{保密}{\confidential{\IfNoValueTF{#1}{}{#1}}}{%
+  \ifstrequal{#2}{不保密}{\notconfidential}{%
+    \renewcommand\sdju@secretbox{\sdju@box}\renewcommand\sdju@publicbox{\sdju@box}%
+    \renewcommand\sdju@secretyears{\hspace{2\ccwd}}%
+    \ifblank{#2}{}{\ClassWarningNoLine{sdjuthesis}{\string\confidentiality\space 的参数应为「保密」或「不保密」}}}}}
+\newcommand\declarationdate[3]{\sdju@setsrcdate{decl}{#1}{#2}{#3}}
+\newcommand\integritydate[3]{\sdju@setsrcdate{decl-integrity}{#1}{#2}{#3}}
+\newcommand\aistudentdate[3]{\sdju@setsrcdate{decl-ai-student}{#1}{#2}{#3}}
+\newcommand\aisupervisordate[3]{\sdju@setsrcdate{decl-ai-supervisor}{#1}{#2}{#3}}
+\newcommand\copyrightstudentdate[3]{\sdju@setsrcdate{decl-copyright-student}{#1}{#2}{#3}}
+\newcommand\copyrightsupervisordate[3]{\sdju@setsrcdate{decl-copyright-supervisor}{#1}{#2}{#3}}
+% 第 #2 处签字（integrity、ai-student…）的源码日期：单独写的 > \declarationdate；在本组内作为
+%   角色 #1 的源码日期交给 \sdju@datefill（其中源码日期优先于签名配置）
+\newcommand\sdju@declsrc[2]{%
+  \ifcsname sdju@srcdate@decl-#2\endcsname
+    \expandafter\let\csname sdju@srcdate@#1\expandafter\endcsname\csname sdju@srcdate@decl-#2\endcsname
+  \else\ifcsname sdju@srcdate@decl\endcsname
+    \expandafter\let\csname sdju@srcdate@#1\expandafter\endcsname\csname sdju@srcdate@decl\endcsname
+  \fi\fi}
 \newcommand\sdju@declindent{31.5bp}% 声明正文首行缩进
 \newcommand\sdju@signone{189bp}%      学术诚信声明签名栏的左端
 \newcommand\sdju@signright{286.9bp}%  两栏签名的右栏左端
-% 日期：#1 签名人角色；签名配置文件给了该角色的日期时填入，否则为空白（待手写）
-\newcommand\sdju@date[1]{日期：\sdju@datefill{#1}{2\ccwd}{1.5\ccwd}{1.5\ccwd}}
+% 日期：#1 签名人角色，#2 第几处签字；源码中写了日期时填入，否则签名配置文件给了该角色的日期时填入，
+%   都没有时为空白（待手写）
+\newcommand\sdju@date[2]{日期：\begingroup\sdju@declsrc{#1}{#2}%
+  \sdju@datefill{#1}{2\ccwd}{1.5\ccwd}{1.5\ccwd}\endgroup}
 % 签名处：#1 角色，#2 签名处的宽度。没有签名配置时留空（待手签）；有配置时由系统放入签名图片，
 %   高 28 磅，紧接在「作者签名：」「指导教师签名：」之后，底部压在基线上（见文末「电子签名」）
 \newcommand\sdju@signhere[2]{\sdju@signleft{#1}{#2}{28bp}}
@@ -727,7 +756,7 @@
    \vspace{3\baselineskip}
    \noindent\hspace*{\sdju@signone}作者签名：\sdju@signhere{student}{\dimexpr\textwidth-\sdju@signone-5\ccwd\relax}\par
    \vspace{\baselineskip}
-   \noindent\hspace*{\sdju@signone}\sdju@date{student}\par
+   \noindent\hspace*{\sdju@signone}\sdju@date{student}{integrity}\par
   \end{sdju@declbody}
   % ---- AI 使用情况声明（2026 版样本中没有这一页，按用户要求保留）----
   \ifsdju@opt@noaideclaration\else
@@ -745,7 +774,7 @@
      {作者签名：\sdju@signhere{student}{\dimexpr\sdju@signright-\sdju@declindent-5\ccwd-1\ccwd\relax}}%
      {指导教师签名：\sdju@signhere{supervisor}{\dimexpr\textwidth-\sdju@signright-7\ccwd\relax}}
    \vspace{\baselineskip}
-   \sdju@signpair{\sdju@declindent}{\sdju@date{student}}{\sdju@date{supervisor}}
+   \sdju@signpair{\sdju@declindent}{\sdju@date{student}{ai-student}}{\sdju@date{supervisor}{ai-supervisor}}
   \end{sdju@declbody}
   \fi
   % ---- 版权使用授权书 ----
@@ -761,7 +790,7 @@
      {作者签名：\sdju@signhere{student}{\dimexpr\sdju@signright-5\ccwd-1\ccwd\relax}}%
      {指导教师签名：\sdju@signhere{supervisor}{\dimexpr\textwidth-\sdju@signright-7\ccwd\relax}}
    \vspace{\baselineskip}
-   \sdju@signpair{\z@}{\sdju@date{student}}{\sdju@date{supervisor}}
+   \sdju@signpair{\z@}{\sdju@date{student}{copyright-student}}{\sdju@date{supervisor}{copyright-supervisor}}
   \end{sdju@declbody}
   \clearpage
   \fi}
@@ -934,7 +963,16 @@
   \@for\sdju@r:=#1\do{%
     \ifcsname sdju@sdate@\sdju@r\endcsname
       \expandafter\expandafter\expandafter\sdju@getdate@i\csname sdju@sdate@\sdju@r\endcsname
+    \fi}%
+  % 源码中写了日期（\studentdate、\supervisordate、\committeedate）时以源码为准
+  \@for\sdju@r:=#1\do{%
+    \ifcsname sdju@srcdate@\sdju@r\endcsname
+      \expandafter\expandafter\expandafter\sdju@usesrcdate\csname sdju@srcdate@\sdju@r\endcsname
     \fi}}
+\newcommand\sdju@usesrcdate[3]{\global\sdju@hasdatetrue\gdef\sdju@dy{#1}\gdef\sdju@dm{#2}\gdef\sdju@dd{#3}}
+% 源码中的日期：\sdju@setsrcdate{角色}{年}{月}{日}；三项都留空时取消（为空白的「年 月 日」，或签名配置的日期）
+\newcommand\sdju@setsrcdate[4]{\ifblank{#2#3#4}{\global\csundef{sdju@srcdate@#1}}
+  {\global\@namedef{sdju@srcdate@#1}{{#2}{#3}{#4}}}}
 \newcommand\sdju@getdate@i[3]{%
   \sdju@dcur=\numexpr(#1)*10000+(#2)*100+(#3)\relax
   \ifnum\sdju@dcur>\sdju@dbest
