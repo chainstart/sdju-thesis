@@ -321,9 +321,23 @@
 \newcommand\sdju@headpage{%
   \setbox\z@\hbox{\thepage}%
   \ifdim\wd\z@<\sdju@headpagew \hbox to\sdju@headpagew{\box\z@\hss}\else\box\z@\fi}
+% 页眉题目超过「版心宽 - 页码栏 - 1 字」时在自己的一栏内转行（末行与页码同一基线），
+%   不再与页码重叠；并给出警告，建议用 \title[页眉短题目]{…} 写一个短题目
+\newcommand\sdju@headtitlew{\dimexpr\headwidth-\sdju@headpagew-1em\relax}
+\newcommand\sdju@headtitlebox{%
+  \setbox\z@\hbox{\sdju@headtitle}%
+  \ifdim\wd\z@>\sdju@headtitlew
+    \smash{\parbox[b]{\sdju@headtitlew}{\raggedright\sdju@headtitle}}% 向上伸展，不改页眉高度、版心位置
+  \else\box\z@\fi}
+\AtBeginDocument{%
+  \setbox\z@\hbox{\sdjufont{9bp}{11.7bp}\heiti\sdju@headtitle}%
+  \ifdim\wd\z@>\sdju@headtitlew
+    \ClassWarningNoLine{sdjuthesis}{页眉中的论文题目一行排不下，已在页眉中转行；
+      建议用 \string\title[页眉短题目]{封面题目} 给页眉写一个短题目}%
+  \fi}
 \fancypagestyle{sdju}{%
   \fancyhf{}%
-  \fancyhead[L]{\sdjufont{9bp}{11.7bp}\heiti\sdju@headtitle}%
+  \fancyhead[L]{\sdjufont{9bp}{11.7bp}\heiti\sdju@headtitlebox}%
   \fancyhead[R]{\sdjufont{9bp}{11.7bp}\sdju@headpage}%
   \renewcommand\headrulewidth{0.75bp}%
   \renewcommand\footrulewidth{0pt}}
