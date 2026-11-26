@@ -607,24 +607,31 @@
 % 摘要
 %   中文：标题小二号黑体居中；正文小四号宋体，首行缩进 2 字符，段前段后 12 磅，1.25 倍行距
 %         （标题的段后 12 磅与首段的段前 12 磅取较大者，不叠加）；
-%         「关键词：」五号黑体，关键词小四号宋体，逗号分开，最后一个后面无标点
-%   英文：标题小二号 Times New Roman 加粗居中，段前 31.2 磅；正文同上；「Key words:」五号加粗
+%         「关键词：」五号黑体，关键词小四号宋体，逗号分开，最后一个后面无标点；
+%         关键词行为单倍行距（行框 15.6 磅），段前 12 磅（附件26 样本与 Word 模板）
+%   英文：标题小二号 Times New Roman 加粗居中，段前 31.2 磅；正文同上；「Key words:」五号加粗；
+%         关键词行为 1.5 倍行距（行框 23.4 磅），段前 12 磅（附件26 样本与 Word 模板）
+%   两种行距照样本原样保留（用户 2026-11-26 决定）；关键词行的位置按行框算法换算：
+%   与摘要末行基线相距 中文 29.5 磅、英文 33.5 磅
 % ===============================================================
 \newcommand\sdju@keywords{}
 \newcommand\sdju@keywordsen{}
 \newcommand\keywords[1]{\renewcommand\sdju@keywords{#1}}
 \newcommand\keywordsen[1]{\renewcommand\sdju@keywordsen{#1}}
-\newcommand\sdju@kwline[2]{% 悬挂缩进到标签之后
-  \par\noindent\settowidth{\@tempdima}{#1}%
+% \sdju@kwline{行框高}{标签}{关键词}：小四号，行距为行框高；悬挂缩进到标签之后
+\newcommand\sdju@kwline[3]{%
+  \par\vskip\sdju@pre{12bp}{#1}%
+  \begingroup\sdjufont{12bp}{#1}%
+  \noindent\settowidth{\@tempdima}{#2}%
   \hangindent=\@tempdima\hangafter=1
-  #1#2\par}
+  #2#3\par\endgroup}
 \newenvironment{abstract}
   {\sdjuchapter{摘\hspace{1em}要}\setlength{\parskip}{12bp}\vspace{-\parskip}}
-  {\sdju@kwline{{\heiti\sdjufont{10.5bp}{19.5bp}关键词：}}{\sdju@keywords}%
+  {\sdju@kwline{15.6bp}{{\heiti\sdjufont{10.5bp}{15.6bp}关键词：}}{\sdju@keywords}%
    \setlength{\parskip}{0pt}}
 \newenvironment{abstracten}
   {\sdjuchapter[][31.2bp]{\rmfamily\bfseries ABSTRACT}\setlength{\parskip}{12bp}\vspace{-\parskip}}
-  {\sdju@kwline{{\rmfamily\bfseries\sdjufont{10.5bp}{19.5bp}Key words: }}{\sdju@keywordsen}%
+  {\sdju@kwline{23.4bp}{{\rmfamily\bfseries\sdjufont{10.5bp}{23.4bp}Key words: }}{\sdju@keywordsen}%
    \setlength{\parskip}{0pt}}
 
 % ===============================================================
