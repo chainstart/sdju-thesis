@@ -90,7 +90,7 @@
   {\setCJKfamilyfont{sdjuyahei}{Microsoft YaHei}\newfontfamily\sdju@yaheilatin{Microsoft YaHei}%
    \newcommand\sdju@yahei{\CJKfamily{sdjuyahei}\sdju@yaheilatin}}
   {\newcommand\sdju@yahei{\heiti\sffamily}}
-\xeCJKDeclareCharClass{CJK}{"25A1,"221A}   % □ √ 用中文字体
+\xeCJKDeclareCharClass{CJK}{"25A1,"221A,"2460->"2469}   % □ √ ①～⑩ 用中文字体
 
 % ===============================================================
 % 格式参数（字号单位 bp，即 Word 中的「磅」）
@@ -442,6 +442,18 @@
 \newcommand\sdju@listindent{2em}
 \setlist{nosep}
 \setlist[enumerate,1]{label=（\arabic*）,leftmargin=0pt,labelindent=\sdju@listindent,
+  itemindent=*,labelsep=0pt,align=left,listparindent=\sdju@listindent}
+% 第二级编号（用户 2026-11-26 决定）：「（1）」下一级用「①」「②」…，编号后紧接内容；
+%   缩进、转行与第一级相同（首行缩进 \sdju@listindent，转行回到左边）。
+%   ①～⑩ 用字体中的字符（U+2460～U+2469，宋体、Fandol 都有）；宋体、Fandol 没有 ⑪ 以后的字符，
+%   第 11 项起画一个 1 字宽的圆圈，数字居中
+\newcommand\sdju@circled[1]{\ifnum#1>10 \sdju@drawcircled{#1}\else\char\numexpr"245F+#1\relax\fi}
+\newcommand\sdju@drawcircled[1]{\makebox[1em]{\raisebox{-0.12em}{\setlength\unitlength{1em}%
+  \begin{picture}(1,1)\put(0.5,0.5){\circle{0.9}}\put(0.5,0.47){\makebox(0,0){%
+    \fontsize{0.55em}{0.55em}\selectfont\number#1}}\end{picture}}}}
+\newcommand\sdju@circlednum[1]{\expandafter\sdju@circled\csname c@#1\endcsname}
+\AddEnumerateCounter{\sdju@circlednum}{\sdju@circled}{⑩}
+\setlist[enumerate,2]{label=\sdju@circlednum*,leftmargin=0pt,labelindent=\sdju@listindent,
   itemindent=*,labelsep=0pt,align=left,listparindent=\sdju@listindent}
 \setlist[itemize,1]{leftmargin=0pt,labelindent=\sdju@listindent,itemindent=*,
   labelsep=0.5em,listparindent=\sdju@listindent}
