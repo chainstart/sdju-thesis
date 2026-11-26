@@ -279,6 +279,11 @@
 \geometry{a4paper,top=28mm,bottom=25mm,left=25mm,right=25mm,
   headheight=12bp,headsep=8mm-12.6bp,footskip=10mm}
 \raggedbottom
+% 只放图表的页（浮动页）：图表从版心顶端排起（与 Word 中图片移到下一页时的位置一致），
+%   不按 LaTeX 默认在页面中部上下居中（一张小图悬在空白页中间）
+\setlength\@fptop{0pt}
+\setlength\@fpsep{\floatsep}
+\setlength\@fpbot{0pt plus 1fil}
 
 % ===============================================================
 % 论文信息
