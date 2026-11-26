@@ -177,12 +177,18 @@
 \newcommand\sdju@author{}
 \newcommand\sdju@supervisor{}
 \newcommand\sdju@companysupervisor{}
-% 封面日期：源码中用 \taskdate 写了日期时照写；没有写时，若签名配置文件给了院长、校内或企业
-%   指导教师的签字日期，取其中最晚的，写作「年 月 日」形式；都没有时为空白的「年 月 日」
-\newcommand\sdju@taskdate{\sdju@getdate{dean,supervisor,company_supervisor}%
+% 封面日期：源码中用 \taskdate 写了日期时照写；没有写或写成 \taskdate{}（留空）时，若签名配置文件
+%   给了院长、校内或企业指导教师的签字日期，取其中最晚的，写作「年 月 日」形式；都没有时为空白的「年 月 日」
+\newcommand\sdju@taskdatesrc{}
+\newcommand\sdju@taskdatedefault{\sdju@getdate{dean,supervisor,company_supervisor}%
   \ifsdju@hasdate
     \sdju@dy\hspace{1em}年\hspace{1em}\sdju@dm\hspace{1em}月\hspace{1em}\sdju@dd\hspace{1em}日%
   \else 年\hspace{2em}月\hspace{2em}日\fi}
+\newcommand\sdju@taskdate{\ifdefempty\sdju@taskdatesrc{\sdju@taskdatedefault}{\sdju@taskdatesrc}}
+% 封面框外的注（表格原有的文字）：\covernote{…} 可改写；留空时为附件22 原文
+\newcommand\sdju@covernotedefault{注：本任务书由上海电机学院教务处印制。}
+\newcommand\sdju@covernotetext{}
+\newcommand\covernote[1]{\renewcommand\sdju@covernotetext{#1}}
 \renewcommand\title[1]{\renewcommand\sdju@title{#1}}
 \newcommand\school[1]{\renewcommand\sdju@school{#1}}
 \newcommand\major[1]{\renewcommand\sdju@major{#1}}
@@ -191,7 +197,7 @@
 \renewcommand\author[1]{\renewcommand\sdju@author{#1}}
 \newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}
 \newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}
-\newcommand\taskdate[1]{\renewcommand\sdju@taskdate{#1}}
+\newcommand\taskdate[1]{\renewcommand\sdju@taskdatesrc{#1}}% 留空：空白的「年 月 日」
 
 % ===============================================================
 % 封面（附件22 第 1 页）
@@ -314,7 +320,7 @@
     \sdju@coverat{1.5\sdju@coverpitch}{\hfil\sdju@taskdate\hfil}%
     % 框外的注：基线在框底之下 \sdju@covernote（不加粗）
     \sdju@coverat{\dimexpr 624bp+\sdju@covernote-61bp-52bp-\sdju@coverhead-10.5\sdju@coverpitch\relax}%
-      {\mdseries\kaishu\sdjufont{10.5bp}{10.5bp}注：本任务书由上海电机学院教务处印制。\hfil}%
+      {\mdseries\kaishu\sdjufont{10.5bp}{10.5bp}\ifdefempty\sdju@covernotetext{\sdju@covernotedefault}{\sdju@covernotetext}\hfil}%
     \vss}%
   \par\endgroup
   \clearpage}
