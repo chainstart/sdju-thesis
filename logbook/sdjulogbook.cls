@@ -160,6 +160,10 @@
 % 指导记录表至少排多少行（不足时补空行，附件32 为 15 行）：\recordrows{15}
 \newcommand\sdju@recordrows{15}
 \newcommand\recordrows[1]{\renewcommand\sdju@recordrows{#1}}
+% 表下的注（表格原有的文字）：\recordnote{…} 可改写；留空时为附件32 原文
+\newcommand\sdju@recordnotedefault{注：每周（次）填写一条，学生应重点记录师生间课题探讨、研究、解决及任务布置等信息。}
+\newcommand\sdju@recordnote{}
+\newcommand\recordnote[1]{\renewcommand\sdju@recordnote{#1}}
 
 % ===============================================================
 % 表格
@@ -303,7 +307,7 @@
     \setbox\sdju@notebox\vbox{\hsize=\textwidth \linewidth=\hsize \parindent=\z@
       \normalfont\bfseries\sdjufont{10.5bp}{15.6bp}\sdju@firstline
       \xeCJKsetup{RubberPunctSkip=false}%
-      注：每周（次）填写一条，学生应重点记录师生间课题探讨、研究、解决及任务布置等信息。\par}%
+      \ifdefempty\sdju@recordnote{\sdju@recordnotedefault}{\sdju@recordnote}\par}%
     % 补空行：只补到本页排满为止，不为补空行而另起一页
     \begingroup\normalfont\normalsize
     \sdju@makerow{\sdju@rowh}{\sdju@cell{\sdju@datew}{c}{}\sdju@lastcell{j}{}}%
