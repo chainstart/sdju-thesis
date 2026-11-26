@@ -438,6 +438,16 @@
 \setlist[itemize,1]{leftmargin=0pt,labelindent=\sdju@listindent,itemindent=*,
   labelsep=0.5em,listparindent=\sdju@listindent}
 
+% 浮动体的放置：LaTeX 默认凡占半页以上的图表都可单独成页（floatpagefraction = 0.5），
+%   开题报告中半页多的表格、流程图因此常独占一页、下方留出大片空白，后文却排在下一页。
+%   改为：图表可占页面上方 90%（topfraction），正文至少留 10%；只有占页面 80% 以上的图表
+%   才单独成页，其余放在页面上方，下面接排正文
+\renewcommand\topfraction{.9}
+\renewcommand\bottomfraction{.6}
+\renewcommand\textfraction{.1}
+\renewcommand\floatpagefraction{.8}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{4}
 % 图、表、公式：按节编号；图表题与表格格式见前文
 \renewcommand\thefigure{\arabic{section}-\arabic{figure}}
 \renewcommand\thetable{\arabic{section}-\arabic{table}}
