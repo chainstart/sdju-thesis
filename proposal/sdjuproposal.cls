@@ -307,14 +307,27 @@
 %   下划线线粗 \sdju@ulinerule，中线在栏目基线之下 \sdju@ulinepos（附件23 中为 1.7～2.2 磅，取 1.9 磅）
 \newcommand\sdju@ulinepos{1.9bp}
 \newcommand\sdju@ulinerule{0.72bp}
-\newcommand\sdju@coverline[2]{%
-  \rlap{\rule[\dimexpr-\sdju@ulinepos-\sdju@ulinerule/2\relax]{#1}{\sdju@ulinerule}}%
-  \hbox to#1{\hss\sdjufont{15bp}{15bp}#2\hss}}
-% 栏目行：#1 栏目名（盒子），#2 内容；下划线从栏目名后 0.5 字起，到右端为止
+%   可选参数 #1：内容中心比下划线中心左移的距离的两倍（见 \sdju@coverfield）；不为 0 时内容最多
+%   左移到下划线左端为止
+\newcommand\sdju@coverline[3][\z@]{%
+  \rlap{\rule[\dimexpr-\sdju@ulinepos-\sdju@ulinerule/2\relax]{#2}{\sdju@ulinerule}}%
+  \ifdim#1=\z@
+    \hbox to#2{\hss\sdjufont{15bp}{15bp}#3\hss}%
+  \else
+    \setbox\tw@\hbox{\sdjufont{15bp}{15bp}#3}%
+    \@tempdimb=\dimexpr(#2-(#1)-\wd\tw@)/2\relax
+    \ifdim\@tempdimb<\z@ \@tempdimb=\z@ \fi
+    \hbox to#2{\kern\@tempdimb\box\tw@\hss}%
+  \fi}
+% 栏目行：#1 栏目名（盒子），#2 内容；下划线从栏目名后 0.5 字起，到右端为止。
+%   填写内容的中心与四字栏目（课题名称、学院……姓名）各行的内容中心对齐（用户 2026-11-26 决定）：
+%   栏目名比 4 字宽时（校内指导教师、企业指导教师），下划线照旧从栏目名之后起，内容不在本行下划线
+%   上居中，而是左移到与上面各行同一条竖线上
 \newcommand\sdju@coverfield[2]{%
   \sdju@coverrow{18}{\hskip\sdju@coverindent\setbox\z@\hbox{#1\hskip 0.5em}%
     \sdju@ulinew=\dimexpr\sdju@coverend-\sdju@coverindent-\wd\z@\relax
-    \box\z@\sdju@coverline{\sdju@ulinew}{#2}\hfil}}
+    \@tempdima=\dimexpr\wd\z@-4.5em\relax
+    \box\z@\sdju@coverline[\@tempdima]{\sdju@ulinew}{#2}\hfil}}
 % 课题名称第二行：小三号行，只有下划线（与第一行的下划线对齐）
 \newcommand\sdju@covertitle[1]{%
   \sdju@coverrow{15}{\hskip\dimexpr\sdju@coverend-\sdju@coverw\relax\sdju@coverline{\sdju@coverw}{#1}\hfil}}

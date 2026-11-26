@@ -514,12 +514,27 @@
 \newdimen\sdju@fieldgaplen
 \newlength\sdju@ulinew
 \newbox\sdju@titlebox
-% 栏目行：#1 栏目名，#2 内容（写在下划线上，居中）
+% 栏目行：#1 栏目名，#2 内容（写在下划线上）
+%   填写内容的中心与最上面两行（学生姓名、学生学号）的内容中心在同一条竖线上（用户 2026-11-26
+%   决定，与开题报告封面同一原则）：栏目名比「学生姓名：」长或短时（专业、校内指导教师、
+%   企业指导教师、学院），下划线照旧从栏目名之后起到右端，内容按上面两行的中心排，
+%   但不越出本行下划线的两端
 \newcommand\sdju@coverfield[2]{%
   \setbox\z@\hbox{#1：}%
   \sdju@ulinew=\dimexpr\sdju@coverright-\sdju@coverleft-\wd\z@\relax
-  \box\z@\rlap{\rule[-2.5bp]{\sdju@ulinew}{0.6bp}}%
-  \hbox to\sdju@ulinew{\hss#2\hss}}
+  \setbox\tw@\hbox{学生姓名：}%
+  \ifdim\wd\z@=\wd\tw@
+    \box\z@\rlap{\rule[-2.5bp]{\sdju@ulinew}{0.6bp}}%
+    \hbox to\sdju@ulinew{\hss#2\hss}%
+  \else
+    \setbox\@tempboxa\hbox{#2}%
+    % 内容左端距下划线左端：上面两行的内容中心 - 本行栏目名宽 - 内容宽的一半
+    \dimen@=\dimexpr(\sdju@coverright-\sdju@coverleft+\wd\tw@)/2-\wd\z@-\wd\@tempboxa/2\relax
+    \ifdim\dimen@>\dimexpr\sdju@ulinew-\wd\@tempboxa\relax \dimen@=\dimexpr\sdju@ulinew-\wd\@tempboxa\relax \fi
+    \ifdim\dimen@<\z@ \dimen@=\z@ \fi
+    \box\z@\rlap{\rule[-2.5bp]{\sdju@ulinew}{0.6bp}}%
+    \hbox to\sdju@ulinew{\kern\dimen@\box\@tempboxa\hss}%
+  \fi}
 % 均衡折行（用户 2026-11-26 决定：长题目转行时两行长度大致相当，不让一两个字单独成行）：
 %   \sdju@balance{内容} 在当前字体、\hsize 下求出与整宽排时行数相同的最小行宽 w（二分，精度 0.1 磅），
 %   把 \leftskip、\rightskip 设为 (\hsize - w)/2 加上原有的伸展，各行仍居中、长度大致相当。
