@@ -28,17 +28,24 @@
 % ===============================================================
 % 字体：宋体 / 黑体 / Times New Roman；找不到时用 Fandol / TeX Gyre Termes
 % ===============================================================
+% 加粗：样表中的「加粗」是 Word 的描边加粗（字形填充后再以字号 1/35 的线宽描边，2026 版 PDF
+%   各附件实测均为字号的 2.86%）。宋体、黑体、楷体、仿宋、华文中宋没有粗体字形，用 XeTeX 的伪粗体
+%   模拟：xdvipdfmx 的描边线宽为 AutoFakeBold × 字号（pt）/ 100，取 \sdju@fakebold = 2.85，与 Word 相同。
+%   只用于真字体（Windows 字体）；Fandol 有粗体字形，找不到真字体时的设置与此无关。
+\def\sdju@fakebold{2.85}
+\newif\ifsdju@realfonts
 \providecommand\songti{}\providecommand\heiti{}
 \providecommand\kaishu{}\providecommand\fangsong{}
 \IfFontExistsTF{SimSun}{%
-  \setCJKmainfont{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKsansfont{SimHei}[AutoFakeBold=2]
+  \sdju@realfontstrue
+  \setCJKmainfont{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKsansfont{SimHei}[AutoFakeBold=\sdju@fakebold]
   \setCJKmonofont{SimSun}
-  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=2]
-  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
-  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}[AutoFakeBold=2]}
-    {\setCJKfamilyfont{zhfs}{SimSun}[AutoFakeBold=2]}
+  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=\sdju@fakebold]
+  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhkai}{SimSun}[AutoFakeBold=\sdju@fakebold]}
+  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}[AutoFakeBold=\sdju@fakebold]}
+    {\setCJKfamilyfont{zhfs}{SimSun}[AutoFakeBold=\sdju@fakebold]}
 }{%
   \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
   \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
@@ -61,6 +68,14 @@
 \RequirePackage{unicode-math}
 \setmathfont{texgyretermes-math.otf}
 \xeCJKDeclareCharClass{CJK}{"25A1,"221A}   % □ √ 用中文字体
+% 栏目名中的半角符号「(」「)」「/」：样表为宋体的半角字形（半个字宽），有宋体时照用；
+%   没有宋体时用正文西文字体（与 Fandol 回退版原样相同）
+\ifsdju@realfonts
+  \newfontfamily\sdju@songlatin{SimSun}
+  \newcommand\sdju@asc[1]{{\sdju@songlatin#1}}
+\else
+  \newcommand\sdju@asc[1]{#1}
+\fi
 
 % ===============================================================
 % 格式参数（字号单位 bp，即 Word 中的「磅」）
@@ -320,9 +335,9 @@
     \sdju@cell{76.05bp}{c}{\sdju@lab{专\hspace{1em}业}}\sdju@cell{91.2bp}{l}{\sdju@major}%
     \sdju@cell{100.1bp}{c}{\sdju@lab{学\hspace{1em}院}}\sdju@lastcell{l}{\sdju@school}}%
   \sdju@row{25.5bp}{%
-    \sdju@cell{111.05bp}{l}{{\def\CJKecglue{}毕业设计(论文)题目}}\sdju@lastcell{l}{\sdju@title}}%
+    \sdju@cell{111.05bp}{l}{{\def\CJKecglue{}毕业设计\sdju@asc{(}论文\sdju@asc{)}题目}}\sdju@lastcell{l}{\sdju@title}}%
   \sdju@row{25.5bp}{%
-    \sdju@cell{111.05bp}{l}{课题来源/项目编号}\sdju@lastcell{l}{\sdju@projectsource}}%
+    \sdju@cell{111.05bp}{l}{课题来源\sdju@asc{/}项目编号}\sdju@lastcell{l}{\sdju@projectsource}}%
   \sdju@row{25.5bp}{%
     \sdju@cell{111.05bp}{l}{课题有无变化}%
     \sdju@lastcell{l}{\sdju@checkbox{\sdju@changeno}无\hspace{1em}\sdju@checkbox{\sdju@changeyes}有\hspace{1em}%

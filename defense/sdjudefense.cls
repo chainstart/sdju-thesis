@@ -28,16 +28,23 @@
 % ===============================================================
 % 字体：宋体 / 黑体 / Times New Roman；找不到时用 Fandol / TeX Gyre Termes
 % ===============================================================
+% 加粗：样表中的「加粗」是 Word 的描边加粗（字形填充后再以字号 1/35 的线宽描边，2026 版 PDF
+%   各附件实测均为字号的 2.86%）。宋体、黑体、楷体、仿宋、华文中宋没有粗体字形，用 XeTeX 的伪粗体
+%   模拟：xdvipdfmx 的描边线宽为 AutoFakeBold × 字号（pt）/ 100，取 \sdju@fakebold = 2.85，与 Word 相同。
+%   只用于真字体（Windows 字体）；Fandol 有粗体字形，找不到真字体时的设置与此无关。
+\def\sdju@fakebold{2.85}
+\newif\ifsdju@realfonts
 \providecommand\songti{}\providecommand\heiti{}
 \providecommand\kaishu{}\providecommand\fangsong{}
 \IfFontExistsTF{SimSun}{%
-  \setCJKmainfont{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKsansfont{SimHei}[AutoFakeBold=2]
+  \sdju@realfontstrue
+  \setCJKmainfont{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKsansfont{SimHei}[AutoFakeBold=\sdju@fakebold]
   \setCJKmonofont{SimSun}
-  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=2]
-  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
-  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}}{\setCJKfamilyfont{zhfs}{SimSun}}
+  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=\sdju@fakebold]
+  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhkai}{SimSun}[AutoFakeBold=\sdju@fakebold]}
+  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhfs}{SimSun}[AutoFakeBold=\sdju@fakebold]}
 }{%
   \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
   \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]

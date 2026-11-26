@@ -26,18 +26,25 @@
 \RequirePackage{tikz}
 
 % ===============================================================
-% 字体：宋体 / 黑体 / Times New Roman，标题用方正大标宋；找不到时用 Fandol / TeX Gyre Termes
+% 字体：宋体 / 黑体 / Times New Roman，标题用方正大标宋（无则华文中宋）；找不到时用 Fandol / TeX Gyre Termes
 % ===============================================================
+% 加粗：样表中的「加粗」是 Word 的描边加粗（字形填充后再以字号 1/35 的线宽描边，2026 版 PDF
+%   各附件实测均为字号的 2.86%）。宋体、黑体、楷体、仿宋、华文中宋没有粗体字形，用 XeTeX 的伪粗体
+%   模拟：xdvipdfmx 的描边线宽为 AutoFakeBold × 字号（pt）/ 100，取 \sdju@fakebold = 2.85，与 Word 相同。
+%   只用于真字体（Windows 字体）；Fandol 有粗体字形，找不到真字体时的设置与此无关。
+\def\sdju@fakebold{2.85}
+\newif\ifsdju@realfonts
 \providecommand\songti{}\providecommand\heiti{}
 \providecommand\kaishu{}\providecommand\fangsong{}
 \IfFontExistsTF{SimSun}{%
-  \setCJKmainfont{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKsansfont{SimHei}[AutoFakeBold=2]
+  \sdju@realfontstrue
+  \setCJKmainfont{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKsansfont{SimHei}[AutoFakeBold=\sdju@fakebold]
   \setCJKmonofont{SimSun}
-  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=2]
-  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
-  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}}{\setCJKfamilyfont{zhfs}{SimSun}}
+  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=\sdju@fakebold]
+  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhkai}{SimSun}[AutoFakeBold=\sdju@fakebold]}
+  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhfs}{SimSun}[AutoFakeBold=\sdju@fakebold]}
 }{%
   \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
   \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
@@ -192,14 +199,22 @@
 
 % ===============================================================
 % 标题与基本信息（附件32 上部）：\maketitle
-%   「上海电机学院毕业设计（论文）指导记录」小二号方正大标宋（没有时用宋体加粗），居中，
+%   「上海电机学院毕业设计（论文）指导记录」小二号方正大标宋，不加粗（样表为方正大标宋简体，未描边），居中，
 %   基线在版心顶下 20.7 磅，表格上边线（外缘）再下 10.5 磅（2026 版附件32）
+%   没有方正大标宋时用华文中宋代替（用户 2026-11-26 决定，看成品再定）：华文中宋比大标宋细，
+%   加伪粗体 \sdju@dbsfakebold，使墨迹与样表相当：样表标题每字墨迹占字面（1 字 × 1 字）的 32.7%
+%   （2026 版 PDF 以 1200 dpi 渲染实测）；华文中宋不加粗约 22%，伪粗体 2.45、2.65、2.85、3.0 时
+%   分别为 31.4%、32.1%、32.8%、33.4%，取 2.85（与描边加粗的强度相同）。也没有华文中宋时用宋体加粗。
 %   基本信息：学院、专业／班级、学号／姓名、指导教师（四格）；题目（两格）。四号宋体，单倍行距 18.2 磅，
 %   栏目名加粗居中（2026 版为宋体加粗：填充＋描边），填写的内容不加粗、两端对齐（靠左）
 % ===============================================================
+\def\sdju@dbsfakebold{2.85}
 \IfFontExistsTF{FZDaBiaoSong-B06S}
   {\setCJKfamilyfont{sdjudabiaosong}{FZDaBiaoSong-B06S}\newcommand\sdju@titlefont{\CJKfamily{sdjudabiaosong}}}
-  {\newcommand\sdju@titlefont{\songti\bfseries}}
+  {\IfFontExistsTF{STZhongsong}
+    {\setCJKfamilyfont{sdjudabiaosong}{STZhongsong}[FakeBold=\sdju@dbsfakebold]%
+     \newcommand\sdju@titlefont{\CJKfamily{sdjudabiaosong}}}
+    {\newcommand\sdju@titlefont{\songti\bfseries}}}
 \newcommand\sdju@cellfont{\normalfont\sdjufont{14bp}{18.2bp}}% 表格栏目：四号，单倍行距
 \newcommand\sdju@lab[1]{{\bfseries#1}}% 栏目名加粗
 \newlength\sdju@titlebase \setlength\sdju@titlebase{20.7bp}% 标题基线在版心顶之下
@@ -232,7 +247,8 @@
 %   两行以内不加高）。一页排不下时下一页接着排，并重复表头行。记录不足 \recordrows 行（默认 15）时
 %   在末尾补空行，空行只补到本页排满为止（连同其后的注）。
 %   表格之后印附件32 的注：五号宋体加粗、单倍行距，紧接表格下边线（第一行基线在其下 11.6 磅），
-%   左右与版心齐，排不下时转行。
+%   左右与版心齐，排不下时转行。有宋体等真字体时，注中的标点按 Word 的方式不压缩
+%   （xeCJK 默认可压缩标点后的空白，41 个字能挤进一行；Word 不压缩，样表在「信」后转行）。
 % ===============================================================
 \newif\ifsdju@recopen
 \newcounter{sdjurecord}
@@ -270,6 +286,7 @@
     % 注
     \setbox\sdju@notebox\vbox{\hsize=\textwidth \linewidth=\hsize \parindent=\z@
       \normalfont\bfseries\sdjufont{10.5bp}{15.6bp}\sdju@firstline
+      \ifsdju@realfonts\xeCJKsetup{RubberPunctSkip=false}\fi
       注：每周（次）填写一条，学生应重点记录师生间课题探讨、研究、解决及任务布置等信息。\par}%
     % 补空行：只补到本页排满为止，不为补空行而另起一页
     \begingroup\normalfont\normalsize

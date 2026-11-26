@@ -44,16 +44,23 @@
 % ===============================================================
 % 字体：宋体 / 黑体 / Times New Roman，封面用微软雅黑；找不到时用 Fandol / TeX Gyre Termes
 % ===============================================================
+% 加粗：样表中的「加粗」是 Word 的描边加粗（字形填充后再以字号 1/35 的线宽描边，2026 版 PDF
+%   各附件实测均为字号的 2.86%）。宋体、黑体、楷体、仿宋、华文中宋没有粗体字形，用 XeTeX 的伪粗体
+%   模拟：xdvipdfmx 的描边线宽为 AutoFakeBold × 字号（pt）/ 100，取 \sdju@fakebold = 2.85，与 Word 相同。
+%   只用于真字体（Windows 字体）；Fandol 有粗体字形，找不到真字体时的设置与此无关。
+\def\sdju@fakebold{2.85}
+\newif\ifsdju@realfonts
 \providecommand\songti{}\providecommand\heiti{}
 \providecommand\kaishu{}\providecommand\fangsong{}
 \IfFontExistsTF{SimSun}{%
-  \setCJKmainfont{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKsansfont{SimHei}[AutoFakeBold=2]
+  \sdju@realfontstrue
+  \setCJKmainfont{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKsansfont{SimHei}[AutoFakeBold=\sdju@fakebold]
   \setCJKmonofont{SimSun}
-  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=2]
-  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
-  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}}{\setCJKfamilyfont{zhfs}{SimSun}}
+  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=\sdju@fakebold]
+  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhkai}{SimSun}[AutoFakeBold=\sdju@fakebold]}
+  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhfs}{SimSun}[AutoFakeBold=\sdju@fakebold]}
 }{%
   \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
   \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
@@ -632,8 +639,18 @@
   {\sdjuchapter{摘\hspace{1em}要}\setlength{\parskip}{12bp}\vspace{-\parskip}}
   {\sdju@kwline{15.6bp}{{\heiti\sdjufont{10.5bp}{15.6bp}关键词：}}{\sdju@keywords}%
    \setlength{\parskip}{0pt}}
+% 英文摘要的词间距按 Word 的两端对齐方式排（只在有 Times New Roman 等真字体时启用）：Word 只拉宽、
+%   不压缩词间空格，行末空格留在行内（附件26 样本英文摘要各行右端都比版心右边短一个空格，
+%   521.2 磅对 524.4 磅）。TeX 默认可压缩词间空格、行末不留空，每行多排几个字母，样本 23 行排成 22 行，
+%   「Key words」比样本高 19.5 磅；按 Word 的方式排后与样本同为 23 行。
+\newcommand\sdju@wordjustify{%
+  \ifsdju@realfonts
+    \spaceskip=\fontdimen2\font plus \fontdimen3\font\relax
+    \rightskip=\fontdimen2\font\relax
+  \fi}
 \newenvironment{abstracten}
-  {\sdjuchapter[][31.2bp]{\rmfamily\bfseries ABSTRACT}\setlength{\parskip}{12bp}\vspace{-\parskip}}
+  {\sdjuchapter[][31.2bp]{\rmfamily\bfseries ABSTRACT}\setlength{\parskip}{12bp}\vspace{-\parskip}%
+   \sdju@wordjustify}
   {\sdju@kwline{23.4bp}{{\rmfamily\bfseries\sdjufont{10.5bp}{23.4bp}Key words: }}{\sdju@keywordsen}%
    \setlength{\parskip}{0pt}}
 

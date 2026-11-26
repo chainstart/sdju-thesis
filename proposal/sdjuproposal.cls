@@ -38,22 +38,24 @@
 
 % ===============================================================
 % 字体：宋体 / 黑体 / Times New Roman，封面用华文中宋；找不到时用 Fandol / TeX Gyre Termes
-%   加粗：附件23 中的「加粗」是 Word 的描边加粗（字形填充后再描边）。宋体、黑体没有粗体字形，
-%   用 XeTeX 的伪粗体（AutoFakeBold）模拟，强度 \sdju@fakebold 按 2026 版 PDF 中各字号
-%   （12～26 磅）加粗文字的笔画粗细（字面墨迹占比）标定：2.7 时与样表一致，原来的 2 偏细。
-%   Fandol 宋体有真正的粗体字形，其笔画粗细与样表的描边加粗相当（同法核对），直接使用。
 % ===============================================================
-\def\sdju@fakebold{2.7}
+% 加粗：样表中的「加粗」是 Word 的描边加粗（字形填充后再以字号 1/35 的线宽描边，2026 版 PDF
+%   各附件实测均为字号的 2.86%）。宋体、黑体、楷体、仿宋、华文中宋没有粗体字形，用 XeTeX 的伪粗体
+%   模拟：xdvipdfmx 的描边线宽为 AutoFakeBold × 字号（pt）/ 100，取 \sdju@fakebold = 2.85，与 Word 相同。
+%   只用于真字体（Windows 字体）；Fandol 有粗体字形，找不到真字体时的设置与此无关。
+\def\sdju@fakebold{2.85}
+\newif\ifsdju@realfonts
 \providecommand\songti{}\providecommand\heiti{}
 \providecommand\kaishu{}\providecommand\fangsong{}
 \IfFontExistsTF{SimSun}{%
+  \sdju@realfontstrue
   \setCJKmainfont{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
   \setCJKsansfont{SimHei}[AutoFakeBold=\sdju@fakebold]
   \setCJKmonofont{SimSun}
   \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
   \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=\sdju@fakebold]
-  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
-  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}}{\setCJKfamilyfont{zhfs}{SimSun}}
+  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhkai}{SimSun}[AutoFakeBold=\sdju@fakebold]}
+  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhfs}{SimSun}[AutoFakeBold=\sdju@fakebold]}
 }{%
   \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
   \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
@@ -531,10 +533,15 @@
   \sdju@opfirsttrue
   \sdju@oploop
   \endgroup}
-% 方框「□」：按附件23（宋体的 □）画出，边长 0.71 字、线粗 0.04 字，底边在基线上，
-%   左边距 0.14 字，占 1 字宽；不用字体里的 □（Fandol 的 □ 几乎占满整个字身，比样表大得多）
-\newcommand\sdju@box{\makebox[1em][l]{\hspace{0.14em}%
-  \fboxsep=\z@\fboxrule=0.04em\framebox{\rule{0pt}{0.63em}\rule{0.63em}{0pt}}}}
+% 方框「□」：有宋体时直接用宋体的 □（附件23 即宋体的 □）；只有 Fandol 时按宋体的 □ 画出
+%   （边长 0.71 字、线粗 0.04 字，底边在基线上，左边距 0.14 字，占 1 字宽），
+%   不用 Fandol 的 □（几乎占满整个字身，比样表大得多）
+\ifsdju@realfonts
+  \newcommand\sdju@box{□}
+\else
+  \newcommand\sdju@box{\makebox[1em][l]{\hspace{0.14em}%
+    \fboxsep=\z@\fboxrule=0.04em\framebox{\rule{0pt}{0.63em}\rule{0.63em}{0pt}}}}
+\fi
 \newcommand\committeeopinion{%
   \newgeometry{top=72bp,bottom=72bp,left=90bp,right=90bp,headheight=0pt,headsep=0pt,
     footskip=\dimexpr 72bp-49.6bp-\sdju@below{9bp}{11.7bp}\relax}%
