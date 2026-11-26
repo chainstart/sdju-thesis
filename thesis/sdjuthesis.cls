@@ -710,7 +710,10 @@
   \clearpage
   \setcounter{chapter}{0}\setcounter{section}{0}%
   \renewcommand\thechapter{\Alph{chapter}}%
-  \ctexset{chapter/name={附录,},chapter/number=\thechapter,chapter/aftername=\enspace}}
+  % 「附录A」中「录」与「A」之间不插入中西文间距（同「图2-1」「表2-1」）
+  \ctexset{chapter/name={附录,},
+    chapter/number=\texorpdfstring{\hbox{\thechapter}}{\thechapter},
+    chapter/aftername=\enspace}}
 
 \RequirePackage[hidelinks,bookmarksnumbered,unicode]{hyperref}
 \graphicspath{{figures/}}
