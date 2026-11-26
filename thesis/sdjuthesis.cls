@@ -54,13 +54,16 @@
 \providecommand\kaishu{}\providecommand\fangsong{}
 \IfFontExistsTF{SimSun}{%
   \sdju@realfontstrue
-  \setCJKmainfont{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
-  \setCJKsansfont{SimHei}[AutoFakeBold=\sdju@fakebold]
-  \setCJKmonofont{SimSun}
-  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
-  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=\sdju@fakebold]
-  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhkai}{SimSun}[AutoFakeBold=\sdju@fakebold]}
-  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhfs}{SimSun}[AutoFakeBold=\sdju@fakebold]}
+  % 宋体、黑体等缺字（如「泰莱达因・艾斯科」的 U+30FB）时用 Fandol 中的同类字体补字，
+  %   不再整字丢失（Word 也会换用其他字体显示）
+  \xeCJKsetup{AutoFallBack=true}
+  \setCJKmainfont{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2,FallBack={FandolSong-Regular.otf}]
+  \setCJKsansfont{SimHei}[AutoFakeBold=\sdju@fakebold,FallBack={FandolHei-Regular.otf}]
+  \setCJKmonofont{SimSun}[FallBack={FandolSong-Regular.otf}]
+  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2,FallBack={FandolSong-Regular.otf}]
+  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=\sdju@fakebold,FallBack={FandolHei-Regular.otf}]
+  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}[AutoFakeBold=\sdju@fakebold,FallBack={FandolKai-Regular.otf}]}{\setCJKfamilyfont{zhkai}{SimSun}[AutoFakeBold=\sdju@fakebold,FallBack={FandolSong-Regular.otf}]}
+  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}[AutoFakeBold=\sdju@fakebold,FallBack={FandolFang-Regular.otf}]}{\setCJKfamilyfont{zhfs}{SimSun}[AutoFakeBold=\sdju@fakebold,FallBack={FandolSong-Regular.otf}]}
 }{%
   \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
   \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
