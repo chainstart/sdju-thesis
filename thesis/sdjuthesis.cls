@@ -453,7 +453,8 @@
     \lineskiplimit=-\maxdimen
     \sdju@title\par
     \ifx\sdju@titleen\@empty\else\sdju@titleen\par\fi
-    \kern-\prevdepth}}
+    % 题目为空时盒中没有行，\prevdepth 为 -1000pt，不能拿来回退（否则盒子深 1000pt）
+    \ifdim\prevdepth>\z@ \kern-\prevdepth\fi}}
 % 封面能容纳的额外高度：上移 + 下移 + 两处弹性间距的压缩量
 \newcommand\sdju@coverroom{%
   \dimexpr\sdju@coverupmax+\sdju@coverdownmax+\sdju@coversqueeze\relax}
