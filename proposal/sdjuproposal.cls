@@ -268,7 +268,9 @@
 \newcommand\sdju@author{}
 \newcommand\sdju@supervisor{}
 \newcommand\sdju@companysupervisor{}
-\newcommand\sdju@finaldate{20\hspace{1em}年\hspace{1em}月\hspace{1em}日}
+\newcommand\sdju@finaldatedefault{20\hspace{1em}年\hspace{1em}月\hspace{1em}日}
+\newcommand\sdju@finaldatesrc{}
+\newcommand\sdju@finaldate{\ifdefempty\sdju@finaldatesrc{\sdju@finaldatedefault}{\sdju@finaldatesrc}}
 \renewcommand\title[1]{\renewcommand\sdju@title{#1}}
 \newcommand\subtitle[1]{\renewcommand\sdju@subtitle{#1}}
 \newcommand\school[1]{\renewcommand\sdju@school{#1}}
@@ -278,7 +280,7 @@
 \renewcommand\author[1]{\renewcommand\sdju@author{#1}}
 \newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}% 校内指导教师
 \newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}% 企业指导教师（无则不写，封面该栏留空）
-\newcommand\finaldate[1]{\renewcommand\sdju@finaldate{#1}}
+\newcommand\finaldate[1]{\renewcommand\sdju@finaldatesrc{#1}}% 留空：空白的「20 年 月 日」
 
 % ===============================================================
 % 封面（附件23 第 1 页）：边框内自上而下逐行排，每行占一个 Word 行框（1.5 倍行距）
@@ -640,12 +642,13 @@
   \newcommand\sdju@box{\makebox[1em][l]{\hspace{0.14em}%
     \fboxsep=\z@\fboxrule=0.04em\framebox{\rule{0pt}{0.63em}\rule{0.63em}{0pt}}}}
 \fi
-% 意见页的填写内容（可选；不写时为空白表，与样表相同）。用于把已经填好的开题报告（如往届归档稿）
-%   原样录入；正常流程中这些内容由指导教师、答辩小组在打印稿上手写。
+% 意见页的栏目：和封面栏目一样，在源码中直接填写；留空（花括号内不写）时为空白表，与样表相同。
+%   \supervisoropinion{意见}：指导教师意见（正文中，排出这一页）
 %   \supervisordate{年}{月}{日}：指导教师意见的日期，填在「年 月 日」的空白处
-%   \committeecheck{第几项}{第几个方框}：答辩小组意见第 1～8 项中勾选的方框（从 1 数），可写多次
+%   \committeecheck{第几项}{选项}：答辩小组意见第 1～8 项中勾选的方框，选项写方框后的文字
+%     （如 \committeecheck{1}{有工程背景}），也可写第几个方框（从 1 数）；留空不勾；可写多次
 %   \committeeadvice{建议内容}：答辩小组结论中「建议：」下的文字（小四号，1.25 倍行距，首行缩进 2 字符）
-%   \committeeconclusion{通过|不通过}、\committeegrade{优秀|良好|及格}：勾选答辩结论、等第
+%   \committeeresult{通过|不通过}（同 \committeeconclusion）、\committeegrade{优秀|良好|及格}：勾选答辩结论、等第
 %   \committeedate{年}{月}{日}：答辩小组结论的日期
 %   勾选的方框为方框内加「√」（Word 样稿用 Wingdings 2 的带勾方框）。
 %   签名：没有签名配置时留空，待手签；有配置时由系统放入签名图片（指导教师 supervisor、答辩小组组长
@@ -666,11 +669,27 @@
     \sdju@getdate{#2}%
     \ifsdju@hasdate \sdju@datefill{#2}{0pt}{2em}{2em}\else \sdju@datefields{#1}\fi
   \else \sdju@datefields{#1}\fi}
-\newcommand\committeecheck[2]{\@namedef{sdju@chk@#1@#2}{}}
+% 各项方框后的文字 → 第几个方框（\committeecheck 的第二个参数可写文字）
+\def\sdju@defopts#1#2{\@tempcnta=\z@
+  \@for\sdju@o:=#2\do{\advance\@tempcnta\@ne
+    \expandafter\edef\csname sdju@opt@#1@\sdju@o\endcsname{\the\@tempcnta}}}
+\sdju@defopts{1}{有理论意义,有工程背景,有实用价值,意义不大}
+\sdju@defopts{2}{偏高,适当,偏低}
+\sdju@defopts{3}{偏大,适当,偏小}
+\sdju@defopts{4}{好,较好,一般,不可行}
+\sdju@defopts{5}{好,较好,一般,较差}
+\sdju@defopts{6}{好,较好,一般,较差}
+\sdju@defopts{7}{好,较好,一般,较差}
+\sdju@defopts{8}{好,较好,一般,较差}
+\newcommand\committeecheck[2]{\ifblank{#2}{}{%
+  \ifcsname sdju@opt@#1@#2\endcsname
+    \@namedef{sdju@chk@#1@\csname sdju@opt@#1@#2\endcsname}{}%
+  \else \@namedef{sdju@chk@#1@#2}{}\fi}}
 \newcommand\sdju@comadvice{}
 \newcommand\committeeadvice[1]{\renewcommand\sdju@comadvice{#1}}
 \newcommand\committeeconclusion[1]{\def\@tempa{#1}\def\@tempb{通过}%
-  \ifx\@tempa\@tempb\committeecheck{c}{1}\else\committeecheck{c}{2}\fi}
+  \ifx\@tempa\@tempb\committeecheck{c}{1}\else\ifblank{#1}{}{\committeecheck{c}{2}}\fi}
+\newcommand\committeeresult{\committeeconclusion}
 \newcommand\committeegrade[1]{\def\@tempa{#1}%
   \def\@tempb{优秀}\ifx\@tempa\@tempb\committeecheck{g}{1}\fi
   \def\@tempb{良好}\ifx\@tempa\@tempb\committeecheck{g}{2}\fi
