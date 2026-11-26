@@ -79,7 +79,7 @@
     \usebeamerfont{page number in head/foot}%
     \sbox\sdju@footbox{\insertshorttitle}%
     \ifdim\wd\sdju@footbox>.75\textwidth
-      毕业设计（论文）答辩%
+      \sdju@defensename%
     \else
       \usebox\sdju@footbox
     \fi
@@ -101,12 +101,17 @@
 \newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}
 \newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}
 \newcommand\defensedate[1]{\date{#1}}
+% 封面题目上方、页脚（题目过长时）的答辩名称：\defensename{…}；留空为「毕业设计（论文）答辩」
+\newcommand\sdju@defensenamedefault{毕业设计（论文）答辩}
+\newcommand\sdju@defensenamesrc{}
+\newcommand\defensename[1]{\renewcommand\sdju@defensenamesrc{#1}}
+\newcommand\sdju@defensename{\ifx\sdju@defensenamesrc\@empty\sdju@defensenamedefault\else\sdju@defensenamesrc\fi}
 \defensedate{}
 
 \setbeamertemplate{title page}{%
   \includegraphics[width=.29\textwidth]{figures/sdju-logo.jpg}\par
   \medskip
-  {\color{sdjumuted}\small 毕业设计（论文）答辩\par}
+  {\color{sdjumuted}\small \sdju@defensename\par}
   \smallskip
   {\usebeamercolor[fg]{title}\usebeamerfont{title}\raggedright\inserttitle\par}
   \ifx\sdju@titleen\@empty\else
@@ -145,8 +150,9 @@
 }
 \AtBeginSection[]{%
   \frame{\sdju@divider{第 \insertsectionnumber\ 节}{\insertsectionhead}}}
-\newcommand\sdjuthanks[1]{%
-  \frame[plain,noframenumbering]{\sdju@divider{致谢}{谢谢各位老师}\medskip #1}}
+% 致谢页：\sdjuthanks[大字标题]{致谢文字}；大字标题默认「谢谢各位老师」
+\newcommand\sdjuthanks[2][谢谢各位老师]{%
+  \frame[plain,noframenumbering]{\sdju@divider{致谢}{#1}\medskip #2}}
 
 % 放在图表题注之后。路径用 \path{...}，以便在较长路径中断行。
 \newcommand\sdjusource[1]{%
