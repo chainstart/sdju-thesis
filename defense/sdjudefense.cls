@@ -147,8 +147,10 @@
 % ===============================================================
 % 表格（尺寸按 2026 版附件31 量取）
 %   行高为相邻两条横线中心之间的距离。
-%   表格宽 428.9 磅，左边线伸出版心左边 5.8 磅；线粗均为 0.48 磅（原件为细实线，外框不加粗）。
-%   列宽 104.9 | 161.7 | 67.4 | 余下（94.9）；单元格左右内边距 5.4 磅；表格文字小四号宋体。
+%   表格宽 428.9 磅（含两侧边线），左边线伸出版心左边 5.8 磅；线粗均为 0.48 磅（原件为细实线，外框不加粗）。
+%   列宽（相邻竖线中心之间）104.65 | 161.65 | 67.5 | 余下（94.6），与 Word 模板的 2093/3233/1350/1892 缇一致；
+%   单元格左右内边距 5.4 磅；表格文字小四号宋体，行框 19.6 磅，文字在行框中上下居中
+%   （基线在行框中心下 0.359 个字高，与 Word 中宋体的位置一致）。
 %   行高：姓名 24、专业 28.1、毕业设计（论文）题目 39.5、答辩类型 31.5、专家组成员 31.4 磅；
 %   答辩记录大格最小高度 483.5 磅，内容多时自动加高、跨页，「记录人」与「年 月 日」总在大格底部。
 % ===============================================================
@@ -158,6 +160,11 @@
 \newlength\sdju@padx       \setlength\sdju@padx{5.4bp}
 \newlength\sdju@pady       \setlength\sdju@pady{2bp}
 \newlength\sdju@cw
+% 表格文字的支柱：行高 19.6 磅，基线在行框中心下 0.359 个字高（12 磅字为 4.3 磅）
+\def\sdju@emcenter{0.359}
+\newcommand\sdju@cellstrut{%
+  \vrule width\z@ height\dimexpr\baselineskip/2+\sdju@emcenter\dimexpr\f@size pt\relax\relax
+    depth\dimexpr\baselineskip/2-\sdju@emcenter\dimexpr\f@size pt\relax\relax}
 \newlength\sdju@avail \newlength\sdju@minh \newlength\sdju@tmpa
 \newlength\sdju@used \newlength\sdju@axis
 \newbox\sdju@body \newbox\sdju@tail \newbox\sdju@piece
@@ -167,7 +174,8 @@
 \newcommand\sdju@cellbox[3]{%
   \hbox to\dimexpr#1-\sdju@rule\relax{\hskip\sdju@padx
     $\vcenter{\hsize=\dimexpr#1-\sdju@rule-2\sdju@padx\relax \linewidth=\hsize
-      \parindent=\z@ \csname sdju@align@#2\endcsname \strut#3\strut\par}$%
+      \parindent=\z@ \csname sdju@align@#2\endcsname
+      \kern-.5\sdju@rule\sdju@cellstrut#3\sdju@cellstrut\par\kern-.5\sdju@rule}$%
     \hss}}
 \newcommand\sdju@cell[3]{%
   \sdju@cellbox{#1}{#2}{#3}\vrule width\sdju@rule \addtolength\sdju@used{#1}}
@@ -208,7 +216,7 @@
 \newcommand\sdju@formrow[1]{%
   \par
   \setlength\sdju@minh{#1}%
-  \addtolength\sdju@minh{-2\sdju@pady-2\sdju@rule}%
+  \addtolength\sdju@minh{-2\sdju@pady-\sdju@rule}% 行高按横线中心计，上下两条线各算一半
   \setbox\sdju@body\vbox{\unvbox\sdju@body
     \ifvoid\sdju@tail\else \par\nobreak\vskip 12bp plus 1fill \box\sdju@tail\fi}% 记录人栏不单独落到下一页
   \setlength\sdju@tmpa{\ht\sdju@body+\dp\sdju@body}%
@@ -244,34 +252,34 @@
 
 % ===============================================================
 % 标题与表头：\maketitle
-%   「本科生毕业设计（论文）答辩记录表」小三号黑体（15 磅）居中，基线距纸边上沿 93.1 磅；
+%   「本科生毕业设计（论文）答辩记录表」小三号黑体加粗（15 磅，附件31 为描边加粗）居中，基线距纸边上沿 93.1 磅；
 %   表头五行：姓名 | 学号、专业 | 班级、毕业设计（论文）题目、答辩类型、专家组成员，栏目名居中
 % ===============================================================
 \renewcommand\maketitle{%
   \par
   \begingroup
-  \centering\heiti\sdjufont{15bp}{15bp}%
+  \centering\heiti\bfseries\sdjufont{15bp}{15bp}%
   \vspace*{\dimexpr6.1bp-\topskip\relax}%
   本科生毕业设计（论文）答辩记录表\par
   \endgroup
-  \vskip 7.1bp
+  \kern-\prevdepth\vskip 10.06bp% 表格上边线顶端在标题基线下 10.06 磅（线中心 10.3 磅），不受标题字体深度影响
   \begingroup
   \normalfont\sdjufont{12bp}{19.6bp}%
   \sdju@row{24bp}{%
-    \sdju@cell{104.9bp}{c}{姓名}\sdju@cell{161.7bp}{c}{\sdju@author}%
-    \sdju@cell{67.4bp}{c}{学号}\sdju@lastcell{c}{\sdju@studentid}}%
+    \sdju@cell{104.65bp}{c}{姓名}\sdju@cell{161.65bp}{c}{\sdju@author}%
+    \sdju@cell{67.5bp}{c}{学号}\sdju@lastcell{c}{\sdju@studentid}}%
   \sdju@row{28.1bp}{%
-    \sdju@cell{104.9bp}{c}{专业}\sdju@cell{161.7bp}{c}{\sdju@major}%
-    \sdju@cell{67.4bp}{c}{班级}\sdju@lastcell{c}{\sdju@classname}}%
+    \sdju@cell{104.65bp}{c}{专业}\sdju@cell{161.65bp}{c}{\sdju@major}%
+    \sdju@cell{67.5bp}{c}{班级}\sdju@lastcell{c}{\sdju@classname}}%
   \sdju@row{39.5bp}{%
-    \sdju@cell{104.9bp}{c}{毕业设计（论文）\\题目}\sdju@lastcell{l}{\sdju@title}}%
+    \sdju@cell{104.65bp}{c}{\makebox[\linewidth][l]{毕业设计（论文）}\\题目}\sdju@lastcell{l}{\sdju@title}}%
   \sdju@row{31.5bp}{%
-    \sdju@cell{104.9bp}{c}{答辩类型}%
+    \sdju@cell{104.65bp}{c}{答辩类型}%
     \sdju@lastcell{l}{\sdju@checkbox{\sdju@typeproposal}开题答辩\hspace{1em}%
       \sdju@checkbox{\sdju@typemidterm}中期检查答辩\hspace{1em}%
       \sdju@checkbox{\sdju@typethesis}毕业设计（论文）答辩}}%
   \sdju@row{31.4bp}{%
-    \sdju@cell{104.9bp}{c}{专家组成员}\sdju@lastcell{l}{\sdju@committee}}%
+    \sdju@cell{104.65bp}{c}{专家组成员}\sdju@lastcell{l}{\sdju@committee}}%
   \endgroup}
 
 % ===============================================================

@@ -156,14 +156,32 @@
 %   写在表格之前，对其后的表格有效（放在花括号里则只对这一个表有效）。
 %   跨页表格：在 longtable 的续页表头中用 \sdjucontinued{<列数>}，右上方显示「续表x-x」。
 % ===============================================================
+%   竖向位置按 Word 的行框换算（附件26 样本）：
+%     表格每行占一个单倍行距的行框（15.6 磅），文字在行框中上下居中，表线（含表头下的线）
+%     与行框之间不另留空，即表线中心到相邻一行基线 12.4 磅（上方）/ 3.7 磅（下方）；
+%     表名的行框为 1.25 倍行距（19.5 磅），表名基线到表格上线 6.5 磅；
+%     图名基线在图片下沿之下 13.1 磅（图片所在行的下沿 + 图名行框中的基线位置）。
 \DeclareCaptionFont{sdjucap}{\songti\sdjufont{9bp}{\sdju@grid}\bfseries}
-\captionsetup{font=sdjucap,labelsep=space,justification=centering,singlelinecheck=false}
-\captionsetup[table]{position=top,skip=4bp}
-\captionsetup[figure]{position=bottom,skip=6bp}
-\newcommand\sdjutablefont{\sdjufont{12bp}{\sdju@grid}}
-\newcommand\sdjutablesize[1]{\renewcommand\sdjutablefont{\sdjufont{#1}{\sdju@grid}}}
+% 表名末行的深度固定为行框中基线以下的部分，表名到表格上线的距离不随字形变化
+\DeclareCaptionTextFormat{sdjutable}{#1\vrule\@width\z@\@height\z@\@depth\sdju@below{9bp}{19.5bp}}
+% 「表2-1」「图2-1」的「表」「图」与编号之间不留空（不插入中西文间距），编号后空半个字（样本 4.5 磅）
+\DeclareCaptionLabelFormat{sdju}{#1\hbox{#2}}
+\DeclareCaptionLabelSeparator{sdju}{\hspace{0.5em}}
+\captionsetup{font=sdjucap,labelformat=sdju,labelsep=sdju,justification=centering,singlelinecheck=false}
+\captionsetup[table]{position=top,skip=\z@,textformat=sdjutable}
+% 图名首行的支柱高为 0.7 倍行距，图片下沿到图名基线 = skip + 0.7 × 15.6 磅 = 13.1 磅
+\captionsetup[figure]{position=bottom,skip=2.18bp}
+% 表内文字的支柱：行框高 = 行距，基线在行框中心下 0.359 个字高（与 Word 中宋体的位置一致）
+\newcommand\sdju@tablestrut{%
+  \setbox\strutbox\hbox{\vrule\@width\z@
+    \@height\dimexpr\baselineskip/2+\sdju@emcenter\dimexpr\f@size pt\relax\relax
+    \@depth\dimexpr\baselineskip/2-\sdju@emcenter\dimexpr\f@size pt\relax\relax}}
+\newcommand\sdjutablefont{\sdjufont{12bp}{\sdju@grid}\sdju@tablestrut}
+\newcommand\sdjutablesize[1]{\renewcommand\sdjutablefont{\sdjufont{#1}{\sdju@grid}\sdju@tablestrut}}
 \newcommand\sdju@tablerules{%
   \renewcommand\arraystretch{1}%
+  \setlength\aboverulesep{\z@}\setlength\belowrulesep{\z@}%
+  \setlength\abovetopsep{\z@}\setlength\belowbottomsep{\z@}%
   \setlength\heavyrulewidth{0.5bp}\setlength\lightrulewidth{0.5bp}}
 \newcommand\sdjutablesetup{\sdjutablefont\sdju@tablerules}
 \AtBeginEnvironment{table}{\sdju@tablerules}
@@ -171,12 +189,13 @@
 \AtBeginEnvironment{longtable}{\par\sdjutablesetup}
 % 浮动体开头 LaTeX 会恢复正文字号行距，这里再设回单倍行距（表格用表内字号）
 \def\sdju@tablecaptype{table}
-\appto\@floatboxreset{%
+\appto\@floatboxreset{\lineskip\z@
   \ifx\@captype\sdju@tablecaptype \sdjutablefont \else \sdjufont{12bp}{\sdju@grid}\fi}
 \newcommand\sdjucontinued[1]{%
-  \multicolumn{#1}{r}{\sdjutablefont 续表\thetable}\\}
-% 公式编号使用全角括号
-\renewcommand\tagform@[1]{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
+  \multicolumn{#1}{@{}r@{}}{\sdjutablefont 续表\hbox{\thetable}}\\}% 右端与表格右边对齐
+% 公式编号：全角括号，五号（附件26 样本的（2-1）为五号 Times New Roman，右对齐）
+\renewcommand\tagform@[1]{\maketag@@@{\fontsize{10.5bp}{\sdju@grid}\selectfont
+  （\ignorespaces#1\unskip\@@italiccorr）}}
 
 % ===============================================================
 % 参考文献：GB/T 7714-2005 顺序编码制（与学校样本一致），\cite 为上标中括号；
@@ -209,8 +228,9 @@
 \newcommand\sdjucite[1]{\textsuperscript{[#1]}}
 
 % 页面：上 2.8cm，下、左、右 2.5cm，页眉 2cm
+% 页眉文字基线距纸边 65.8 磅，横线中心 69.7 磅（2026 版样本；页眉距纸边 2 cm，即页眉段落的行框顶在 2 cm 处）
 \geometry{a4paper,top=28mm,bottom=25mm,left=25mm,right=25mm,
-  headheight=12bp,headsep=8mm-12bp,footskip=10mm}
+  headheight=12bp,headsep=8mm-12.6bp,footskip=10mm}
 \raggedbottom
 
 % ===============================================================
@@ -241,13 +261,18 @@
 \newcommand\coverdate[1]{\renewcommand\sdju@coverdate{#1}}
 
 % ===============================================================
-% 页眉：左为论文题目（黑体小五号），右为页码（小五号），下有 0.75 磅横线；页脚空
+% 页眉：左为论文题目（黑体小五号），右为页码（小五号，左端距右边距 17 磅，与样本一致；
+%       页码更宽时向右伸展、右端对齐右边距），下有 0.75 磅横线；页脚空
 % 页码：封面无；声明、摘要、目录用 I, II…；正文起用 1, 2…
 % ===============================================================
+\newcommand\sdju@headpagew{17bp}
+\newcommand\sdju@headpage{%
+  \setbox\z@\hbox{\thepage}%
+  \ifdim\wd\z@<\sdju@headpagew \hbox to\sdju@headpagew{\box\z@\hss}\else\box\z@\fi}
 \fancypagestyle{sdju}{%
   \fancyhf{}%
   \fancyhead[L]{\sdjufont{9bp}{11.7bp}\heiti\sdju@headtitle}%
-  \fancyhead[R]{\sdjufont{9bp}{11.7bp}\thepage}%
+  \fancyhead[R]{\sdjufont{9bp}{11.7bp}\sdju@headpage}%
   \renewcommand\headrulewidth{0.75bp}%
   \renewcommand\footrulewidth{0pt}}
 \fancypagestyle{plain}{\fancyhf{}\renewcommand\headrulewidth{0pt}}
@@ -309,7 +334,8 @@
 
 % ===============================================================
 % 目录：标题小二号黑体加粗居中，段前 31.2 磅、段后 12 磅；列出一、二级标题
-%   一级：黑体四号，单倍行距（行框 31.2 磅）；二级：黑体小四号，单倍行距（行框 15.6 磅），缩进 2 字符
+%   一级：黑体四号，单倍行距（行框 31.2 磅）；二级：黑体小四号，单倍行距（行框 15.6 磅），左缩进 18 磅
+%   （附件26 样本与 Word 模板均为 18 磅，即 1.5 个小四号字）
 %   引导线为短横线；页码统一为五号 Times New Roman
 % ===============================================================
 \newcommand\sdju@tocpage[1]{{\sdjufont{10.5bp}{10.5bp}\rmfamily #1}}
@@ -320,7 +346,7 @@
   {\thecontentslabel\enspace}{}
   {\sdju@tocdots\sdju@tocpage{\thecontentspage}}
   [\vskip\sdju@post{14bp}{31.2bp}]
-\titlecontents{section}[2\ccwd]
+\titlecontents{section}[18bp]
   {\vskip\sdju@pre{12bp}{15.6bp}\heiti\sdjufont{12bp}{15.6bp}}
   {\thecontentslabel\enspace}{}
   {\sdju@tocdots\sdju@tocpage{\thecontentspage}}
@@ -499,7 +525,10 @@
 %   附件26（2026 版）只有学术诚信声明和版权使用授权书两页，标题高度一致；
 %   AI 使用情况声明按用户要求保留在两者之间（选项 noaideclaration 可去掉）
 %   全页按 2 倍行距（31.2 磅）排：空两行；标题两行（上海电机学院 / 声明名称），小二号黑体加粗居中；
-%   空一行；正文四号宋体，首行缩进 2 字符；签名前空三行（AI 声明内容多，空一行）；签名与日期间空一行
+%   空一行；正文四号宋体，首行缩进 31.5 磅（附件26 样本与 Word 模板）；签名前空三行（AI 声明内容多，空一行）；
+%   签名与日期间空一行。签名、日期的位置（相对版心左边）：学术诚信声明一栏，在 189 磅处；
+%   AI 使用情况声明、版权使用授权书两栏，左栏分别在首行缩进处、版心左边，右栏在 286.9 磅处；
+%   日期为「日期：」+ 2 字 +「年」+ 1.5 字 +「月」+ 1.5 字 +「日」（四号字宽）
 % ===============================================================
 \newcommand\sdju@decltitle[1]{%
   \def\sdju@chapbefore{62.4bp}%
@@ -507,7 +536,7 @@
   \chapter*{上海电机学院\\#1}%
   \def\sdju@chapbefore{0bp}\def\sdju@chapafter{12bp}}
 \newenvironment{sdju@declbody}
-  {\par\sdjufont{14bp}{31.2bp}\setlength\parindent{2\ccwd}}
+  {\par\sdjufont{14bp}{31.2bp}\setlength\parindent{\sdju@declindent}}
   {\par}
 % 签名、日期行
 % 版权使用授权书的「保密」「不保密」：默认两项都空着，打印后手工勾选；
@@ -523,8 +552,13 @@
 \newcommand\notconfidential{%
   \renewcommand\sdju@secretbox{\sdju@box}\renewcommand\sdju@publicbox{\sdju@checkedbox}%
   \renewcommand\sdju@secretyears{\hspace{2\ccwd}}}
-\newcommand\sdju@date{日期：\hspace{3\ccwd}年\hspace{1.5\ccwd}月\hspace{1.5\ccwd}日}
-\newcommand\sdju@signpair[2]{\noindent\makebox[0.5\linewidth][l]{#1}#2\par}
+\newcommand\sdju@declindent{31.5bp}% 声明正文首行缩进
+\newcommand\sdju@signone{189bp}%      学术诚信声明签名栏的左端
+\newcommand\sdju@signright{286.9bp}%  两栏签名的右栏左端
+\newcommand\sdju@date{日期：\hspace{2\ccwd}年\hspace{1.5\ccwd}月\hspace{1.5\ccwd}日}
+% \sdju@signpair{左栏左端}{左栏}{右栏}
+\newcommand\sdju@signpair[3]{\noindent\hspace*{#1}%
+  \makebox[\dimexpr\sdju@signright-(#1)\relax][l]{#2}#3\par}
 \newcommand\makedeclaration{%
   \ifsdju@opt@nodeclaration\else
   % ---- 学术诚信声明 ----
@@ -532,9 +566,9 @@
   \begin{sdju@declbody}
    本人郑重声明：所呈交的毕业设计（论文），是本人在导师的指导下，独立进行研究工作所取得的成果。除文中已经注明引用的内容外，本论文不包含任何其他个人或集体已经发表或撰写过的作品成果。对本文的研究做出重要贡献的个人和集体，均已在文中以明确方式标明。本人完全意识到本声明的法律结果由本人承担。\par
    \vspace{3\baselineskip}
-   \sdju@signpair{}{作者签名：}
+   \noindent\hspace*{\sdju@signone}作者签名：\par
    \vspace{\baselineskip}
-   \sdju@signpair{}{\sdju@date}
+   \noindent\hspace*{\sdju@signone}\sdju@date\par
   \end{sdju@declbody}
   % ---- AI 使用情况声明（2026 版样本中没有这一页，按用户要求保留）----
   \ifsdju@opt@noaideclaration\else
@@ -548,9 +582,9 @@
    5．未引用AI生成的未经标注版权的内容。\par
    本人承诺所提交论文的原创性，完全符合《上海电机学院本科毕业设计（论文）过程管理实施细则》及《上海电机学院本科毕业设计（论文）使用AI工具的指导性意见》及相关学术诚信要求。\par
    \vspace{\baselineskip}
-   \sdju@signpair{\hspace{2\ccwd}作者签名：}{指导教师签名：}
+   \sdju@signpair{\sdju@declindent}{作者签名：}{指导教师签名：}
    \vspace{\baselineskip}
-   \sdju@signpair{\hspace{2\ccwd}\sdju@date}{\sdju@date}
+   \sdju@signpair{\sdju@declindent}{\sdju@date}{\sdju@date}
   \end{sdju@declbody}
   \fi
   % ---- 版权使用授权书 ----
@@ -562,9 +596,9 @@
    \hphantom{本论文属于}\hspace{2\ccwd}\textbf{不保密}\sdju@publicbox。\par
    （请在以上方框内打“√”）\par
    \vspace{3\baselineskip}
-   \sdju@signpair{作者签名：}{指导教师签名：}
+   \sdju@signpair{\z@}{作者签名：}{指导教师签名：}
    \vspace{\baselineskip}
-   \sdju@signpair{\sdju@date}{\sdju@date}
+   \sdju@signpair{\z@}{\sdju@date}{\sdju@date}
   \end{sdju@declbody}
   \clearpage
   \fi}
@@ -573,24 +607,31 @@
 % 摘要
 %   中文：标题小二号黑体居中；正文小四号宋体，首行缩进 2 字符，段前段后 12 磅，1.25 倍行距
 %         （标题的段后 12 磅与首段的段前 12 磅取较大者，不叠加）；
-%         「关键词：」五号黑体，关键词小四号宋体，逗号分开，最后一个后面无标点
-%   英文：标题小二号 Times New Roman 加粗居中，段前 31.2 磅；正文同上；「Key words:」五号加粗
+%         「关键词：」五号黑体，关键词小四号宋体，逗号分开，最后一个后面无标点；
+%         关键词行为单倍行距（行框 15.6 磅），段前 12 磅（附件26 样本与 Word 模板）
+%   英文：标题小二号 Times New Roman 加粗居中，段前 31.2 磅；正文同上；「Key words:」五号加粗；
+%         关键词行为 1.5 倍行距（行框 23.4 磅），段前 12 磅（附件26 样本与 Word 模板）
+%   两种行距照样本原样保留（用户 2026-11-26 决定）；关键词行的位置按行框算法换算：
+%   与摘要末行基线相距 中文 29.5 磅、英文 33.5 磅
 % ===============================================================
 \newcommand\sdju@keywords{}
 \newcommand\sdju@keywordsen{}
 \newcommand\keywords[1]{\renewcommand\sdju@keywords{#1}}
 \newcommand\keywordsen[1]{\renewcommand\sdju@keywordsen{#1}}
-\newcommand\sdju@kwline[2]{% 悬挂缩进到标签之后
-  \par\noindent\settowidth{\@tempdima}{#1}%
+% \sdju@kwline{行框高}{标签}{关键词}：小四号，行距为行框高；悬挂缩进到标签之后
+\newcommand\sdju@kwline[3]{%
+  \par\vskip\sdju@pre{12bp}{#1}%
+  \begingroup\sdjufont{12bp}{#1}%
+  \noindent\settowidth{\@tempdima}{#2}%
   \hangindent=\@tempdima\hangafter=1
-  #1#2\par}
+  #2#3\par\endgroup}
 \newenvironment{abstract}
   {\sdjuchapter{摘\hspace{1em}要}\setlength{\parskip}{12bp}\vspace{-\parskip}}
-  {\sdju@kwline{{\heiti\sdjufont{10.5bp}{19.5bp}关键词：}}{\sdju@keywords}%
+  {\sdju@kwline{15.6bp}{{\heiti\sdjufont{10.5bp}{15.6bp}关键词：}}{\sdju@keywords}%
    \setlength{\parskip}{0pt}}
 \newenvironment{abstracten}
   {\sdjuchapter[][31.2bp]{\rmfamily\bfseries ABSTRACT}\setlength{\parskip}{12bp}\vspace{-\parskip}}
-  {\sdju@kwline{{\rmfamily\bfseries\sdjufont{10.5bp}{19.5bp}Key words: }}{\sdju@keywordsen}%
+  {\sdju@kwline{23.4bp}{{\rmfamily\bfseries\sdjufont{10.5bp}{23.4bp}Key words: }}{\sdju@keywordsen}%
    \setlength{\parskip}{0pt}}
 
 % ===============================================================
