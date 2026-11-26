@@ -213,7 +213,7 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 | 页眉 | 左：论文题目，黑体小五号；右：页码，小五号，页码左端距右边距 17 磅（与 2026 版样本一致；更宽的页码向右伸展到右边距为止）；文字基线距纸边 65.8 磅，下有 0.75 磅横线（中心距纸边 69.7 磅）；无页脚。题目一行排不下时在页码左侧的一栏内转行（向上伸展，版心不动）并给出警告，建议用 `\title[页眉短题目]{…}` |
 | 封面 | 附件25：校徽；「学士学位论文」40 磅微软雅黑；中文题目、英文题目（`\titleen`）小一号微软雅黑，行距 46.8 磅；栏目三号宋体，依次为学生姓名、学生学号、专业、校内指导教师、企业指导教师、学院，栏目名按实际宽度、下划线右端对齐，行距 31.2 磅；各行填写内容的中心都与学生姓名、学生学号两行对齐（栏目名长短不同的行，下划线不变、内容不越出下划线两端；与开题报告封面同一原则，**用户 2026-11-26 决定**）；日期在栏目下两行。各处位置按 2026 版 PDF 量取。栏目和日期的颜色为 #231815（附件25 原件即此色，不是纯黑，模板照原件保留）。题目超过样本的两行（中英文各一行）时，按统一规则保证整页在版心之内（日期不越过下边距）：① 多出的高度一半由校徽、「学士学位论文」和题目上移，一半由栏目和日期下移，各以版心上、下沿为限，一边到限由另一边承担；② 仍放不下时按同一比例压缩题目与栏目的间距（82.1 → 62.4 磅）和栏目行距（31.2 → 26 磅）；③ 再放不下时题目字号依次缩为 22、20、18、16 磅并给出警告（`Class sdjuthesis Warning: 封面题目过长……`），应缩短题目。中文 3 行、英文 2 行以内都不缩字号 |
 | 页码 | 封面无页眉页脚；声明、摘要、目录 I, II, …；正文起 1, 2, …（页眉右侧，即右上角） |
-| 声明页 | 学术诚信声明、AI 使用情况声明、版权使用授权书各一页。附件26 样本只有第一、三页；**AI 使用情况声明页是学校样本之外按用户要求保留的**（学校《形式审核关键点内容》也列出「26 年 5 月及之后答辩的插入 AI 使用情况声明页」），不需要时用 `noaideclaration` 选项去掉。签名、日期留空待手写（有签名配置时由系统放入签名和日期，见「电子签名与签字日期」）；授权书的「保密 / 不保密」默认留空手工勾选，也可用 `\confidential{年数}` 或 `\notconfidential` 印出勾选。全页 2 倍行距（31.2 磅）：空两行，标题两行（「上海电机学院」+ 声明名称）小二号黑体加粗居中，空一行，正文四号宋体、首行缩进 31.5 磅（2026 版样本与 Word 模板的值）；签名前空三行（AI 使用情况声明内容多，空一行），签名与日期之间空一行。签名、日期的位置（自版心左边量）：学术诚信声明一栏在 189 磅处；AI 使用情况声明两栏，左栏在首行缩进处；版权使用授权书两栏，左栏顶格；两栏时右栏都在 286.9 磅处；日期写作「日期：」空 2 字「年」空 1.5 字「月」空 1.5 字「日」 |
+| 声明页 | 学术诚信声明、AI 使用情况声明、版权使用授权书各一页。附件26 样本只有第一、三页；**AI 使用情况声明页是学校样本之外按用户要求保留的**（学校《形式审核关键点内容》也列出「26 年 5 月及之后答辩的插入 AI 使用情况声明页」），不需要时用 `noaideclaration` 选项去掉。签名、日期留空待手写（有签名配置时由系统放入签名和日期，见「电子签名与签字日期」）；授权书的「保密 / 不保密」用 `\confidentiality{保密／不保密}` 勾选（保密时 `\confidentiality[年数]{保密}`），留空两项都不勾；各处日期用 `\declarationdate` 等命令填写（见「所有栏目都在源码中直接填写」）。全页 2 倍行距（31.2 磅）：空两行，标题两行（「上海电机学院」+ 声明名称）小二号黑体加粗居中，空一行，正文四号宋体、首行缩进 31.5 磅（2026 版样本与 Word 模板的值）；签名前空三行（AI 使用情况声明内容多，空一行），签名与日期之间空一行。签名、日期的位置（自版心左边量）：学术诚信声明一栏在 189 磅处；AI 使用情况声明两栏，左栏在首行缩进处；版权使用授权书两栏，左栏顶格；两栏时右栏都在 286.9 磅处；日期写作「日期：」空 2 字「年」空 1.5 字「月」空 1.5 字「日」 |
 | 摘要 | 标题小二号黑体居中；正文小四号宋体，首行缩进 2 字符，1.25 倍行距，段前段后 12 磅（与标题的段后 12 磅不叠加）；「关键词：」五号黑体，关键词小四号，单倍行距、段前 12 磅 |
 | ABSTRACT | 标题小二号 Times New Roman 加粗居中，段前 31.2 磅；正文同上；「Key words:」五号加粗，关键词行 1.5 倍行距、段前 12 磅 |
 | 目录 | 标题小二号黑体加粗居中，段前 31.2 磅、段后 12 磅；一级标题黑体四号（行框 31.2 磅），二级标题黑体小四号（行框 15.6 磅）并左缩进 18 磅（样本与 Word 模板均为 18 磅），均为单倍行距；引导线为短横线；页码统一五号 |
@@ -240,7 +240,10 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 \supervisor{}            % 校内指导教师
 \companysupervisor{}     % 企业指导教师（可不写，封面该栏留空；旧文档只写 \supervisor 也能编译）
 \coverdate{二〇二七年五月}
-\confidential{3}  或  \notconfidential   % 可选：授权书中印出勾选，默认留空手工勾选
+\confidentiality{}   % 授权书：保密／不保密，保密时 \confidentiality[3]{保密}；留空两项都不勾
+                     % （旧写法 \confidential{3}、\notconfidential 照旧可用）
+\declarationdate{}{}{}   % 声明页各处日期；单独填写：\integritydate \aistudentdate \aisupervisordate
+                         %   \copyrightstudentdate \copyrightsupervisordate（均为 {年}{月}{日}）
 
 \makecover                 % 封面
 \frontmatter \makedeclaration
@@ -300,7 +303,7 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 | 加粗 | 附件23 的「加粗」是 Word 的描边加粗。用 Windows 宋体、黑体、华文中宋时以伪粗体模拟，描边线宽与样表相同（`\sdju@fakebold` = 2.85，见上文「字体」）；Fandol 宋体用其粗体字形，笔画粗细与样表相当。没有华文中宋时，封面的校名和标题用宋体加重的粗体代替，使笔画粗细与样表接近 |
 | 进度安排 | `schedule` 环境，内容换行后与首行内容对齐 |
 | 参考文献 | 另起一页，「参考文献：」小二号黑体加粗居中，1.5 倍行距；条目小四号单倍行距，悬挂缩进 2 字符（编号顶格，转行缩进 2 字符；按附件26 的参考文献格式，**用户 2026-11-26 决定**，附件23 样表的转行顶格不再照搬）；同样可用 `references` 环境手工录入（环境内汉字与「[J]」等之间不加西文间距，与 .bib 方式一致；环境内不能用 `\item[…]` 改编号） |
-| 意见页 | `\supervisoropinion{...}` 指导教师意见、`\committeeopinion` 答辩小组意见与结论，各占一页，留签名和日期位置；表格宽度、行高、栏目名位置按附件23 量取。指导教师意见写到签名处时，表格续排到下一页（续页为同样大小的表格，不重复栏目名），签名和日期在最后一页的原位置。答辩小组页的方框「□」有宋体时直接用宋体的 □（与样表相同），只有 Fandol 时按宋体 □ 的尺寸画出（边长 0.71 字），不用 Fandol 的 □；表格线粗 0.48 磅。答辩小组页在附件23 中单独成节（左右边距 3.17 cm、上下 2.54 cm），模板在这一页同样换用该页面设置。录入已填好的意见页（如往届归档稿）时可用：`\supervisordate{年}{月}{日}`、`\committeecheck{项}{第几个方框}`、`\committeeadvice{建议}`、`\committeeconclusion{通过}`、`\committeegrade{良好}`、`\committeedate{年}{月}{日}`，勾选的方框为方框内加「√」；不写时为空白表（与样表相同）。签名：没有签名配置时留空待手签，有配置时由系统放入签名（见「电子签名与签字日期」） |
+| 意见页 | `\supervisoropinion{...}` 指导教师意见、`\committeeopinion` 答辩小组意见与结论，各占一页，留签名和日期位置；表格宽度、行高、栏目名位置按附件23 量取。指导教师意见写到签名处时，表格续排到下一页（续页为同样大小的表格，不重复栏目名），签名和日期在最后一页的原位置。答辩小组页的方框「□」有宋体时直接用宋体的 □（与样表相同），只有 Fandol 时按宋体 □ 的尺寸画出（边长 0.71 字），不用 Fandol 的 □；表格线粗 0.48 磅。答辩小组页在附件23 中单独成节（左右边距 3.17 cm、上下 2.54 cm），模板在这一页同样换用该页面设置。意见页的栏目和封面栏目一样直接填写（见「所有栏目都在源码中直接填写」）：`\supervisordate{年}{月}{日}`、`\committeecheck{项}{选项}`（选项写方框后的文字，如「有工程背景」，也可写第几个方框）、`\committeeadvice{建议}`、`\committeeresult{通过}`（同 `\committeeconclusion`）、`\committeegrade{良好}`、`\committeedate{年}{月}{日}`，勾选的方框为方框内加「√」；留空时为空白表（与样表相同）。签名：没有签名配置时留空待手签，有配置时由系统放入签名（见「电子签名与签字日期」） |
 
 ```latex
 \title{课题名称} \subtitle{副标题} \school{} \major{} \classname{} \studentid{} \author{}
@@ -308,9 +311,9 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 \finaldate{2027 年 1 月 10 日}  \keywords{甲，乙，丙}
 \makecover  \maketitle  \begin{abstract} ... \end{abstract}
 \section{文献综述} ...  \begin{schedule} \item{时间段}{工作内容} \end{schedule}
-\sdjubibliography  \supervisoropinion{}  \committeeopinion
-% 意见页已填写时（可选）：\supervisordate{2025}{1}{2}  \committeecheck{1}{2}  \committeeadvice{…}
-% \committeeconclusion{通过}  \committeegrade{良好}  \committeedate{2025}{1}{7}（写在 \committeeopinion 之前）
+\supervisordate{}{}{}  \committeecheck{1}{有工程背景}  \committeeadvice{}   % 意见页栏目（导言区）
+\committeeresult{通过}  \committeegrade{良好}  \committeedate{}{}{}
+\sdjubibliography  \supervisoropinion{指导教师意见}  \committeeopinion
 ```
 
 ## 任务书、中期检查报告、指导记录
@@ -350,7 +353,8 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 
 ```latex
 \title{题目} \author{} \studentid{} \supervisor{} \companysupervisor{} \major{} \school{}
-\projectsource{课题来源/项目编号}  \topicchange{无}  % 或 \topicchange[变化原因]{有}
+\projectsource{课题来源/项目编号}  \topicchange{无}  \changereason{}   % 或 \topicchange{有} \changereason{变化原因}
+\studentdate{}{}{}  \supervisordate{}{}{}  \committeeresult{}  \committeegrade{}  \committeedate{}{}{}
 \maketitle
 \section{中期报告} \subsection{已完成的研究内容} ...
 \supervisoropinion{意见，可留空}  \committeeconclusion{建议，可留空}
@@ -387,6 +391,45 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 \question{问题} \answer{回答}
 ```
 
+## 所有栏目都在源码中直接填写
+
+用户 2026-11-26 规定：每份文档每一页上需要填写的位置（封面各栏、日期、勾选框、意见栏、表头栏目、记录人等），都在源码中直接填写，学生和教师都能改；类文件只管版式（字体、字号、表格线、位置），不产生源码里改不到的内容。各目录的示例 `.tex` 把这些栏目全部列出来，没有内容的留空（花括号内不写），留空时版面照原表留出空白（日期为空白的「年 月 日」，方框不勾）。签名不写在源码中：手签，或由系统放入签名图片（见下一节）。
+
+勾选框统一写成「命令{选项文字}」：`\defensetype{开题答辩}`、`\topicchange{有}`、`\committeeresult{通过}`、`\committeegrade{良好}`、`\committeecheck{1}{有工程背景}`、`\confidentiality{不保密}`；留空不勾。日期写成 `{年}{月}{日}` 三项（任务书 `\taskdate`、开题报告 `\finaldate`、论文 `\coverdate`、答辩记录表 `\recorddate`、幻灯片 `\defensedate` 照旧写整句日期）。表格原有的说明文字（如「注」）也可改写，留空时为原表文字。
+
+| 模板 | 页 | 栏目 | 命令 |
+|---|---|---|---|
+| 任务书 | 封面 | 课题、专业、班级、姓名、学号 | `\title` `\major` `\classname` `\author` `\studentid` |
+| 任务书 | 封面 | 日期（留空为空白的「年 月 日」） | `\taskdate` |
+| 任务书 | 封面 | 学院院长、校内指导教师、企业指导教师（签字） | 签名（不在源码中）；`\school` `\supervisor` `\companysupervisor` 只作记录 |
+| 任务书 | 封面 | 框外的注 | `\covernote`（留空为原表文字） |
+| 任务书 | 反面 | 课题来源；课题的目的、意义；要求；课题主要内容及进度 | `\section{栏目名}` 后直接写内容 |
+| 开题报告 | 封面 | 课题名称（含副标题）、学院、专业、班级、学号、姓名、校内指导教师、企业指导教师 | `\title` `\subtitle` `\school` `\major` `\classname` `\studentid` `\author` `\supervisor` `\companysupervisor` |
+| 开题报告 | 封面 | 定稿日期（留空为空白的「20 年 月 日」） | `\finaldate` |
+| 开题报告 | 正文 | 摘要、关键词、各节、进度安排、参考文献 | `abstract` `\keywords` `\section` `schedule` `\sdjubibliography` |
+| 开题报告 | 指导教师意见页 | 意见、日期 | `\supervisoropinion{意见}`、`\supervisordate{年}{月}{日}` |
+| 开题报告 | 答辩小组页 | 意见第 1～8 项勾选 | `\committeecheck{项}{选项}` |
+| 开题报告 | 答辩小组页 | 建议、答辩结论、等第评定、日期 | `\committeeadvice` `\committeeresult` `\committeegrade` `\committeedate{年}{月}{日}` |
+| 中期检查报告 | 第 1 页 | 姓名、学号、校内 / 企业指导教师、专业、学院、题目、课题来源 / 项目编号 | `\author` `\studentid` `\supervisor` `\companysupervisor` `\major` `\school` `\title` `\projectsource` |
+| 中期检查报告 | 第 1 页 | 课题有无变化、变化原因 | `\topicchange{无／有}`、`\changereason` |
+| 中期检查报告 | 第 1 页 | 中期报告、学生签名日期 | `\section{中期报告}` 后直接写内容、`\studentdate{年}{月}{日}` |
+| 中期检查报告 | 第 2 页 | 指导教师意见、日期 | `\supervisoropinion{意见}`、`\supervisordate{年}{月}{日}` |
+| 中期检查报告 | 第 2 页 | 答辩小组建议、答辩结论、等第评定、日期 | `\committeeconclusion{建议}`、`\committeeresult` `\committeegrade` `\committeedate{年}{月}{日}` |
+| 论文 | 封面 | 中英文题目、学生姓名、学号、专业、校内 / 企业指导教师、学院、日期 | `\title` `\titleen` `\author` `\studentid` `\major` `\supervisor` `\companysupervisor` `\school` `\coverdate` |
+| 论文 | 学术诚信声明 | 日期 | `\integritydate{年}{月}{日}` |
+| 论文 | AI 使用情况声明 | 作者、指导教师的日期 | `\aistudentdate` `\aisupervisordate` |
+| 论文 | 版权使用授权书 | 保密 / 不保密、解密年限；作者、指导教师的日期 | `\confidentiality[年数]{保密／不保密}`；`\copyrightstudentdate` `\copyrightsupervisordate` |
+| 论文 | 声明页 | 各处日期统一填写（单独写的优先） | `\declarationdate{年}{月}{日}` |
+| 指导记录 | 表 | 学院、专业、班级、学号、姓名、指导教师、题目 | `\school` `\major` `\classname` `\studentid` `\author` `\supervisor` `\title` |
+| 指导记录 | 表 | 每条记录（日期、指导记录）、最少行数 | `\record{日期}{内容}`、`\recordrows` |
+| 指导记录 | 表下 | 注 | `\recordnote`（留空为原表文字） |
+| 答辩记录表 | 表头 | 姓名、学号、专业、班级、题目、答辩类型、专家组成员 | `\author` `\studentid` `\major` `\classname` `\title` `\defensetype` `\committee` |
+| 答辩记录表 | 大格 | 答辩记录、记录人、日期 | `\question` `\answer`、`\recorder`、`\recorddate` |
+| 答辩幻灯片 | 封面 | 题目、英文题目、姓名、学号、专业、学院、校内 / 企业指导教师、答辩日期、答辩名称 | `\title` `\titleen` `\author` `\studentid` `\major` `\school` `\supervisor` `\companysupervisor` `\defensedate` `\defensename` |
+| 答辩幻灯片 | 致谢页 | 大字标题、致谢文字 | `\sdjuthanks[标题]{文字}` |
+
+日期的优先次序：源码中写了的照源码；源码中留空的，用系统签名配置文件中该签字人的日期；都没有时留空待手写。
+
 ## 电子签名与签字日期（服务端编译时放入）
 
 用户 2026-11-26 决定：每个课题保存一组签名图片，编译时插入；不区分签名版与普通版。模板侧的接口是「配置文件 + 固定路径的图片」，由系统（服务端）在编译目录中写入，学生、教师的源码里不写任何签名命令，模板也不提供面向源码的公开命令。
@@ -411,7 +454,7 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 
 - 只有配置文件声明了的角色才放签名；`signatures/` 中有图片而未声明的角色不起作用。声明了但找不到图片时该处留空，编译日志中给出警告（`配置文件声明了签名角色 …，但找不到 …`），不报错。
 - 签名图片按签字处的高度等比缩放、宽度不超过签字处，底部压在签字线（没有签字线的签字处为栏目文字的基线）上；图片排成零尺寸的盒子，不改变分页、行数和任何文字、表格线的位置（有签名与无签名两种 PDF 中，文字与线条的坐标除日期数字外完全相同）。
-- 日期填在「年 月 日」的空白处，「年」「月」「日」的位置不变。源码中已写了日期（任务书 `\taskdate`、开题报告 `\supervisordate`、`\committeedate`、答辩记录表 `\recorddate`）时以源码为准。几人共用一个日期的（任务书封面三人、答辩小组），取其中最晚的日期。
+- 日期填在「年 月 日」的空白处，「年」「月」「日」的位置不变。源码中已写了日期（任务书 `\taskdate`；开题报告、中期检查报告 `\supervisordate`、`\committeedate`；中期检查报告 `\studentdate`；论文 `\declarationdate`、`\integritydate` 等；答辩记录表 `\recorddate`）时以源码为准，源码中留空时用配置文件的日期，都没有时留空待手写。几人共用一个日期的（任务书封面三人、答辩小组），取其中最晚的日期。
 - 答辩小组组员横向排列，一行排不下时向下换行（第二行避开右侧的日期）；两行仍排不下时签名高度逐级缩小（每级 10%，最小为一半）。
 
 **签字处清单**（指导记录、答辩幻灯片没有签字处）
