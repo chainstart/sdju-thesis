@@ -761,14 +761,31 @@
 % 附录（可选，放在致谢之后）：\appendix 之后的 \chapter 编为「附录A」「附录B」…，
 %   标题格式与一级标题相同，进入目录；附录中的图、表、公式编为 A-1、A-2…
 % ===============================================================
+%   只有一个附录时（用户 2026-11-26 决定），标题排成不编号的「附　录」（同「致　谢」的写法），
+%   目录中为「附录」；\chapter 的题目文字不印出，引用它（\ref）得到空文字（「见附录\ref{…}」排为「见附录」）；
+%   图、表、公式仍编为 A-1、A-2…。
+%   附录的个数在上一遍编译结束时记入 .aux（\sdju@appcount），本遍据此选择排法；
+%   第一遍按多个附录排，latexmk 会自动重新编译。
+\providecommand\sdju@appcount{0}
+\newif\ifsdju@inappendix
 \renewcommand\appendix{%
   \clearpage
+  \global\sdju@inappendixtrue
   \setcounter{chapter}{0}\setcounter{section}{0}%
   \renewcommand\thechapter{\Alph{chapter}}%
   % 「附录A」中「录」与「A」之间不插入中西文间距（同「图2-1」「表2-1」）
   \ctexset{chapter/name={附录,},
     chapter/number=\texorpdfstring{\hbox{\thechapter}}{\thechapter},
-    chapter/aftername=\enspace}}
+    chapter/aftername=\enspace}%
+  \ifnum\sdju@appcount=\@ne
+    \let\sdju@origchapter\chapter \let\chapter\sdju@singleappendix \fi}
+\NewDocumentCommand\sdju@singleappendix{s o m}{%
+  \let\chapter\sdju@origchapter
+  \sdjuchapter[附录]{附\hspace{1em}录}%
+  \refstepcounter{chapter}\def\@currentlabel{}% 「见附录\ref{…}」排为「见附录」
+  \let\chapter\sdju@singleappendix}
+\AtEndDocument{\ifsdju@inappendix
+  \immediate\write\@auxout{\gdef\noexpand\sdju@appcount{\the\c@chapter}}\fi}
 
 \RequirePackage[hidelinks,bookmarksnumbered,unicode]{hyperref}
 \graphicspath{{figures/}}
