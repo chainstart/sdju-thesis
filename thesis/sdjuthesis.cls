@@ -156,15 +156,36 @@
 \tolerance=1000
 \setlength{\emergencystretch}{3em}
 \urlstyle{same}
-\g@addto@macro\UrlBreaks{\do\-\do\_\do\&}
-% 长网址也可在字母、数字后换行（与 .bib 方式的 biburl*penalty 一致）。只能在符号处换行时，
-%   整行网址排不满，多出的空白被摊到网址的每个字符之间，成了「https : / / www . st . com」
-\@tfor\sdju@tmp:=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\do{%
-  \expandafter\g@addto@macro\expandafter\UrlBreaks\expandafter{\expandafter\do\sdju@tmp}}
+% 网址断行：可以在 / . - _ 等符号后断开（罚分 0），也可以在字母、数字后断开（罚分 300，只在符号处
+%   排不好时才用，避免只能在符号处换行时整行网址排不满、字符间被拉开成「https : / / www . st . com」），
+%   但网址开头的 8 个字符（「https://」「http://w」）之内不断开，不会出现「ht / tps://」。
+%   正文中的 \url、手工录入的参考文献与 .bib 生成的参考文献（biblatex 的 \biburlsetup）都用这套规则：
+%   每个字符排成 \mathchar 加 \Urlmuskip 的弹性间距，再按它在网址中的位置加罚分
+\newcount\sdju@urlpos
+\newcommand\sdju@urlprotect{8}% 网址开头不断开的字符数
+\newcommand\sdju@urlletterpen{300}% 在字母、数字后断开的罚分
+\newcommand\sdju@urlbreak[1]{\global\advance\sdju@urlpos\@ne
+  \ifnum\sdju@urlpos>\sdju@urlprotect\relax\penalty#1\relax\fi}
+\let\sdju@UrlSpecials\UrlSpecials
+\newcommand\sdju@urlsetup{%
+  \def\UrlBreaks{}\def\UrlBigBreaks{}%
+  \def\UrlLeft{\global\sdju@urlpos\z@}%
+  \let\UrlSpecials\sdju@UrlSpecials
+  \def\do##1{\appto\UrlSpecials{\do##1{\mathchar`##1\mskip\Urlmuskip\sdju@urlbreak\sdju@urlletterpen}}}%
+  \do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j\do\k\do\l\do\m
+  \do\n\do\o\do\p\do\q\do\r\do\s\do\t\do\u\do\v\do\w\do\x\do\y\do\z
+  \do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M
+  \do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X\do\Y\do\Z
+  \do\0\do\1\do\2\do\3\do\4\do\5\do\6\do\7\do\8\do\9
+  \def\do##1{\appto\UrlSpecials{\do##1{\mathchar`##1\mskip\Urlmuskip\sdju@urlbreak\z@}}}%
+  \do\.\do\/\do\-\do\_\do\&\do\:\do\?\do\=\do\#\do\@\do\!\do\;\do\,\do\+\do\|\do\]\do\)\do\>\do\*%
+  \let\do\noexpand}
+\sdju@urlsetup
 \Urlmuskip=0mu plus 1mu
-\setcounter{biburlnumpenalty}{100}
-\setcounter{biburlucpenalty}{100}
-\setcounter{biburllcpenalty}{100}
+\setcounter{biburlnumpenalty}{0}% 字母、数字的断行改由 \sdju@urlsetup 处理
+\setcounter{biburlucpenalty}{0}
+\setcounter{biburllcpenalty}{0}
+\appto\biburlsetup{\sdju@urlsetup}
 
 % ===============================================================
 % 图表题与表格
