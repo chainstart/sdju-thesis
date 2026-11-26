@@ -291,6 +291,13 @@
 \setlength\@fptop{0pt}
 \setlength\@fpsep{\floatsep}
 \setlength\@fpbot{0pt plus 1fil}
+% 浮动体的放置（与开题报告模板相同）：LaTeX 默认凡占半页以上的图表都可单独成页
+%   （floatpagefraction = 0.5），浮动页从顶端排起后下半页整片空白。改为：图表可占页面上方 90%，
+%   正文至少留 10%；只有占页面 80% 以上的图表（或几个合计）才单独成页
+\renewcommand\topfraction{.9}
+\renewcommand\bottomfraction{.6}
+\renewcommand\textfraction{.1}
+\renewcommand\floatpagefraction{.8}
 
 % ===============================================================
 % 论文信息
