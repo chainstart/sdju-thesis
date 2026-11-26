@@ -151,6 +151,10 @@
 \setlength{\emergencystretch}{3em}
 \urlstyle{same}
 \g@addto@macro\UrlBreaks{\do\-\do\_\do\&}
+% 长网址也可在字母、数字后换行（与 .bib 方式的 biburl*penalty 一致）。只能在符号处换行时，
+%   整行网址排不满，多出的空白被摊到网址的每个字符之间，成了「https : / / www . st . com」
+\@tfor\sdju@tmp:=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\do{%
+  \expandafter\g@addto@macro\expandafter\UrlBreaks\expandafter{\expandafter\do\sdju@tmp}}
 \Urlmuskip=0mu plus 1mu
 \setcounter{biburlnumpenalty}{100}
 \setcounter{biburlucpenalty}{100}
