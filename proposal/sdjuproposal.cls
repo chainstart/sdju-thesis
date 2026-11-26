@@ -575,6 +575,9 @@
 \newcommand\sdju@opsignroom{\dimexpr\sdju@opsigny-2\dimexpr19.5bp\relax\relax}
 \newcommand\sdju@opbottom{8bp}
 \newbox\sdju@opbox \newbox\sdju@oppiece
+% 格子中正文第一行：基线在格子顶之下 \sdju@above{字号}（#1 为字号；在竖直模式的开头使用）。
+%   不像 \rule 那样开始一个段落，内容开头的空行（\par）不会排出一个空行
+\newcommand\sdju@firstline[1]{\prevdepth=\dimexpr\baselineskip-\sdju@above{#1}{\baselineskip}\relax}
 \newif\ifsdju@opfirst
 % 排一页意见表：#1 为 1 时印栏目名，#2 为 1 时印签名和日期；内容在 \sdju@oppiece 中
 \newcommand\sdju@oppage[2]{%
@@ -614,10 +617,11 @@
   % 表格左上角：版心左边外 5.4 磅，版心上边下 0.3 磅
   \setlength\sdju@formx{\dimexpr1in+\oddsidemargin+\hoffset-\sdju@cellpad\relax}%
   \setlength\sdju@formy{\dimexpr1in+\topmargin+\voffset+\headheight+\headsep+0.3bp\relax}%
-  % 意见内容：小四号，1.25 倍行距，首行缩进 2 字符；首行基线在表格顶下一个行框上部的高度处
+  % 意见内容：小四号，1.25 倍行距，首行缩进 2 字符；首行基线在表格顶下一个行框上部的高度处。
+  %   用 \prevdepth 定第一行的位置（不另起一个空段落），意见开头有空行（\par）时也从栏目顶部排起
   \setbox\sdju@opbox\vbox{\hsize=\dimexpr\sdju@formw-24.8bp-2\dimexpr\sdju@cellpad\relax\relax
     \sdjufont{12bp}{19.5bp}\setlength\parindent{2em}\setlength\parskip{\z@}%
-    \rule{\z@}{\sdju@above{12bp}{19.5bp}}#1\par}%
+    \sdju@firstline{12bp}#1\par}%
   \splittopskip=\sdju@above{12bp}{19.5bp}\relax
   \vbadness=\@M
   \sdju@opfirsttrue
@@ -694,9 +698,12 @@
     \node[anchor=base west,inner sep=0pt] at ([xshift=\Wl+\sdju@cellpad,yshift=-12.4bp]B)
       {\sdjufont{12bp}{15.6bp}建议：};
     % 建议内容：从「建议：」的下一行起排（行距 19.5 磅）
-    \node[anchor=north west,inner sep=0pt,text width=\W-\Wl-2*\sdju@cellpad]
+    %   （排在一个 \vbox 里，用 \sdju@firstline 定第一行，建议开头有空行时也从「建议：」的下一行排起）
+    \node[anchor=north west,inner sep=0pt]
       at ([xshift=\Wl+\sdju@cellpad,yshift=-12.4bp-19.5bp+\sdju@above{12bp}{19.5bp}]B)
-      {\sdjufont{12bp}{19.5bp}\setlength\parindent{2em}\rule{\z@}{\sdju@above{12bp}{19.5bp}}\sdju@comadvice\par};
+      {\vbox{\hsize=\dimexpr\W-\Wl-2\dimexpr\sdju@cellpad\relax\relax \linewidth=\hsize
+        \sdjufont{12bp}{19.5bp}\setlength\parindent{2em}\setlength\parskip{\z@}%
+        \sdju@firstline{12bp}\sdju@comadvice\par}};
     % 结论：小四号，首行基线在本行顶下 28.1 磅，行距 31.2 磅（组员签名前多空半行）
     \begin{scope}[every node/.style={anchor=base west,inner sep=0pt,font=\sdjufont{12bp}{15.6bp}}]
       \node at ([xshift=\Wl+\sdju@cellpad,yshift=-28.1bp]C)
