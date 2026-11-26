@@ -226,7 +226,8 @@
   breaklines=true,breakatwhitespace=false,breakindent=2em,
   postbreak={},prebreak={},
   xleftmargin=0pt,aboveskip=6bp,belowskip=6bp,
-  tabsize=4,extendedchars=false,upquote=true}
+  tabsize=4,extendedchars=false,upquote=true,
+  literate={-}{{-}}1 {*}{{*}}1}% 减号、星号照原样（listings 默认排成数学符号 − ∗）
 \lstset{style=sdju}
 \lstnewenvironment{code}[1][]{\lstset{style=sdju,#1}}{}
 
