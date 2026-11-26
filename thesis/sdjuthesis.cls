@@ -845,9 +845,9 @@
 % 附录（可选，放在致谢之后）：\appendix 之后的 \chapter 编为「附录A」「附录B」…，
 %   标题格式与一级标题相同，进入目录；附录中的图、表、公式编为 A-1、A-2…
 % ===============================================================
-%   只有一个附录时（用户 2026-11-26 决定），标题排成不编号的「附　录」（同「致　谢」的写法），
-%   目录中为「附录」；\chapter 的题目文字不印出，引用它（\ref）得到空文字（「见附录\ref{…}」排为「见附录」）；
-%   图、表、公式仍编为 A-1、A-2…。
+%   只有一个附录时（用户 2026-11-26 决定），标题不编号，排成「附录」加一个全角空格加该附录的题目
+%   （如「附录　程序清单」），目录中同样为「附录　程序清单」（\chapter 的可选参数为目录中的题目）；
+%   引用它（\ref）得到「附录」；没有题目时排成「附　录」。图、表、公式仍编为 A-1、A-2…。
 %   附录的个数在上一遍编译结束时记入 .aux（\sdju@appcount），本遍据此选择排法；
 %   第一遍按多个附录排，latexmk 会自动重新编译。
 \providecommand\sdju@appcount{0}
@@ -865,8 +865,10 @@
     \let\sdju@origchapter\chapter \let\chapter\sdju@singleappendix \fi}
 \NewDocumentCommand\sdju@singleappendix{s o m}{%
   \let\chapter\sdju@origchapter
-  \sdjuchapter[附录]{附\hspace{1em}录}%
-  \refstepcounter{chapter}\def\@currentlabel{}% 「见附录\ref{…}」排为「见附录」
+  \ifblank{#3}
+    {\sdjuchapter[附录]{附\hspace{1em}录}}
+    {\sdjuchapter[附录\texorpdfstring{\hspace{1em}}{　}\IfValueTF{#2}{#2}{#3}]{附录\hspace{1em}#3}}%
+  \refstepcounter{chapter}\def\@currentlabel{附录}% 「见\ref{…}」排为「见附录」
   \let\chapter\sdju@singleappendix}
 \AtEndDocument{\ifsdju@inappendix
   \immediate\write\@auxout{\gdef\noexpand\sdju@appcount{\the\c@chapter}}\fi}
