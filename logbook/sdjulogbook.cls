@@ -247,8 +247,9 @@
 %   两行以内不加高）。一页排不下时下一页接着排，并重复表头行。记录不足 \recordrows 行（默认 15）时
 %   在末尾补空行，空行只补到本页排满为止（连同其后的注）。
 %   表格之后印附件32 的注：五号宋体加粗、单倍行距，紧接表格下边线（第一行基线在其下 11.6 磅），
-%   左右与版心齐，排不下时转行。有宋体等真字体时，注中的标点按 Word 的方式不压缩
+%   左右与版心齐，排不下时转行。注中的标点按 Word 的方式不压缩
 %   （xeCJK 默认可压缩标点后的空白，41 个字能挤进一行；Word 不压缩，样表在「信」后转行）。
+%   真字体与 Fandol 回退版都这样排（用户 2026-11-26 决定）。
 % ===============================================================
 \newif\ifsdju@recopen
 \newcounter{sdjurecord}
@@ -286,7 +287,7 @@
     % 注
     \setbox\sdju@notebox\vbox{\hsize=\textwidth \linewidth=\hsize \parindent=\z@
       \normalfont\bfseries\sdjufont{10.5bp}{15.6bp}\sdju@firstline
-      \ifsdju@realfonts\xeCJKsetup{RubberPunctSkip=false}\fi
+      \xeCJKsetup{RubberPunctSkip=false}%
       注：每周（次）填写一条，学生应重点记录师生间课题探讨、研究、解决及任务布置等信息。\par}%
     % 补空行：只补到本页排满为止，不为补空行而另起一页
     \begingroup\normalfont\normalsize

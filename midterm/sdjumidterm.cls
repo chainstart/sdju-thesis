@@ -69,12 +69,14 @@
 \setmathfont{texgyretermes-math.otf}
 \xeCJKDeclareCharClass{CJK}{"25A1,"221A}   % □ √ 用中文字体
 % 栏目名中的半角符号「(」「)」「/」：样表为宋体的半角字形（半个字宽），有宋体时照用；
-%   没有宋体时用正文西文字体（与 Fandol 回退版原样相同）
+%   没有宋体时用 Fandol 宋体的西文字形，放在半个字宽的盒子里居中，占位与宋体相同
+%   （用户 2026-11-26 决定：这一处与字体无关的排版改进在回退版中同样启用）
 \ifsdju@realfonts
   \newfontfamily\sdju@songlatin{SimSun}
   \newcommand\sdju@asc[1]{{\sdju@songlatin#1}}
 \else
-  \newcommand\sdju@asc[1]{#1}
+  \newfontfamily\sdju@songlatin{FandolSong-Regular.otf}
+  \newcommand\sdju@asc[1]{\makebox[.5em]{\sdju@songlatin#1}}
 \fi
 
 % ===============================================================
