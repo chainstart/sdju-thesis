@@ -209,6 +209,28 @@
   （\ignorespaces#1\unskip\@@italiccorr）}}
 
 % ===============================================================
+% 程序代码：\begin{code} … \end{code}（附件26 和学校 Word 模板没有规定，以下是模板的约定）
+%   五号、单倍行距，等宽字体（有 Courier New 用之，否则 TeX Gyre Cursor），汉字用宋体；
+%   左端与版心左边对齐，原样保留空格缩进；过长的行自动折行，续行缩进 2 字符；
+%   可跨页。可选参数传给 listings，如 \begin{code}[firstnumber=1,numbers=left]
+% ===============================================================
+\RequirePackage{listings}
+\IfFontExistsTF{Courier New}
+  {\newfontfamily\sdju@codefont{Courier New}[Ligatures={NoCommon,NoRequired}]}
+  {\newfontfamily\sdju@codefont{texgyrecursor}[Extension=.otf,UprightFont=*-regular,
+     BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic,
+     Ligatures={NoCommon,NoRequired}]}% 代码中的 fl、fi 不连写
+\lstdefinestyle{sdju}{%
+  basicstyle=\sdjufont{10.5bp}{\sdju@grid}\sdju@codefont,
+  columns=fullflexible,keepspaces=true,showstringspaces=false,
+  breaklines=true,breakatwhitespace=false,breakindent=2em,
+  postbreak={},prebreak={},
+  xleftmargin=0pt,aboveskip=6bp,belowskip=6bp,
+  tabsize=4,extendedchars=false,upquote=true}
+\lstset{style=sdju}
+\lstnewenvironment{code}[1][]{\lstset{style=sdju,#1}}{}
+
+% ===============================================================
 % 参考文献：GB/T 7714-2005 顺序编码制（与学校样本一致），\cite 为上标中括号；
 %   条目悬挂缩进 2 字符。字号、行距与标题在后面「参考文献」一节设定。
 % ===============================================================

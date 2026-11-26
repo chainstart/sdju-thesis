@@ -219,7 +219,7 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 | 二级标题 | 四号宋体，首行缩进 2 字符，行框 31.2 磅，段前 12、段后 0 磅，编号「1.1」 |
 | 三级标题 | 小四号黑体，首行缩进 2 字符，行框 15.6 磅，段前 12、段后 0 磅，编号「1.1.1」 |
 | 正文 | 小四号宋体 / Times New Roman，首行缩进 2 字符，1.25 倍行距 |
-| 断行 | 与 Word 一致，英文单词不用连字符拆开；网址、长标识符可在 `/ . - _` 等符号处换行 |
+| 断行 | 与 Word 一致，英文单词不用连字符拆开；网址、长标识符可在 `/ . - _` 等符号及任意字母、数字后换行（不会被拉成字间稀疏） |
 | 分项 | `enumerate` 编号为全角「（1）」「（2）」…，与正文同样缩进 2 字符，编号后紧接内容，转行顶格（各模板统一，见「编号列表」） |
 | 公式 | 另起一行居中，按章编号「（2-1）」，编号五号、右对齐（附件26 样本的（2-1）为五号 Times New Roman） |
 | 表 | 三线表，线粗 0.5 磅；表名在表正上方，宋体小五号加粗「表2-1 …」（「表」与编号间不空，编号后空半字），表名基线到表格上线 6.5 磅（表名行框 19.5 磅）；表内文字小四号、单倍行距，每行占 15.6 磅行框、文字在行框中居中，表线与行框之间不另留空（表线中心到下方一行基线 12.4 磅、到上方一行基线 3.7 磅，与样本一致）（列多时可用 `\sdjutablesize` 改小）；一页放得下的表用 `table` + `tabular`，跨页的长表用 `longtable`，续页右上方「续表2-1」（小四号，右端与表格右边对齐，基线在上线之上 3.7 磅）并重复表头，每页以底线收尾（`\endfoot` 中写 `\bottomrule`，见示例 `ch2-method.tex`） |
@@ -227,6 +227,7 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 | 参考文献 | GB/T 7714-2005 顺序编码制（与样本一致）；正文中 `\cite` 为上标「[1]」；条目小四号，悬挂缩进 2 字符，1.25 倍行距；可由 `.bib` 生成，也可在 `references` 环境中手工录入 |
 | 致谢 | 标题小二号黑体居中；正文五号宋体，首行缩进 2 字符，单倍行距 |
 | 附录（可选） | 放在致谢之后，`\appendix` 之后的 `\chapter` 编为「附录A」…，进目录，图表公式编为 A-1 … |
+| 程序代码 | `code` 环境（附件26 与 Word 模板没有规定，模板约定）：五号、单倍行距，等宽字体（Courier New，没有时 TeX Gyre Cursor），汉字用宋体；左端与版心对齐，保留原有空格缩进；过长的行自动折行、续行缩进 2 字符；可跨页 |
 
 ## 常用命令
 
@@ -248,6 +249,7 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 \backmatter  \sdjubibliography
 \begin{acknowledgements} ... \end{acknowledgements}
 \appendix  \chapter{程序清单}   % 可选：附录A
+\begin{code} … \end{code}   % 程序代码（五号等宽，长行自动折行），可选参数传给 listings
 
 \cite{key}          % 上标引用 [1]
 \parencite{key}     % 非上标 [1]
