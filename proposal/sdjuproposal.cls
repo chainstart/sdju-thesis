@@ -487,9 +487,14 @@
 \newcommand\sdjubibliography{\printbibliography[heading=sdjuproposal]}
 % 不用 .bib 文献库时，手工录入：\begin{references} \item 作者. 题名[J]. …… \end{references}
 % 条目自动编号 [1]、[2]…；正文中用 \sdjucite{1} 标注
+%   条目中的「[」：xeCJK 会在汉字与半角「[」之间加西文间距，手工录入的「题名[J]」排成「题名 [J]」，
+%   与 .bib 方式的输出、附件23/26 的样例（「研究[J]」）不一致。环境内把「[」前面的汉字与它隔开
+%   （\kern0pt），不再加间距；其他汉字与西文之间的间距照常。环境内因此不能用 \item[…] 改编号
+{\catcode`\[=\active
+ \gdef\sdju@refbrackets{\catcode`\[=\active \def[{\kern\z@\string[}}}
 \newenvironment{references}
   {\sdju@refheading{参考文献：}%
-   \sdjufont{12bp}{\sdju@grid}\begin{sdju@reflist}}
+   \sdjufont{12bp}{\sdju@grid}\begin{sdju@reflist}\sdju@refbrackets}
   {\end{sdju@reflist}}
 
 % ===============================================================
