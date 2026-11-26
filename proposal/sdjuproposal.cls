@@ -398,8 +398,8 @@
 
 % 三级标题（「3.1.1 …」）：附件23 只有两级标题；学生的开题报告常用到三级。按附件26 的文字规定
 %   「章节采用三级标题，用阿拉伯数字连续编号，例如 1，1.1，1.1.1」「三级标题黑体小四」排：
-%   小四号黑体、不加粗，与二级标题同样首行缩进 2 字符、1.25 倍行距，段前段后与二级标题一致（0 磅），
-%   使开题报告内各级标题的间距统一
+%   小四号黑体、不加粗，与二级标题同样首行缩进 2 字符、1.25 倍行距；段前 12 磅、段后 0 磅
+%   （附件26 三级标题的段前段后，用户 2026-11-26 决定；紧跟在二级标题之后时不另加）
 \setcounter{secnumdepth}{3}
 \def\sdju@secbox{31.55bp}% 一级标题行框：Word 中为 1.73 倍行距（416/240），1.733 × 1.3 × 14 磅
 \ctexset{
@@ -416,9 +416,9 @@
     beforeskip=0pt, afterskip=0pt, afterindent=true,
   },
   subsubsection={
-    format=\sdju@headstart{12bp}{19.5bp}{0bp}{0bp}\raggedright\heiti\mdseries\sdjufont{12bp}{19.5bp},
+    format=\sdju@headstart{12bp}{19.5bp}{12bp}{0bp}\raggedright\heiti\mdseries\sdjufont{12bp}{19.5bp},
     aftername=\enspace, indent=2em,
-    beforeskip=0pt, afterskip=0pt, afterindent=true,
+    beforeskip=12bp, afterskip=0pt, afterindent=true,
   },
 }
 
