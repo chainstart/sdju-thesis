@@ -77,10 +77,10 @@
 \def\sdju@single{1.3}
 % 表格内填写的内容（附件16 任务书反面各栏的段落格式，2026 版附件22 未另作规定）：
 %   四号仿宋 / Times New Roman，1.5 倍行距（1.5 × 1.3 × 14 = 27.3 磅），两端对齐；
-%   附件16 的空白栏目未设首行缩进，模板按中文段落习惯首行缩进 2 字符（\sdju@bodyindent）。
+%   不设首行缩进（附件16 各栏段落没有缩进；样表没写明的按模板原样，不另加惯例）。
 \def\sdju@bodysize{14bp}
 \def\sdju@bodyskip{27.3bp}
-\newcommand\sdju@bodyindent{2em}
+\newcommand\sdju@bodyindent{0pt}
 \newcommand\sdju@bodyfont{\fangsong}
 \renewcommand\normalsize{%
   \@setfontsize\normalsize{\sdju@bodysize}{\sdju@bodyskip}%
@@ -107,12 +107,12 @@
 \tolerance=1000
 \setlength{\emergencystretch}{3em}
 
-% 列表：(1)、(2)…，与正文同样首行缩进 2 字符
+% 列表：(1)、(2)…，与正文同样的首行缩进（\sdju@bodyindent，即不缩进），转行回到左边
 \setlist{nosep}
-\setlist[enumerate,1]{label=(\arabic*),leftmargin=0pt,labelindent=2em,
-  itemindent=*,labelsep=0.5em,align=left,listparindent=2em}
-\setlist[itemize,1]{leftmargin=0pt,labelindent=2em,itemindent=*,
-  labelsep=0.5em,listparindent=2em}
+\setlist[enumerate,1]{label=(\arabic*),leftmargin=0pt,labelindent=\sdju@bodyindent,
+  itemindent=*,labelsep=0.5em,align=left,listparindent=\sdju@bodyindent}
+\setlist[itemize,1]{leftmargin=0pt,labelindent=\sdju@bodyindent,itemindent=*,
+  labelsep=0.5em,listparindent=\sdju@bodyindent}
 % 公式编号使用全角括号
 \renewcommand\tagform@[1]{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
 
@@ -500,11 +500,10 @@
   \noindent{\bfseries\IfBooleanF{#1}{\arabic{subsection}\enspace}#2}\par\nobreak}
 
 % 进度安排：\begin{schedule} \item{20XX年XX月--20XX年XX月}{工作内容} \end{schedule}
-% 时间段之后的内容换行时与首行内容对齐
+% 每项一段「时间段：工作内容」，与正文同样的段落格式（不缩进，转行回到左边，不设悬挂缩进）
 \newenvironment{schedule}
-  {\par\setlength\parindent{2em}%
-   \def\item##1##2{\par\settowidth\@tempdima{\hspace*{2em}##1：}%
-     \hangindent\@tempdima\hangafter1 ##1：##2\par}}
+  {\par\setlength\parindent{\sdju@bodyindent}%
+   \def\item##1##2{\par ##1：##2\par}}
   {\par}
 
 % ===============================================================

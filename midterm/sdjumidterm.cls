@@ -73,8 +73,8 @@
 \def\sdju@single{1.3}
 % 表格内填写的内容（附件14 各格的段落格式，2026 版附件24 未另作规定）：小四号、单倍行距、两端对齐；
 %   中期报告一栏为仿宋（\sdju@bodyfont），指导教师意见、答辩小组建议为宋体（\sdju@opinionfont）；
-%   附件14 的空白格子未设首行缩进，模板按中文段落习惯首行缩进 2 字符（\sdju@bodyindent）。
-\newcommand\sdju@bodyindent{2em}
+%   不设首行缩进（附件14 各格段落没有缩进；样表没写明的按模板原样，不另加惯例）。
+\newcommand\sdju@bodyindent{0pt}
 \newcommand\sdju@bodyfont{\fangsong}
 \newcommand\sdju@opinionfont{\songti}
 \renewcommand\normalsize{%
@@ -108,12 +108,12 @@
 \tolerance=1000
 \setlength{\emergencystretch}{3em}
 
-% 列表：(1)、(2)…，与正文同样首行缩进 2 字符
+% 列表：(1)、(2)…，与正文同样的首行缩进（\sdju@bodyindent，即不缩进），转行回到左边
 \setlist{nosep}
-\setlist[enumerate,1]{label=(\arabic*),leftmargin=0pt,labelindent=2em,
-  itemindent=*,labelsep=0.5em,align=left,listparindent=2em}
-\setlist[itemize,1]{leftmargin=0pt,labelindent=2em,itemindent=*,
-  labelsep=0.5em,listparindent=2em}
+\setlist[enumerate,1]{label=(\arabic*),leftmargin=0pt,labelindent=\sdju@bodyindent,
+  itemindent=*,labelsep=0.5em,align=left,listparindent=\sdju@bodyindent}
+\setlist[itemize,1]{leftmargin=0pt,labelindent=\sdju@bodyindent,itemindent=*,
+  labelsep=0.5em,listparindent=\sdju@bodyindent}
 % 公式编号使用全角括号
 \renewcommand\tagform@[1]{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
 
@@ -290,7 +290,7 @@
 %   （2026 版附件24 两行都不加粗；旧附件14 第二行加粗，以 2026 版为准）；
 %   均居中，固定行距 20 磅（第一行基线在版心顶下 16 磅），段后 7.8 磅
 %   基本信息表：行高（相邻横线间距）25.5 磅；前三行四格（栏目名加粗居中，2026 版为宋体加粗），
-%   后三行两格（栏目名不加粗、左对齐）
+%   后三行两格（栏目名不加粗、左对齐）；填写的内容不加粗、左对齐（附件14 填写格的段落为 Normal 两端对齐）
 % ===============================================================
 \renewcommand\maketitle{%
   \par
@@ -305,14 +305,14 @@
   \def\sdju@lab##1{{\bfseries##1}}%
   \sdju@thickrule
   \sdju@row{25.5bp}{%
-    \sdju@cell{76.05bp}{c}{\sdju@lab{姓\hspace{1em}名}}\sdju@cell{91.2bp}{c}{\sdju@author}%
-    \sdju@cell{100.1bp}{c}{\sdju@lab{学\hspace{1em}号}}\sdju@lastcell{c}{\sdju@studentid}}%
+    \sdju@cell{76.05bp}{c}{\sdju@lab{姓\hspace{1em}名}}\sdju@cell{91.2bp}{l}{\sdju@author}%
+    \sdju@cell{100.1bp}{c}{\sdju@lab{学\hspace{1em}号}}\sdju@lastcell{l}{\sdju@studentid}}%
   \sdju@row{25.5bp}{%
-    \sdju@cell{76.05bp}{c}{\sdju@lab{校内指导教师}}\sdju@cell{91.2bp}{c}{\sdju@supervisor}%
-    \sdju@cell{100.1bp}{c}{\sdju@lab{企业指导教师}}\sdju@lastcell{c}{\sdju@companysupervisor}}%
+    \sdju@cell{76.05bp}{c}{\sdju@lab{校内指导教师}}\sdju@cell{91.2bp}{l}{\sdju@supervisor}%
+    \sdju@cell{100.1bp}{c}{\sdju@lab{企业指导教师}}\sdju@lastcell{l}{\sdju@companysupervisor}}%
   \sdju@row{25.5bp}{%
-    \sdju@cell{76.05bp}{c}{\sdju@lab{专\hspace{1em}业}}\sdju@cell{91.2bp}{c}{\sdju@major}%
-    \sdju@cell{100.1bp}{c}{\sdju@lab{学\hspace{1em}院}}\sdju@lastcell{c}{\sdju@school}}%
+    \sdju@cell{76.05bp}{c}{\sdju@lab{专\hspace{1em}业}}\sdju@cell{91.2bp}{l}{\sdju@major}%
+    \sdju@cell{100.1bp}{c}{\sdju@lab{学\hspace{1em}院}}\sdju@lastcell{l}{\sdju@school}}%
   \sdju@row{25.5bp}{%
     \sdju@cell{111.05bp}{l}{{\def\CJKecglue{}毕业设计(论文)题目}}\sdju@lastcell{l}{\sdju@title}}%
   \sdju@row{25.5bp}{%
@@ -327,12 +327,12 @@
 % 正文栏目：\section{中期报告}
 %   写在一个通栏的大格里：首行为栏目名及附件24 中的说明
 %   「中期报告（已完成的研究内容，所取得阶段性成果，下一步工作计划和研究内容等）」，
-%   下面是正文（小四号仿宋，单倍行距，首行缩进 2 字符），栏目底部为「学生签名：____ 年 月 日」，
+%   下面是正文（小四号仿宋，单倍行距，不缩进），栏目底部为「学生签名：____ 年 月 日」，
 %   「年 月 日」右侧空 48 磅，其行框底与栏目下边线齐（2026 版附件24 中这一行被栏目下边线压住，
 %   模板把它放进栏目内，比样表高 3.7 磅）。
 %   栏目写到下一个 \section、\supervisoropinion 或文档结束为止；最小高度 457.3 磅（附件24 的行高），
 %   可用可选参数改：\section[120mm]{中期报告}。内容写不下时自动跨页。
-%   栏目内的小标题用 \subsection{…}（小四号宋体加粗，编号 1、2、3…）。
+%   栏目内的小标题用 \subsection{…}（与正文同字体字号加粗，编号 1、2、3…）。
 % ===============================================================
 \@namedef{sdju@hint@中期报告}{（已完成的研究内容，所取得阶段性成果，下一步工作计划和研究内容等）}
 \@namedef{sdju@minh@中期报告}{457.3bp}
@@ -369,11 +369,10 @@
   \noindent{\bfseries\IfBooleanF{#1}{\arabic{subsection}\enspace}#2}\par\nobreak}
 
 % 进度安排：\begin{schedule} \item{20XX年XX月--20XX年XX月}{工作内容} \end{schedule}
-% 时间段之后的内容换行时与首行内容对齐
+% 每项一段「时间段：工作内容」，与正文同样的段落格式（不缩进，转行回到左边，不设悬挂缩进）
 \newenvironment{schedule}
-  {\par\setlength\parindent{2em}%
-   \def\item##1##2{\par\settowidth\@tempdima{\hspace*{2em}##1：}%
-     \hangindent\@tempdima\hangafter1 ##1：##2\par}}
+  {\par\setlength\parindent{\sdju@bodyindent}%
+   \def\item##1##2{\par ##1：##2\par}}
   {\par}
 
 % ===============================================================

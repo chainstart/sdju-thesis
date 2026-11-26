@@ -79,7 +79,7 @@
   \belowdisplayskip \abovedisplayskip
   \let\@listi\@listI}
 \normalsize
-\setlength{\parindent}{2em}
+\setlength{\parindent}{0pt}% 不设首行缩进（样表没写明的按 Word 默认段落，不另加惯例）
 \setlength{\parskip}{0pt}
 % 页面顶端的第一行（标题、续页的表头）从版心顶算起，不加 \topskip
 \setlength{\topskip}{0pt}
@@ -99,12 +99,12 @@
 \tolerance=1000
 \setlength{\emergencystretch}{3em}
 
-% 列表：(1)、(2)…，与正文同样首行缩进 2 字符
+% 列表：(1)、(2)…，不缩进，转行回到左边
 \setlist{nosep}
-\setlist[enumerate,1]{label=(\arabic*),leftmargin=0pt,labelindent=2em,
-  itemindent=*,labelsep=0.5em,align=left,listparindent=2em}
-\setlist[itemize,1]{leftmargin=0pt,labelindent=2em,itemindent=*,
-  labelsep=0.5em,listparindent=2em}
+\setlist[enumerate,1]{label=(\arabic*),leftmargin=0pt,labelindent=0pt,
+  itemindent=*,labelsep=0.5em,align=left,listparindent=0pt}
+\setlist[itemize,1]{leftmargin=0pt,labelindent=0pt,itemindent=*,
+  labelsep=0.5em,listparindent=0pt}
 % 公式编号使用全角括号
 \renewcommand\tagform@[1]{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
 
@@ -193,7 +193,7 @@
 %   「上海电机学院毕业设计（论文）指导记录」小二号方正大标宋（没有时用宋体加粗），居中，
 %   基线在版心顶下 20.7 磅，表格上边线（外缘）再下 10.5 磅（2026 版附件32）
 %   基本信息：学院、专业／班级、学号／姓名、指导教师（四格）；题目（两格）。四号宋体，单倍行距 18.2 磅，
-%   栏目名加粗居中（2026 版为宋体加粗：填充＋描边），填写的内容不加粗
+%   栏目名加粗居中（2026 版为宋体加粗：填充＋描边），填写的内容不加粗、两端对齐（靠左）
 % ===============================================================
 \IfFontExistsTF{FZDaBiaoSong-B06S}
   {\setCJKfamilyfont{sdjudabiaosong}{FZDaBiaoSong-B06S}\newcommand\sdju@titlefont{\CJKfamily{sdjudabiaosong}}}
@@ -211,22 +211,22 @@
   \begingroup
   \sdju@cellfont
   \sdju@row{\sdju@rowh}{%
-    \sdju@cell{\sdju@datew}{c}{\sdju@lab{学院}}\sdju@cell{135.8bp}{c}{\sdju@school}%
-    \sdju@cell{78.8bp}{c}{\sdju@lab{专业}}\sdju@lastcell{c}{\sdju@major}}%
+    \sdju@cell{\sdju@datew}{c}{\sdju@lab{学院}}\sdju@cell{135.8bp}{j}{\sdju@school}%
+    \sdju@cell{78.8bp}{c}{\sdju@lab{专业}}\sdju@lastcell{j}{\sdju@major}}%
   \sdju@row{\sdju@rowh}{%
-    \sdju@cell{\sdju@datew}{c}{\sdju@lab{班级}}\sdju@cell{135.8bp}{c}{\sdju@classname}%
-    \sdju@cell{78.8bp}{c}{\sdju@lab{学号}}\sdju@lastcell{c}{\sdju@studentid}}%
+    \sdju@cell{\sdju@datew}{c}{\sdju@lab{班级}}\sdju@cell{135.8bp}{j}{\sdju@classname}%
+    \sdju@cell{78.8bp}{c}{\sdju@lab{学号}}\sdju@lastcell{j}{\sdju@studentid}}%
   \sdju@row{\sdju@rowh}{%
-    \sdju@cell{\sdju@datew}{c}{\sdju@lab{姓名}}\sdju@cell{135.8bp}{c}{\sdju@author}%
-    \sdju@cell{78.8bp}{c}{\sdju@lab{指导教师}}\sdju@lastcell{c}{\sdju@supervisor}}%
+    \sdju@cell{\sdju@datew}{c}{\sdju@lab{姓名}}\sdju@cell{135.8bp}{j}{\sdju@author}%
+    \sdju@cell{78.8bp}{c}{\sdju@lab{指导教师}}\sdju@lastcell{j}{\sdju@supervisor}}%
   \sdju@row{\sdju@rowh}{%
-    \sdju@cell{\sdju@datew}{c}{\sdju@lab{题目}}\sdju@lastcell{l}{\sdju@title}}%
+    \sdju@cell{\sdju@datew}{c}{\sdju@lab{题目}}\sdju@lastcell{j}{\sdju@title}}%
   \endgroup}
 
 % ===============================================================
 % 正文栏目：\section{指导记录}
 %   印出表头行「日期 | 指 导 记 录」，其后每条记录用 \record{日期}{记录内容} 写一行：
-%   日期小四号居中，记录内容小四号宋体、单倍行距（15.6 磅）、两端对齐，行高随内容增加（至少 31.7 磅，
+%   日期与记录内容均为两端对齐（靠左）、不缩进（样表没写明，按 Word 默认段落）；内容小四号宋体、单倍行距（15.6 磅）、两端对齐，行高随内容增加（至少 31.7 磅，
 %   两行以内不加高）。一页排不下时下一页接着排，并重复表头行。记录不足 \recordrows 行（默认 15）时
 %   在末尾补空行，空行只补到本页排满为止（连同其后的注）。
 %   表格之后印附件32 的注：五号宋体加粗、单倍行距，紧接表格下边线（第一行基线在其下 11.6 磅），
@@ -250,7 +250,7 @@
   \begingroup
   \normalfont\normalsize
   \sdju@makerow{\sdju@rowh}{%
-    \sdju@cell{\sdju@datew}{c}{#1}\sdju@lastcell{j}{#2}}%
+    \sdju@cell{\sdju@datew}{j}{#1}\sdju@lastcell{j}{#2}}%
   \sdju@getavail
   \ifdim\dimexpr\ht\sdju@rowbox+\dp\sdju@rowbox\relax>\sdju@avail
     \newpage\sdju@headrow
