@@ -2,7 +2,7 @@
 %% 上海电机学院 毕业设计（论文）中期检查报告 LaTeX 模板
 %% 依据：《教学归档材料及质量评价要素（2026 版）》附件24《毕业设计（论文）中期检查报告》
 %%
-%% 行距约定：「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp。
+%% 行距约定：Word 中文字体单倍行距 = 1.3 × 字号（小四号 15.6bp），文字在行框内上下居中。
 %% 编译：xelatex（或直接 latexmk midterm.tex）
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{sdjumidterm}[2026/11/20 v1.0 SDJU Midterm Report Template]
@@ -28,16 +28,24 @@
 % ===============================================================
 % 字体：宋体 / 黑体 / Times New Roman；找不到时用 Fandol / TeX Gyre Termes
 % ===============================================================
+% 加粗：样表中的「加粗」是 Word 的描边加粗（字形填充后再以字号 1/35 的线宽描边，2026 版 PDF
+%   各附件实测均为字号的 2.86%）。宋体、黑体、楷体、仿宋、华文中宋没有粗体字形，用 XeTeX 的伪粗体
+%   模拟：xdvipdfmx 的描边线宽为 AutoFakeBold × 字号（pt）/ 100，取 \sdju@fakebold = 2.85，与 Word 相同。
+%   只用于真字体（Windows 字体）；Fandol 有粗体字形，找不到真字体时的设置与此无关。
+\def\sdju@fakebold{2.85}
+\newif\ifsdju@realfonts
 \providecommand\songti{}\providecommand\heiti{}
 \providecommand\kaishu{}\providecommand\fangsong{}
 \IfFontExistsTF{SimSun}{%
-  \setCJKmainfont{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKsansfont{SimHei}[AutoFakeBold=2]
+  \sdju@realfontstrue
+  \setCJKmainfont{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKsansfont{SimHei}[AutoFakeBold=\sdju@fakebold]
   \setCJKmonofont{SimSun}
-  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=2]
-  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
-  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}}{\setCJKfamilyfont{zhfs}{SimSun}}
+  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=\sdju@fakebold]
+  \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}[AutoFakeBold=\sdju@fakebold]}{\setCJKfamilyfont{zhkai}{SimSun}[AutoFakeBold=\sdju@fakebold]}
+  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}[AutoFakeBold=\sdju@fakebold]}
+    {\setCJKfamilyfont{zhfs}{SimSun}[AutoFakeBold=\sdju@fakebold]}
 }{%
   \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
   \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
@@ -45,7 +53,7 @@
   \setCJKfamilyfont{zhsong}{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
   \setCJKfamilyfont{zhhei}{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
   \setCJKfamilyfont{zhkai}{FandolKai-Regular.otf}
-  \setCJKfamilyfont{zhfs}{FandolFang-Regular.otf}
+  \setCJKfamilyfont{zhfs}{FandolFang-Regular.otf}[AutoFakeBold=2]
 }
 \renewcommand\songti{\CJKfamily{zhsong}}
 \renewcommand\heiti{\CJKfamily{zhhei}}
@@ -59,41 +67,91 @@
      ItalicFont=*-italic,BoldItalicFont=*-bolditalic]}
 \RequirePackage{unicode-math}
 \setmathfont{texgyretermes-math.otf}
-\xeCJKDeclareCharClass{CJK}{"25A1,"221A}   % □ √ 用中文字体
+\xeCJKDeclareCharClass{CJK}{"25A1,"221A,"2460->"2469}   % □ √ ①～⑩ 用中文字体
+% 栏目名中的半角符号「(」「)」「/」：样表为宋体的半角字形（半个字宽），有宋体时照用；
+%   没有宋体时用 Fandol 宋体的西文字形，放在半个字宽的盒子里居中，占位与宋体相同
+%   （用户 2026-11-26 决定：这一处与字体无关的排版改进在回退版中同样启用）
+\ifsdju@realfonts
+  \newfontfamily\sdju@songlatin{SimSun}
+  \newcommand\sdju@asc[1]{{\sdju@songlatin#1}}
+\else
+  \newfontfamily\sdju@songlatin{FandolSong-Regular.otf}
+  \newcommand\sdju@asc[1]{\makebox[.5em]{\sdju@songlatin#1}}
+\fi
 
 % ===============================================================
 % 格式参数（字号单位 bp，即 Word 中的「磅」）
 % ===============================================================
 \newcommand\sdjufont[2]{\fontsize{#1}{#2}\selectfont}
-\def\sdju@grid{15.6bp}                       % 单倍行距
-% 表格内填写的内容：小四号宋体 / Times New Roman，1.25 倍行距，首行缩进 2 字符
+\def\sdju@grid{15.6bp}                       % 小四号单倍行距
+% Word 中中文字体的单倍行距 = 1.3 × 字号（附件14 的文档网格为 15.6 磅，小四号单倍行距正好一格）；
+% 「x 倍行距」= x × 单倍行距。文字在行框内上下居中：行框高 L、字号 s 时，基线在行框顶之下
+% (L - s)/2 + 0.86s（\sdju@ascent）。表格不留上下内边距（附件14 的单元格上下边距为 0）。
+\def\sdju@single{1.3}
+% 表格内填写的内容（附件14 各格的段落格式，2026 版附件24 未另作规定）：小四号、单倍行距、两端对齐；
+%   中期报告一栏为仿宋（\sdju@bodyfont），指导教师意见、答辩小组建议为宋体（\sdju@opinionfont）；
+%   不设首行缩进（附件14 各格段落没有缩进；样表没写明的按模板原样，不另加惯例）。
+\newcommand\sdju@bodyindent{0pt}
+\newcommand\sdju@bodyfont{\fangsong}
+\newcommand\sdju@opinionfont{\songti}
 \renewcommand\normalsize{%
-  \@setfontsize\normalsize{12bp}{19.5bp}%
+  \@setfontsize\normalsize{12bp}{15.6bp}%
   \abovedisplayskip 6bp plus 3bp minus 3bp
   \abovedisplayshortskip 0bp plus 3bp
   \belowdisplayshortskip 6bp plus 3bp minus 3bp
   \belowdisplayskip \abovedisplayskip
   \let\@listi\@listI}
 \normalsize
-\setlength{\parindent}{2em}
+\setlength{\parindent}{\sdju@bodyindent}
 \setlength{\parskip}{0pt}
-% 按 Word 的「x 倍行距」设置当前字号的行距：\sdjuspacing{1.5}
+% 页面顶端的第一行（标题、续页的表格边线）从版心顶算起，不加 \topskip
+\setlength{\topskip}{0pt}
+\AtBeginDocument{\setlength{\topskip}{0pt}}
+% 当前字号、行距下 Word 行框中基线距行框顶的距离，及一个高为当前行距的行框支柱
+\newcommand\sdju@ascent{\dimexpr(\baselineskip-1em)/2+0.86em\relax}
+\newcommand\sdju@wstrut{\vrule height\sdju@ascent depth\dimexpr\baselineskip-\sdju@ascent\relax width\z@}
+% 格子中正文第一行：基线在格子上边线之下一个 \sdju@ascent（在竖直模式的开头使用）
+\newcommand\sdju@firstline{\prevdepth=\dimexpr\baselineskip-\sdju@ascent\relax}
+% 格子中正文最后一行：行框在基线之下还有 \sdju@desc（= 行距 - \sdju@ascent），补足到这个深度，
+%   使末行与下边线之间留出 Word 行框的下半部分（附件14 单元格下边距为 0，空白由行距自然留出）
+\newcommand\sdju@desc{\dimexpr\baselineskip-\sdju@ascent\relax}
+\newcommand\sdju@lastline{\par\ifdim\prevdepth<\sdju@desc\vskip\dimexpr\sdju@desc-\prevdepth\relax\fi}
+% Word 固定行距 #1 的一行：基线在行顶之下 0.8 × #1
+\newcommand\sdju@exactline[2]{\hbox to\hsize{\vrule height0.8\dimexpr#1\relax depth0.2\dimexpr#1\relax width\z@ #2}}
+% 按 Word 的「x 倍行距」设置当前字号的行距：\sdjuspacing{1.5}（x × 1.3 × 字号）
 \ExplSyntaxOn
 \NewDocumentCommand\sdjuspacing{m}
-  {\fontsize{\f@size}{\fp_eval:n{#1*15.6}bp}\selectfont}
+  {\fontsize{\f@size}{\fp_eval:n{#1*\sdju@single*\f@size}pt}\selectfont}
 \ExplSyntaxOff
 
 % 断行：与 Word 一致，英文单词不用连字符拆开；排不下时放宽词距
+% 句末标点（. : ? !）之后与普通词距相同，不加大（\frenchspacing；Word 也不加大）。
+%   放在 \AtBeginDocument 中，以免被宏包改回
+\AtBeginDocument{\frenchspacing}
 \hyphenpenalty=10000
 \tolerance=1000
 \setlength{\emergencystretch}{3em}
 
-% 列表：(1)、(2)…，与正文同样首行缩进 2 字符
+% 编号列表（各模板统一）：全角括号「（1）」「（2）」…，编号后紧接内容（全角括号自带半字空白），
+%   首行与正文同样缩进 \sdju@listindent（这里即不缩进），转行回到左边。依据与取舍见 README「编号列表」
+\newcommand\sdju@listindent{\sdju@bodyindent}
 \setlist{nosep}
-\setlist[enumerate,1]{label=(\arabic*),leftmargin=0pt,labelindent=2em,
-  itemindent=*,labelsep=0.5em,align=left,listparindent=2em}
-\setlist[itemize,1]{leftmargin=0pt,labelindent=2em,itemindent=*,
-  labelsep=0.5em,listparindent=2em}
+\setlist[enumerate,1]{label=（\arabic*）,leftmargin=0pt,labelindent=\sdju@listindent,
+  itemindent=*,labelsep=0pt,align=left,listparindent=\sdju@listindent}
+% 第二级编号（用户 2026-11-26 决定）：「（1）」下一级用「①」「②」…，编号后紧接内容；
+%   缩进、转行与第一级相同（首行缩进 \sdju@listindent，转行回到左边）。
+%   ①～⑩ 用字体中的字符（U+2460～U+2469，宋体、Fandol 都有）；宋体、Fandol 没有 ⑪ 以后的字符，
+%   第 11 项起画一个 1 字宽的圆圈，数字居中
+\newcommand\sdju@circled[1]{\ifnum#1>10 \sdju@drawcircled{#1}\else\char\numexpr"245F+#1\relax\fi}
+\newcommand\sdju@drawcircled[1]{\makebox[1em]{\raisebox{-0.12em}{\setlength\unitlength{1em}%
+  \begin{picture}(1,1)\put(0.5,0.5){\circle{0.9}}\put(0.5,0.47){\makebox(0,0){%
+    \fontsize{0.55em}{0.55em}\selectfont\number#1}}\end{picture}}}}
+\newcommand\sdju@circlednum[1]{\expandafter\sdju@circled\csname c@#1\endcsname}
+\AddEnumerateCounter{\sdju@circlednum}{\sdju@circled}{⑩}
+\setlist[enumerate,2]{label=\sdju@circlednum*,leftmargin=0pt,labelindent=\sdju@listindent,
+  itemindent=*,labelsep=0pt,align=left,listparindent=\sdju@listindent}
+\setlist[itemize,1]{leftmargin=0pt,labelindent=\sdju@listindent,itemindent=*,
+  labelsep=0.5em,listparindent=\sdju@listindent}
 % 公式编号使用全角括号
 \renewcommand\tagform@[1]{\maketag@@@{（\ignorespaces#1\unskip\@@italiccorr）}}
 
@@ -128,12 +186,33 @@
 \newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}% 校内指导教师
 \newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}% 企业指导教师
 \newcommand\projectsource[1]{\renewcommand\sdju@projectsource{#1}}% 课题来源/项目编号
-% 课题有无变化：\topicchange{无}，或 \topicchange[变化原因]{有}；不写则两个方框都不勾
+% 课题有无变化：\topicchange{无}，或 \topicchange{有} 加 \changereason{变化原因}
+%   （也可写 \topicchange[变化原因]{有}）；不写或留空（\topicchange{}）则两个方框都不勾
 \NewDocumentCommand\topicchange{o m}{%
   \ifstrequal{#2}{有}
     {\renewcommand\sdju@changeyes{1}\renewcommand\sdju@changeno{0}}
-    {\renewcommand\sdju@changeno{1}\renewcommand\sdju@changeyes{0}}%
+    {\ifblank{#2}{\renewcommand\sdju@changeno{0}\renewcommand\sdju@changeyes{0}}
+      {\renewcommand\sdju@changeno{1}\renewcommand\sdju@changeyes{0}}}%
   \IfNoValueTF{#1}{}{\renewcommand\sdju@changereason{#1}}}
+\newcommand\changereason[1]{\renewcommand\sdju@changereason{#1}}
+% 意见页的栏目（和基本信息一样直接填写；留空时为空白表，与样表相同）：
+%   \studentdate{年}{月}{日}：中期报告栏底部学生签名的日期
+%   \supervisordate{年}{月}{日}：指导教师意见的日期
+%   \committeeresult{通过|不通过}、\committeegrade{优秀|良好|及格}：答辩小组结论中勾选答辩结论、等第
+%   \committeedate{年}{月}{日}：答辩小组结论的日期
+%   指导教师意见、答辩小组的建议分别写在 \supervisoropinion{…}、\committeeconclusion{…} 的花括号内
+\newcommand\studentdate[3]{\sdju@setsrcdate{student}{#1}{#2}{#3}}
+\newcommand\supervisordate[3]{\sdju@setsrcdate{supervisor}{#1}{#2}{#3}}
+\newcommand\committeedate[3]{\sdju@setsrcdate{committee_chair}{#1}{#2}{#3}}
+\newcommand\sdju@respass{0}\newcommand\sdju@resfail{0}
+\newcommand\sdju@gradea{0}\newcommand\sdju@gradeb{0}\newcommand\sdju@gradec{0}
+\newcommand\committeeresult[1]{\renewcommand\sdju@respass{0}\renewcommand\sdju@resfail{0}%
+  \ifstrequal{#1}{通过}{\renewcommand\sdju@respass{1}}{}%
+  \ifstrequal{#1}{不通过}{\renewcommand\sdju@resfail{1}}{}}
+\newcommand\committeegrade[1]{\renewcommand\sdju@gradea{0}\renewcommand\sdju@gradeb{0}\renewcommand\sdju@gradec{0}%
+  \ifstrequal{#1}{优秀}{\renewcommand\sdju@gradea{1}}{}%
+  \ifstrequal{#1}{良好}{\renewcommand\sdju@gradeb{1}}{}%
+  \ifstrequal{#1}{及格}{\renewcommand\sdju@gradec{1}}{}}
 % 方框：\sdju@checkbox{1} 打勾，\sdju@checkbox{0} 空
 \newcommand\sdju@checkbox[1]{%
   \ifnum#1=1 \makebox[0pt][l]{□}\makebox[1em]{\raisebox{0.08em}{\fontsize{0.8\dimexpr\f@size pt\relax}{0pt}\selectfont √}}%
@@ -141,20 +220,21 @@
 
 % ===============================================================
 % 表格
-%   表格宽 427.5 磅，左边线伸出版心左边 6.1 磅；左右外框线 1 磅，表格首尾横线 1 磅，其余线 0.5 磅。
-%   单元格左右内边距 1.4 磅；表格文字小四号宋体。
-%   \sdju@row{最小行高}{单元格…}：一行不可跨页的表格行，各单元格内容上下居中；
+%   表格外缘宽 428.5 磅，左外缘伸出版心左边 6.6 磅（外框线中线伸出 6.1 磅）；左右外框线 1 磅，
+%   表格首尾横线 1 磅，其余线 0.5 磅。文字距竖线中线 1.4 磅（附件14 的单元格左右边距），上下边距 0；
+%   表格文字小四号宋体，单倍行距。
+%   \sdju@row{行高}{单元格…}：一行不可跨页的表格行，行高指相邻两条横线的间距，各单元格内容上下居中；
 %     \sdju@cell{宽度}{对齐 l/c/r}{内容}（宽度含其右侧竖线），最后一格用 \sdju@lastcell{对齐}{内容} 占满余下宽度。
 %   \sdju@formrow：可跨页的大栏目（中期报告、指导教师意见），内容写不下时在页底断开、下一页接着排；
 %     内容少时按「最小高度」留白（取自附件24 各栏的高度），签名栏排在栏目底部。
 % ===============================================================
-\newlength\sdju@formw      \setlength\sdju@formw{427.5bp}%  表格总宽
-\newlength\sdju@formshift  \setlength\sdju@formshift{-6.1bp}% 表格左边线相对版心左边的位移
+\newlength\sdju@formw      \setlength\sdju@formw{428.5bp}%  表格总宽（外缘）
+\newlength\sdju@formshift  \setlength\sdju@formshift{-6.6bp}% 表格左外缘相对版心左边的位移
 \newlength\sdju@rule       \setlength\sdju@rule{0.5bp}%     内框线
 \newlength\sdju@orule      \setlength\sdju@orule{1bp}%      外框线
 \newlength\sdju@labelw     \setlength\sdju@labelw{0pt}%     （本表的大栏目没有竖排栏目名）
-\newlength\sdju@padx       \setlength\sdju@padx{1.4bp}%     单元格左右内边距
-\newlength\sdju@pady       \setlength\sdju@pady{2bp}%       单元格上下内边距
+\newlength\sdju@padx       \setlength\sdju@padx{0.9bp}%     单元格左右内边距（从外框线内缘算，即距中线 1.4 磅）
+\newlength\sdju@pady       \setlength\sdju@pady{0bp}%       单元格上下内边距
 \newlength\sdju@cw         % 内容格中文字的宽度
 \newlength\sdju@avail \newlength\sdju@minh \newlength\sdju@tmpa
 \newlength\sdju@used \newlength\sdju@axis
@@ -167,7 +247,7 @@
 \newcommand\sdju@cellbox[3]{%
   \hbox to\dimexpr#1-\sdju@rule\relax{\hskip\sdju@padx
     $\vcenter{\hsize=\dimexpr#1-\sdju@rule-2\sdju@padx\relax \linewidth=\hsize
-      \parindent=\z@ \csname sdju@align@#2\endcsname \strut#3\strut\par}$%
+      \parindent=\z@ \csname sdju@align@#2\endcsname \sdju@wstrut#3\sdju@wstrut\par}$%
     \hss}}
 \newcommand\sdju@cell[3]{%
   \sdju@cellbox{#1}{#2}{#3}\vrule width\sdju@rule \addtolength\sdju@used{#1}}
@@ -179,7 +259,7 @@
     \hrule height\sdju@rule width\sdju@formw
     \hbox to\sdju@formw{\setlength\sdju@used{\z@}\setbox\z@\hbox{$\vcenter{}$}\sdju@axis=\ht\z@%
       \vrule width\sdju@orule
-      \vrule width\z@ height\dimexpr#1/2+\sdju@axis\relax depth\dimexpr#1/2-\sdju@axis\relax
+      \vrule width\z@ height\dimexpr(#1-\sdju@rule)/2+\sdju@axis\relax depth\dimexpr(#1-\sdju@rule)/2-\sdju@axis\relax
       #2\vrule width\sdju@orule}%
     \hrule height\sdju@rule width\sdju@formw}%
   \kern-\sdju@rule\prevdepth=\z@}
@@ -192,10 +272,11 @@
 \newcommand\sdju@setcw{%
   \setlength\sdju@cw{\sdju@formw-2\sdju@orule-2\sdju@padx}%
   \ifdim\sdju@labelw>\z@ \addtolength\sdju@cw{-\sdju@labelw}\fi}
+\let\sdju@curfont\sdju@bodyfont
 \newcommand\sdju@bodysetup{%
   \hsize=\sdju@cw \linewidth=\hsize \columnwidth=\hsize \@totalleftmargin=\z@
-  \normalfont\normalsize\parindent=2em \parskip=\z@
-  \everypar{}}
+  \normalfont\normalsize\sdju@curfont\parindent=\sdju@bodyindent \parskip=\z@
+  \everypar{}\sdju@firstline}
 \newcommand\sdju@outpiece[1]{%
   \nointerlineskip
   \moveright\sdju@formshift\vbox{%
@@ -221,7 +302,7 @@
 \newcommand\sdju@formrow[1]{%
   \par
   \setlength\sdju@minh{#1}%
-  \addtolength\sdju@minh{-2\sdju@pady-2\sdju@rule}%
+  \addtolength\sdju@minh{-2\sdju@pady-\sdju@rule}% 最小高度指上下两条横线中线的间距
   \ifvoid\sdju@label\else
     \ifdim\sdju@minh<\ht\sdju@label \setlength\sdju@minh{\ht\sdju@label}\fi
   \fi
@@ -237,10 +318,10 @@
     \setlength\sdju@tmpa{\sdju@minh}%
   \fi
   \sdju@firstpiecetrue
-  \splittopskip=14bp \splitmaxdepth=\maxdimen \vbadness=\@M
+  \splittopskip=\sdju@ascent \splitmaxdepth=\maxdimen \vbadness=\@M
   \loop
     \ifdim\sdju@tmpa>\sdju@avail
-      \setbox\sdju@piece\vsplit\sdju@body to\sdju@avail
+      \setbox\sdju@piece\vsplit\sdju@body to\dimexpr\sdju@avail-\sdju@desc\relax% 断开处末行留出行框下半部分
       \sdju@outpiece{\sdju@avail}%
       \sdju@firstpiecefalse
       \newpage\sdju@getavail
@@ -250,46 +331,59 @@
   \sdju@outpiece{\sdju@tmpa}%
   \global\setbox\sdju@label\box\voidb@x
   \global\setbox\sdju@tail\box\voidb@x}
-% 签名栏：#1 签名人（如「学生签名」）；签名下划线 84 磅，下一行「年 月 日」，均靠右
-\newcommand\sdju@signature[1]{%
-  \global\setbox\sdju@tail\vbox{\hsize=\sdju@cw \parindent=\z@
-    \normalfont\sdjufont{12bp}{19.5bp}%
-    \hbox to\hsize{\hfil#1：\rule[-1.6bp]{84bp}{0.6bp}}%
-    \hbox to\hsize{\hfil 年\hspace{2em}月\hspace{2em}日\hspace{3em}}\kern 4bp}}
+% 签名栏：#1 签名人（如「学生签名」），#2「年 月 日」右侧的空白（附件14 段落的右缩进），
+%   #3「年 月 日」一行的行框底到栏目下边线的距离。
+%   签名一行 1.5 倍行距（23.4 磅），「年 月 日」一行单倍行距，文字在行框内居中，两行基线相距 19.5 磅；
+%   签名下划线长 84 磅、线粗 0.6 磅，中线在基线下 1.2 磅，右端距文字区右缘 4.7 磅（附件14、2026 版附件24）。
+%   没有签名配置时签名处留空，待手签；有配置时由系统放入签名图片（高 22 磅，在下划线上居中，底部压在
+%   下划线上）和日期（见文末「电子签名」）。签名人：学生签名 → student，指导教师签名 → supervisor
+\newcommand\sdju@signline[2]{\hbox to\hsize{%
+  \vrule height\dimexpr(#1-1em)/2+0.86em\relax depth\dimexpr(#1+1em)/2-0.86em\relax width\z@ #2}}
+\newcommand\sdju@signature[3]{%
+  \global\setbox\sdju@tail\vbox{\hsize=\sdju@cw \parindent=\z@ \offinterlineskip
+    \normalfont\songti\sdjufont{12bp}{15.6bp}%
+    \edef\sdju@signer{\csname sdju@signer@#1\endcsname}%
+    \sdju@signline{23.4bp}{\hfil#1：\raise-1.2bp\hbox{\sdju@sign{\sdju@signer}{84bp}{22bp}}%
+      \rule[-1.5bp]{84bp}{0.6bp}\kern4.7bp}%
+    \sdju@signline{15.6bp}{\hfil \sdju@datefill{\sdju@signer}{0pt}{2em}{2em}\hspace{#2}}\kern#3}}
+\@namedef{sdju@signer@学生签名}{student}
+\@namedef{sdju@signer@指导教师签名}{supervisor}
 
 % ===============================================================
 % 标题与基本信息表（附件24 第 1 页上部）：\maketitle
-%   「上 海 电 机 学 院」三号黑体，字距 0.5 字；「本科生毕业设计（论文）中期检查报告」三号黑体加粗；
-%   均居中，固定行距 20 磅，段后 7.8 磅
-%   基本信息表：行高 25.5 磅；前三行四格（栏目名加粗居中），后三行两格（栏目名左对齐）
+%   「上 海 电 机 学 院」三号黑体，字距 0.5 字；「本科生毕业设计（论文）中期检查报告」三号黑体
+%   （2026 版附件24 两行都不加粗；旧附件14 第二行加粗，以 2026 版为准）；
+%   均居中，固定行距 20 磅（第一行基线在版心顶下 16 磅），段后 7.8 磅
+%   基本信息表：行高（相邻横线间距）25.5 磅；前三行四格（栏目名加粗居中，2026 版为宋体加粗），
+%   后三行两格（栏目名不加粗、左对齐）；填写的内容不加粗、左对齐（附件14 填写格的段落为 Normal 两端对齐）
 % ===============================================================
 \renewcommand\maketitle{%
   \par
   \begingroup
-  \centering\heiti\sdjufont{16bp}{20bp}%
-  上\hspace{0.5em}海\hspace{0.5em}电\hspace{0.5em}机\hspace{0.5em}学\hspace{0.5em}院\par
-  {\bfseries 本科生毕业设计（论文）中期检查报告\par}%
+  \heiti\sdjufont{16bp}{20bp}\offinterlineskip
+  \sdju@exactline{20bp}{\hfil 上\hspace{0.5em}海\hspace{0.5em}电\hspace{0.5em}机\hspace{0.5em}学\hspace{0.5em}院\hfil}%
+  \sdju@exactline{20bp}{\hfil 本科生毕业设计（论文）中期检查报告\hfil}%
+  \kern 7.8bp
   \endgroup
-  \vskip 7.8bp
   \begingroup
   \normalfont\sdjufont{12bp}{15.6bp}%
   \def\sdju@lab##1{{\bfseries##1}}%
   \sdju@thickrule
   \sdju@row{25.5bp}{%
-    \sdju@cell{76.3bp}{c}{\sdju@lab{姓\hspace{1em}名}}\sdju@cell{91.2bp}{c}{\sdju@author}%
-    \sdju@cell{100.1bp}{c}{\sdju@lab{学\hspace{1em}号}}\sdju@lastcell{c}{\sdju@studentid}}%
+    \sdju@cell{76.05bp}{c}{\sdju@lab{姓\hspace{1em}名}}\sdju@cell{91.2bp}{l}{\sdju@author}%
+    \sdju@cell{100.1bp}{c}{\sdju@lab{学\hspace{1em}号}}\sdju@lastcell{l}{\sdju@studentid}}%
   \sdju@row{25.5bp}{%
-    \sdju@cell{76.3bp}{c}{\sdju@lab{校内指导教师}}\sdju@cell{91.2bp}{c}{\sdju@supervisor}%
-    \sdju@cell{100.1bp}{c}{\sdju@lab{企业指导教师}}\sdju@lastcell{c}{\sdju@companysupervisor}}%
+    \sdju@cell{76.05bp}{c}{\sdju@lab{校内指导教师}}\sdju@cell{91.2bp}{l}{\sdju@supervisor}%
+    \sdju@cell{100.1bp}{c}{\sdju@lab{企业指导教师}}\sdju@lastcell{l}{\sdju@companysupervisor}}%
   \sdju@row{25.5bp}{%
-    \sdju@cell{76.3bp}{c}{\sdju@lab{专\hspace{1em}业}}\sdju@cell{91.2bp}{c}{\sdju@major}%
-    \sdju@cell{100.1bp}{c}{\sdju@lab{学\hspace{1em}院}}\sdju@lastcell{c}{\sdju@school}}%
+    \sdju@cell{76.05bp}{c}{\sdju@lab{专\hspace{1em}业}}\sdju@cell{91.2bp}{l}{\sdju@major}%
+    \sdju@cell{100.1bp}{c}{\sdju@lab{学\hspace{1em}院}}\sdju@lastcell{l}{\sdju@school}}%
   \sdju@row{25.5bp}{%
-    \sdju@cell{111.3bp}{l}{{\def\CJKecglue{}毕业设计(论文)题目}}\sdju@lastcell{l}{\sdju@title}}%
+    \sdju@cell{111.05bp}{l}{{\def\CJKecglue{}毕业设计\sdju@asc{(}论文\sdju@asc{)}题目}}\sdju@lastcell{l}{\sdju@title}}%
   \sdju@row{25.5bp}{%
-    \sdju@cell{111.3bp}{l}{课题来源/项目编号}\sdju@lastcell{l}{\sdju@projectsource}}%
+    \sdju@cell{111.05bp}{l}{课题来源\sdju@asc{/}项目编号}\sdju@lastcell{l}{\sdju@projectsource}}%
   \sdju@row{25.5bp}{%
-    \sdju@cell{111.3bp}{l}{课题有无变化}%
+    \sdju@cell{111.05bp}{l}{课题有无变化}%
     \sdju@lastcell{l}{\sdju@checkbox{\sdju@changeno}无\hspace{1em}\sdju@checkbox{\sdju@changeyes}有\hspace{1em}%
       变化原因\ifx\sdju@changereason\@empty\else：\sdju@changereason\fi}}%
   \endgroup}
@@ -298,19 +392,21 @@
 % 正文栏目：\section{中期报告}
 %   写在一个通栏的大格里：首行为栏目名及附件24 中的说明
 %   「中期报告（已完成的研究内容，所取得阶段性成果，下一步工作计划和研究内容等）」，
-%   下面是正文（小四号宋体，1.25 倍行距，首行缩进 2 字符），栏目底部为「学生签名：____ 年 月 日」。
+%   下面是正文（小四号仿宋，单倍行距，不缩进），栏目底部为「学生签名：____ 年 月 日」，
+%   「年 月 日」右侧空 48 磅，其行框底与栏目下边线齐（2026 版附件24 中这一行被栏目下边线压住，
+%   模板把它放进栏目内，比样表高 3.7 磅）。
 %   栏目写到下一个 \section、\supervisoropinion 或文档结束为止；最小高度 457.3 磅（附件24 的行高），
 %   可用可选参数改：\section[120mm]{中期报告}。内容写不下时自动跨页。
-%   栏目内的小标题用 \subsection{…}（小四号宋体加粗，编号 1、2、3…）。
+%   栏目内的小标题用 \subsection{…}（与正文同字体字号加粗，编号 1、2、3…）。
 % ===============================================================
 \@namedef{sdju@hint@中期报告}{（已完成的研究内容，所取得阶段性成果，下一步工作计划和研究内容等）}
 \@namedef{sdju@minh@中期报告}{457.3bp}
-\@namedef{sdju@sign@中期报告}{学生签名}
+\@namedef{sdju@sign@中期报告}{{学生签名}{48bp}{0bp}}
 \newif\ifsdju@rowopen
 \newcommand\sdju@rowminh{60mm}
 \newcommand\sdju@closerow{%
   \ifsdju@rowopen
-    \par\egroup
+    \sdju@lastline\egroup
     \global\sdju@rowopenfalse
     \sdju@formrow{\sdju@rowminh}%
     \sdju@thickrule
@@ -326,28 +422,29 @@
   \sdju@setcw
   \global\setbox\sdju@label\box\voidb@x
   \ifcsname sdju@sign@#3\endcsname
-    \sdju@signature{\csname sdju@sign@#3\endcsname}%
+    \expandafter\expandafter\expandafter\sdju@signature\csname sdju@sign@#3\endcsname
   \else \global\setbox\sdju@tail\box\voidb@x \fi
   \setcounter{subsection}{0}%
   \global\sdju@rowopentrue
+  \let\sdju@curfont\sdju@bodyfont
   \setbox\sdju@body\vbox\bgroup\sdju@bodysetup
-    {\parindent=\z@ \noindent #3\ifcsname sdju@hint@#3\endcsname\csname sdju@hint@#3\endcsname\fi\par}}
+    {\parindent=\z@ \noindent\songti #3\ifcsname sdju@hint@#3\endcsname\csname sdju@hint@#3\endcsname\fi\par}}
 \RenewDocumentCommand\subsection{s m}{%
   \par\IfBooleanF{#1}{\stepcounter{subsection}}%
   \noindent{\bfseries\IfBooleanF{#1}{\arabic{subsection}\enspace}#2}\par\nobreak}
 
 % 进度安排：\begin{schedule} \item{20XX年XX月--20XX年XX月}{工作内容} \end{schedule}
-% 时间段之后的内容换行时与首行内容对齐
+% 每项一段「时间段：工作内容」，与正文同样的段落格式（不缩进，转行回到左边，不设悬挂缩进）
 \newenvironment{schedule}
-  {\par\setlength\parindent{2em}%
-   \def\item##1##2{\par\settowidth\@tempdima{\hspace*{2em}##1：}%
-     \hangindent\@tempdima\hangafter1 ##1：##2\par}}
+  {\par\setlength\parindent{\sdju@bodyindent}%
+   \def\item##1##2{\par ##1：##2\par}}
   {\par}
 
 % ===============================================================
 % 意见页（附件24 第 2 页）
-%   \supervisoropinion{<意见内容，可留空>}：另起一页；通栏大格，首行「指导教师意见：」，
-%     底部「指导教师签名：____ 年 月 日」；最小高度 254.2 磅，内容多时自动加高、跨页。
+%   \supervisoropinion{<意见内容，可留空>}：另起一页，表格上边线在版心顶；通栏大格，首行「指导教师意见：」，
+%     正文小四号宋体、单倍行距；底部「指导教师签名：____ 年 月 日」，「年 月 日」右侧空 36 磅，
+%     其行框底距栏目下边线 35.1 磅（2026 版附件24）；最小高度 254.2 磅，内容多时自动加高、跨页。
 %   \committeeconclusion{<建议内容，可留空>}：答辩小组结论，接在指导教师意见之后，高 411.7 磅（不跨页，
 %     本页放不下时移到下一页）。左格竖排「答辩/小组/结论」（五号，每行两字）；
 %     右格上部「建议：」，下部为答辩结论（通过□ 不通过□）、等第评定（优秀□ 良好□ 及格□）、
@@ -358,34 +455,36 @@
   \clearpage
   \sdju@setcw
   \global\setbox\sdju@label\box\voidb@x
-  \sdju@signature{指导教师签名}%
+  \sdju@signature{指导教师签名}{36bp}{35.1bp}%
+  \let\sdju@curfont\sdju@opinionfont
   \setbox\sdju@body\vbox{\sdju@bodysetup
-    {\parindent=\z@ \noindent 指导教师意见：\par}#1\par}%
+    {\parindent=\z@ \noindent 指导教师意见：\par}#1\sdju@lastline}%
   \sdju@thickrule
   \sdju@formrow{254.2bp}}
-\newlength\sdju@cclabelw \setlength\sdju@cclabelw{33.7bp}% 「答辩小组结论」格宽（含其右侧竖线）
+\newlength\sdju@cclabelw \setlength\sdju@cclabelw{33.45bp}% 「答辩小组结论」格宽（含其右侧竖线）
 \newcommand\sdju@ccline[1]{\hbox to\hsize{\vrule width\z@ height 21.2bp depth 10bp #1\hfil}}
 \newcommand\committeeconclusion[1]{%
   \sdju@closerow
   \par
   \begingroup
-  \normalfont\sdjufont{12bp}{19.5bp}%
+  \normalfont\normalsize
+  \let\sdju@curfont\sdju@opinionfont
   \setlength\sdju@cw{\sdju@formw-2\sdju@orule-\sdju@cclabelw-2\sdju@padx}%
   % 上部：建议
   \setbox\sdju@body\vbox{\sdju@bodysetup
-    {\parindent=\z@ \noindent 建议：\par}#1\par}%
+    {\parindent=\z@ \noindent 建议：\par}#1\sdju@lastline}%
   \setlength\sdju@tmpa{203.9bp-\sdju@rule-2\sdju@pady}%
   \ifdim\dimexpr\ht\sdju@body+\dp\sdju@body\relax>\sdju@tmpa
     \setlength\sdju@tmpa{\ht\sdju@body+\dp\sdju@body}\fi
   % 下部：答辩结论
   \setbox\sdju@tail\vbox{\hsize=\sdju@cw \parindent=\z@ \offinterlineskip
-    \kern 6bp
-    \sdju@ccline{答辩结论：\hspace{1.5em}通过\sdju@checkbox{0}\hspace{5em}不通过\sdju@checkbox{0}}%
-    \sdju@ccline{等第评定：\hspace{1.5em}优秀\sdju@checkbox{0}\hspace{1.5em}良好\sdju@checkbox{0}\hspace{1.5em}及格\sdju@checkbox{0}}%
-    \sdju@ccline{答辩小组组长签名：}%
+    \kern 6.5bp
+    \sdju@ccline{答辩结论：\hspace{1.5em}通过\sdju@checkbox{\sdju@respass}\hspace{5em}不通过\sdju@checkbox{\sdju@resfail}}%
+    \sdju@ccline{等第评定：\hspace{1.5em}优秀\sdju@checkbox{\sdju@gradea}\hspace{1.5em}良好\sdju@checkbox{\sdju@gradeb}\hspace{1.5em}及格\sdju@checkbox{\sdju@gradec}}%
+    \sdju@ccline{答辩小组组长签名：\sdju@signleft{committee_chair}{\dimexpr\hsize-9em\relax}{22bp}}%
     \kern 15.6bp
-    \sdju@ccline{答辩小组组员签名：}%
-    \sdju@ccline{\hfill 年\hspace{2em}月\hspace{2em}日\hspace{3em}}%
+    \sdju@ccline{答辩小组组员签名：\sdju@signmembers{\dimexpr\hsize-9em\relax}{22bp}{6bp}{2}{\dimexpr\hsize-9em-15em\relax}}% 第二行避开日期%
+    \sdju@ccline{\hfill \sdju@datefill{\sdju@committeeroles}{0pt}{2.5em}{2em}\hspace{4.5em}}%
     \vss}%
   \setlength\sdju@minh{\sdju@tmpa+207.8bp+2\sdju@pady}% 右格总高
   \sdju@getavail
@@ -397,14 +496,15 @@
       \vrule width\sdju@orule
       \vbox to\sdju@minh{\hsize=\dimexpr\sdju@cclabelw-\sdju@rule\relax
         \vss\sdjufont{10.5bp}{31.2bp}\offinterlineskip
-        \hbox to\hsize{\hss 答辩\hss}\kern 20.7bp
-        \hbox to\hsize{\hss 小组\hss}\kern 20.7bp
-        \hbox to\hsize{\hss 结论\hss}\vss}%
+        \def\sdju@s{\vrule height0.86em depth0.14em width\z@}%
+        \hbox to\hsize{\sdju@s\hss 答辩\hss}\kern 20.7bp
+        \hbox to\hsize{\sdju@s\hss 小组\hss}\kern 20.7bp
+        \hbox to\hsize{\sdju@s\hss 结论\hss}\vss}%
       \vrule width\sdju@rule
       \vbox{\hsize=\dimexpr\sdju@cw+2\sdju@padx\relax
         \hbox{\hskip\sdju@padx\vbox to\dimexpr\sdju@tmpa+2\sdju@pady\relax{%
           \hsize=\sdju@cw\vskip\sdju@pady\box\sdju@body\vss}}%
-        \hrule height\sdju@rule
+        \hrule height\sdju@rule width\dimexpr\sdju@cw+2\sdju@padx\relax
         \hbox{\hskip\sdju@padx\vbox to\dimexpr207.8bp-\sdju@rule\relax{\hsize=\sdju@cw\box\sdju@tail}}}%
       \hfil\vrule width\sdju@orule}%
     \hrule height\sdju@rule width\sdju@formw}%
@@ -460,4 +560,123 @@
 
 \RequirePackage[hidelinks,unicode]{hyperref}
 \graphicspath{{figures/}}
+
+% ===============================================================
+% 电子签名与签字日期（由系统在服务端编译时放入；学生、教师的源码中不使用这些命令）
+%   编译目录中有 sdju-signatures.cfg 时，在类文件末尾（\begin{document} 之前）读入。配置文件中：
+%     \sdju@signrole{<角色>}              启用该角色：在它的每个签字处放入 signatures/<角色>.png
+%     \sdju@signdate{<角色>}{年}{月}{日}   该角色签字处的日期（填在「年 月 日」的空白处）
+%   角色：student、supervisor、company_supervisor、dean、committee_chair、
+%     committee_member-1、committee_member-2、…（从 1 起连续编号）、recorder
+%   没有配置文件、或配置文件中没有声明某角色时，该签字处与原来完全相同（空白，待手签）；
+%   signatures/ 中有图片而配置文件未声明的角色不起作用。签名图片按签字处的高度等比缩放、
+%   宽度不超过签字处，底部压在签字线（没有签字线时为栏目文字的基线）上；图片排成零尺寸的盒子，
+%   不改变分页、行数和其他任何位置。几人共用一个日期的（如答辩小组），取其中最晚的日期。
+%   源码中已写了日期（如 \taskdate、\supervisordate）时以源码为准。
+% ===============================================================
+\newcommand\sdju@signrole[1]{\global\@namedef{sdju@sigon@#1}{}}
+\newcommand\sdju@signdate[4]{\global\@namedef{sdju@sdate@#1}{{#2}{#3}{#4}}}
+\newcommand\sdju@signdir{signatures/}
+% \sdju@ifsign{角色}{有签名时}{没有时}
+\newcommand\sdju@ifsign[3]{%
+  \ifcsname sdju@sigon@#1\endcsname
+    \IfFileExists{\sdju@signdir#1.png}{#2}{%
+      \ClassWarningNoLine{sdjumidterm}{配置文件声明了签名角色 #1，但找不到 \sdju@signdir#1.png，该处留空}#3}%
+  \else #3\fi}
+\newbox\sdju@sigbox
+% 签名图片（零尺寸，参考点在签字处左端的签字线上）：#1 角色，#2 签字处宽度，#3 签名高度；
+%   图片在签字处中水平居中
+\newcommand\sdju@sign[3]{\sdju@ifsign{#1}{%
+  \setbox\sdju@sigbox\hbox{\includegraphics[height=#3,width=#2,keepaspectratio]{\sdju@signdir#1.png}}%
+  \smash{\rlap{\kern\dimexpr(#2-\wd\sdju@sigbox)/2\relax\box\sdju@sigbox}}}{}}
+% 同上，图片靠签字处左端排（签字处没有下划线、紧接在栏目名之后时）
+\newcommand\sdju@signleft[3]{\sdju@ifsign{#1}{%
+  \smash{\rlap{\includegraphics[height=#3,width=#2,keepaspectratio]{\sdju@signdir#1.png}}}}{}}
+% 答辩小组组员（committee_member-1、-2…）：从签字处左端起横向排列，间隔 #3；一行排不下时换到
+%   下一行（向下，行距为签名高度加 #3）。#1 第一行的宽度，#5 以下各行的宽度（避开其右侧的日期），
+%   #2 签名高度，#4 至多几行：行数超过 #4 时签名高度逐级缩小（每级 10%，最小为原来的一半），
+%   直到排得下。零尺寸，参考点在第一行的基线上
+\newcount\sdju@signn \newcount\sdju@signrows
+\newdimen\sdju@signh \newdimen\sdju@signw
+\newcommand\sdju@signmembers[5]{%
+  \def\sdju@signwrest{#5}%
+  \begingroup
+  \sdju@signh=#2\relax
+  \sdju@signbuild{#1}{#3}%
+  \loop
+    \@tempswafalse
+    \ifnum\sdju@signrows>#4\relax \ifdim\sdju@signh>\dimexpr#2/2+1sp\relax \@tempswatrue \fi\fi
+  \if@tempswa
+    \sdju@signh=\dimexpr\sdju@signh-#2/10\relax
+    \sdju@signbuild{#1}{#3}%
+  \repeat
+  \ifnum\sdju@signrows>\z@
+    \smash{\rlap{\vtop{\offinterlineskip\unvbox\sdju@sigbox}}}%
+  \fi
+  \endgroup}
+% 按高度 \sdju@signh 把组员签名排成若干行，放在 \sdju@sigbox，行数在 \sdju@signrows
+\newcommand\sdju@signbuild[2]{%
+  \setbox\sdju@sigbox\vbox{}\setbox\z@\hbox{}\sdju@signrows=\z@ \sdju@signn=\@ne
+  \def\sdju@signrow{% 把当前一行（\box\z@）接到已排的各行之下
+    \setbox\sdju@sigbox\vbox{\offinterlineskip\unvbox\sdju@sigbox
+      \ifnum\sdju@signrows>\z@ \kern#2\fi \box\z@}%
+    \advance\sdju@signrows\@ne}%
+  \sdju@signbuild@i{#1}{#2}%
+  \ifdim\wd\z@>\z@ \sdju@signrow \fi}
+\newcommand\sdju@signbuild@i[2]{%
+  \ifcsname sdju@sigon@committee_member-\the\sdju@signn\endcsname
+    \sdju@ifsign{committee_member-\the\sdju@signn}{%
+      \ifnum\sdju@signrows=\z@ \sdju@signw=#1\relax \else \sdju@signw=\sdju@signwrest\relax \fi
+      \setbox\tw@\hbox{\includegraphics[height=\sdju@signh,width=\sdju@signw,keepaspectratio]%
+        {\sdju@signdir committee_member-\the\sdju@signn.png}}%
+      \ifdim\wd\z@>\z@
+        \ifdim\dimexpr\wd\z@+#2+\wd\tw@\relax>\sdju@signw
+          \sdju@signrow \setbox\z@\hbox{\box\tw@}%
+        \else \setbox\z@\hbox{\unhbox\z@\kern#2\box\tw@}\fi
+      \else \setbox\z@\hbox{\box\tw@}\fi}{}%
+    \advance\sdju@signn\@ne
+    \expandafter\sdju@signbuild@i
+  \else \expandafter\@gobbletwo
+  \fi{#1}{#2}}
+% 答辩小组全体（组长与组员）的角色列表，用于取共用的日期
+\newcommand\sdju@committeeroles{committee_chair,committee_member-1,committee_member-2,committee_member-3,committee_member-4,committee_member-5,committee_member-6,committee_member-7,committee_member-8,committee_member-9,committee_member-10,committee_member-11,committee_member-12,committee_member-13,committee_member-14,committee_member-15,committee_member-16,committee_member-17,committee_member-18,committee_member-19,committee_member-20}
+% 日期：\sdju@getdate{角色,角色,…} 取这些角色中最晚的日期，放在 \sdju@dy、\sdju@dm、\sdju@dd
+%   （没有时为空，\ifsdju@hasdate 为假）
+\newif\ifsdju@hasdate
+\newcount\sdju@dbest \newcount\sdju@dcur
+\newcommand\sdju@getdate[1]{%
+  \global\sdju@hasdatefalse \sdju@dbest=\m@ne
+  \gdef\sdju@dy{}\gdef\sdju@dm{}\gdef\sdju@dd{}%
+  \@for\sdju@r:=#1\do{%
+    \ifcsname sdju@sdate@\sdju@r\endcsname
+      \expandafter\expandafter\expandafter\sdju@getdate@i\csname sdju@sdate@\sdju@r\endcsname
+    \fi}%
+  % 源码中写了日期（\studentdate、\supervisordate、\committeedate）时以源码为准
+  \@for\sdju@r:=#1\do{%
+    \ifcsname sdju@srcdate@\sdju@r\endcsname
+      \expandafter\expandafter\expandafter\sdju@usesrcdate\csname sdju@srcdate@\sdju@r\endcsname
+    \fi}}
+\newcommand\sdju@usesrcdate[3]{\global\sdju@hasdatetrue\gdef\sdju@dy{#1}\gdef\sdju@dm{#2}\gdef\sdju@dd{#3}}
+% 源码中的日期：\sdju@setsrcdate{角色}{年}{月}{日}；三项都留空时取消（为空白的「年 月 日」，或签名配置的日期）
+\newcommand\sdju@setsrcdate[4]{\ifblank{#2#3#4}{\global\csundef{sdju@srcdate@#1}}
+  {\global\@namedef{sdju@srcdate@#1}{{#2}{#3}{#4}}}}
+\newcommand\sdju@getdate@i[3]{%
+  \sdju@dcur=\numexpr(#1)*10000+(#2)*100+(#3)\relax
+  \ifnum\sdju@dcur>\sdju@dbest
+    \sdju@dbest=\sdju@dcur \global\sdju@hasdatetrue
+    \gdef\sdju@dy{#1}\gdef\sdju@dm{#2}\gdef\sdju@dd{#3}%
+  \fi}
+% 「年 月 日」填入日期：#1 角色列表，#2「年」前空白的宽度（年份右对齐写在其中；为 0 时年份写在
+%   「年」左侧之外，不占宽度），#3、#4「月」「日」前空白的宽度（月、日在其中居中）。没有日期时
+%   与原来的「年\hspace{#3}月\hspace{#4}日」相同。数字放在 \hbox 中（不用 \makebox：xeCJK 会在
+%   汉字与 \makebox 之间加中西文间距，使「月」「日」右移），填入日期后「年」「月」「日」的位置不变
+\newcommand\sdju@datefill[4]{%
+  \sdju@getdate{#1}%
+  \ifsdju@hasdate
+    \ifdim#2=\z@ \llap{\sdju@dy}\else \hbox to#2{\hss\sdju@dy}\fi
+    年\hbox to#3{\hss\sdju@dm\hss}月\hbox to#4{\hss\sdju@dd\hss}日%
+  \else
+    \ifdim#2=\z@\else\hspace{#2}\fi 年\hspace{#3}月\hspace{#4}日%
+  \fi}
+\InputIfFileExists{sdju-signatures.cfg}{}{}
 \endinput

@@ -5,6 +5,7 @@
 \addbibresource{refs-proposal.bib}
 
 % ---------------- 封面信息 ----------------
+% 每一页的栏目都在源码中直接填写；没有内容的留空（花括号内不写），版面上照原表留出空白。
 \title{兆瓦级风力发电机控制系统设计}
 \subtitle{液压系统}            % 无副标题可删去
 \school{电气学院}
@@ -17,6 +18,25 @@
 \finaldate{20XX\hspace{0.5em}年\hspace{0.5em}XX\hspace{0.5em}月\hspace{0.5em}XX\hspace{0.5em}日}
 
 \keywords{风力发电，液压系统，制动控制，变桨距控制，PLC}
+
+% ---------------- 意见页（最后两页）的栏目 ----------------
+% 这些栏目和封面一样，直接填写：没有内容的留空（空白表，与样表相同）。
+% 指导教师意见写在文末 \supervisoropinion{…} 的花括号里。
+\supervisordate{}{}{}          % 指导教师意见的日期：{年}{月}{日}
+% 答辩小组意见：每项写勾选的选项（方框后的文字，如 \committeecheck{1}{有工程背景}）；可写多次
+\committeecheck{1}{}           % 1、论文选题：有理论意义／有工程背景／有实用价值／意义不大
+\committeecheck{2}{}           % 2、论文的难度：偏高／适当／偏低
+\committeecheck{3}{}           % 3、论文的工作量：偏大／适当／偏小
+\committeecheck{4}{}           % 4、设计或研究方案的可行性：好／较好／一般／不可行
+\committeecheck{5}{}           % 5、学生对文献资料及课题的了解程度：好／较好／一般／较差
+\committeecheck{6}{}           % 6、综合能力和表达能力：好／较好／一般／较差
+\committeecheck{7}{}           % 7、创新能力：好／较好／一般／较差
+\committeecheck{8}{}           % 8、总体评价：好／较好／一般／较差
+\committeeadvice{}             % 答辩小组结论：建议
+\committeeresult{}             % 答辩结论：通过／不通过
+\committeegrade{}              % 等第评定：优秀／良好／及格
+\committeedate{}{}{}           % 答辩小组结论的日期：{年}{月}{日}
+% 签名：手签，或由系统放入签名图片（源码中不写）
 
 \begin{document}
 
@@ -93,7 +113,7 @@
 \nocite{*}
 \sdjubibliography
 
-\supervisoropinion{}   % 花括号内可填写指导教师意见
-\committeeopinion
+\supervisoropinion{}   % 指导教师意见：直接写在花括号内
+\committeeopinion      % 答辩小组意见与结论（栏目在导言区填写）
 
 \end{document}

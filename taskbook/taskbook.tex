@@ -4,21 +4,25 @@
 \documentclass{sdjutaskbook}
 
 % ---------------- 封面信息 ----------------
+% 封面、反面的每个栏目都在下面直接填写；没有内容的留空（花括号内不写），版面上照原表留出空白。
 \title{兆瓦级风力发电机控制系统设计——液压系统}
 \school{电气学院}               % 封面没有「学院」栏，只作记录
 \major{电气工程及其自动化}
 \classname{XXXXXX}
 \studentid{XXXXXXXXX}
 \author{XXX}
-\supervisor{XXX}                % 校内指导教师（封面须手签，只作记录）
-\companysupervisor{XXX}         % 企业指导教师（封面须手签，只作记录；无则删去）
-\taskdate{20XX\hspace{1em}年\hspace{1em}XX\hspace{1em}月\hspace{1em}XX\hspace{1em}日}
+\supervisor{XXX}                % 校内指导教师（封面签字处不印姓名，只作记录）
+\companysupervisor{XXX}         % 企业指导教师（封面签字处不印姓名，只作记录；无则删去）
+\taskdate{20XX\hspace{1em}年\hspace{1em}XX\hspace{1em}月\hspace{1em}XX\hspace{1em}日}  % 封面日期；留空为空白的「年 月 日」
+\covernote{}                    % 封面框外的「注」；留空为原表文字「注：本任务书由上海电机学院教务处印制。」
+% 学院院长、校内指导教师、企业指导教师三处签字：手签，或由系统放入签名图片（源码中不写）
 
 \begin{document}
 
 \makecover
 
 % ---------------- 任务书反面（以下各项由指导教师填写） ----------------
+% 四个栏目各用一个 \section 开始，栏目名就是花括号里的文字；栏目里直接写内容
 \section{课题来源}
 本课题来源于XXXX企业的XXXX项目（项目编号：XXXXXX），属于工程设计类课题。
 
