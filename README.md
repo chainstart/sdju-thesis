@@ -296,7 +296,7 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 | 加粗 | 附件23 的「加粗」是 Word 的描边加粗。用 Windows 宋体、黑体、华文中宋时以伪粗体模拟，描边线宽与样表相同（`\sdju@fakebold` = 2.85，见上文「字体」）；Fandol 宋体用其粗体字形，笔画粗细与样表相当。没有华文中宋时，封面的校名和标题用宋体加重的粗体代替，使笔画粗细与样表接近 |
 | 进度安排 | `schedule` 环境，内容换行后与首行内容对齐 |
 | 参考文献 | 另起一页，「参考文献：」小二号黑体加粗居中，1.5 倍行距；条目小四号单倍行距，**不缩进**（编号顶格，转行也顶格，与附件23 一致）；同样可用 `references` 环境手工录入 |
-| 意见页 | `\supervisoropinion{...}` 指导教师意见、`\committeeopinion` 答辩小组意见与结论，各占一页，留签名和日期位置；表格宽度、行高、栏目名位置按附件23 量取。指导教师意见写到签名处时，表格续排到下一页（续页为同样大小的表格，不重复栏目名），签名和日期在最后一页的原位置。答辩小组页的方框「□」有宋体时直接用宋体的 □（与样表相同），只有 Fandol 时按宋体 □ 的尺寸画出（边长 0.71 字），不用 Fandol 的 □；表格线粗 0.48 磅。答辩小组页在附件23 中单独成节（左右边距 3.17 cm、上下 2.54 cm），模板在这一页同样换用该页面设置 |
+| 意见页 | `\supervisoropinion{...}` 指导教师意见、`\committeeopinion` 答辩小组意见与结论，各占一页，留签名和日期位置；表格宽度、行高、栏目名位置按附件23 量取。指导教师意见写到签名处时，表格续排到下一页（续页为同样大小的表格，不重复栏目名），签名和日期在最后一页的原位置。答辩小组页的方框「□」有宋体时直接用宋体的 □（与样表相同），只有 Fandol 时按宋体 □ 的尺寸画出（边长 0.71 字），不用 Fandol 的 □；表格线粗 0.48 磅。答辩小组页在附件23 中单独成节（左右边距 3.17 cm、上下 2.54 cm），模板在这一页同样换用该页面设置。录入已填好的意见页（如往届归档稿）时可用：`\supervisordate{年}{月}{日}`、`\committeecheck{项}{第几个方框}`、`\committeeadvice{建议}`、`\committeeconclusion{通过}`、`\committeegrade{良好}`、`\committeedate{年}{月}{日}`，勾选的方框为方框内加「√」；不写时为空白表（与样表相同），签名一律手签 |
 
 ```latex
 \title{课题名称} \subtitle{副标题} \school{} \major{} \classname{} \studentid{} \author{}
@@ -305,6 +305,8 @@ FONTCONFIG_FILE=/path/to/fonts.conf latexmk taskbook.tex
 \makecover  \maketitle  \begin{abstract} ... \end{abstract}
 \section{文献综述} ...  \begin{schedule} \item{时间段}{工作内容} \end{schedule}
 \sdjubibliography  \supervisoropinion{}  \committeeopinion
+% 意见页已填写时（可选）：\supervisordate{2025}{1}{2}  \committeecheck{1}{2}  \committeeadvice{…}
+% \committeeconclusion{通过}  \committeegrade{良好}  \committeedate{2025}{1}{7}（写在 \committeeopinion 之前）
 ```
 
 ## 任务书、中期检查报告、指导记录

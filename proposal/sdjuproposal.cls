@@ -521,7 +521,7 @@
       \node[anchor=base west,inner sep=0pt] at ([xshift=267.1bp,yshift=-\sdju@opsigny]O)
         {\sdjufont{12bp}{15.6bp}指导教师签名：};
       \node[anchor=base west,inner sep=0pt] at ([xshift=336.1bp,yshift=-\sdju@opdatey]O)
-        {\sdjufont{12bp}{15.6bp}年\hspace{2em}月\hspace{2em}日};
+        {\sdjufont{12bp}{15.6bp}\sdju@datefields{\sdju@supdate}};
     \fi
   \end{tikzpicture}\par}
 \newcommand\sdju@oploop{%
@@ -561,6 +561,33 @@
   \newcommand\sdju@box{\makebox[1em][l]{\hspace{0.14em}%
     \fboxsep=\z@\fboxrule=0.04em\framebox{\rule{0pt}{0.63em}\rule{0.63em}{0pt}}}}
 \fi
+% 意见页的填写内容（可选；不写时为空白表，与样表相同）。用于把已经填好的开题报告（如往届归档稿）
+%   原样录入；正常流程中这些内容由指导教师、答辩小组在打印稿上手写。
+%   \supervisordate{年}{月}{日}：指导教师意见的日期，填在「年 月 日」的空白处
+%   \committeecheck{第几项}{第几个方框}：答辩小组意见第 1～8 项中勾选的方框（从 1 数），可写多次
+%   \committeeadvice{建议内容}：答辩小组结论中「建议：」下的文字（小四号，1.25 倍行距，首行缩进 2 字符）
+%   \committeeconclusion{通过|不通过}、\committeegrade{优秀|良好|及格}：勾选答辩结论、等第
+%   \committeedate{年}{月}{日}：答辩小组结论的日期
+%   签名一律手签，模板不放签名图片。勾选的方框为方框内加「√」（Word 样稿用 Wingdings 2 的带勾方框）
+\newcommand\sdju@supdate{{}{}{}}
+\newcommand\sdju@comdate{{}{}{}}
+\newcommand\supervisordate[3]{\renewcommand\sdju@supdate{{#1}{#2}{#3}}}
+\newcommand\committeedate[3]{\renewcommand\sdju@comdate{{#1}{#2}{#3}}}
+% 日期：「年」的位置不变，年份写在「年」之前，月、日写在原来 2 字宽的空白中居中
+\newcommand\sdju@datefields[1]{\expandafter\sdju@datefields@i#1}
+\newcommand\sdju@datefields@i[3]{\llap{#1}年\makebox[2em]{#2}月\makebox[2em]{#3}日}
+\newcommand\committeecheck[2]{\@namedef{sdju@chk@#1@#2}{}}
+\newcommand\sdju@comadvice{}
+\newcommand\committeeadvice[1]{\renewcommand\sdju@comadvice{#1}}
+\newcommand\committeeconclusion[1]{\def\@tempa{#1}\def\@tempb{通过}%
+  \ifx\@tempa\@tempb\committeecheck{c}{1}\else\committeecheck{c}{2}\fi}
+\newcommand\committeegrade[1]{\def\@tempa{#1}%
+  \def\@tempb{优秀}\ifx\@tempa\@tempb\committeecheck{g}{1}\fi
+  \def\@tempb{良好}\ifx\@tempa\@tempb\committeecheck{g}{2}\fi
+  \def\@tempb{及格}\ifx\@tempa\@tempb\committeecheck{g}{3}\fi}
+% \sdju@cbox{项}{第几个}：未勾选时与 \sdju@box 完全相同
+\newcommand\sdju@cbox[2]{\@ifundefined{sdju@chk@#1@#2}{\sdju@box}%
+  {\makebox[1em][l]{\sdju@box}\llap{\makebox[1em][c]{\raisebox{0.06em}{\fontsize{0.8em}{0.8em}\selectfont √}}}}}
 \newcommand\committeeopinion{%
   \newgeometry{top=72bp,bottom=72bp,left=90bp,right=90bp,headheight=0pt,headsep=0pt,
     footskip=\dimexpr 72bp-49.6bp-\sdju@below{9bp}{11.7bp}\relax}%
@@ -581,29 +608,33 @@
     % 答辩小组意见：五号，行距 20 磅，首行基线在表顶下 16.2 磅
     \node[anchor=north west,inner sep=0pt,text width=\W-\Wl-2*\sdju@cellpad]
       at ([xshift=\Wl+\sdju@cellpad]O) {\sdjufont{10.5bp}{20bp}\setlength\parindent{0pt}%
-      \rule{\z@}{16.2bp}1、论文选题：\sdju@box 有理论意义；\sdju@box 有工程背景；\sdju@box 有实用价值；\sdju@box 意义不大。\par
-      2、论文的难度：\sdju@box 偏高；\sdju@box 适当；\sdju@box 偏低。\par
-      3、论文的工作量：\sdju@box 偏大；\sdju@box 适当；\sdju@box 偏小。\par
-      4、设计或研究方案的可行性：\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 不可行。\par
-      5、学生对文献资料及课题的了解程度：\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 较差。\par
+      \rule{\z@}{16.2bp}1、论文选题：\sdju@cbox{1}{1}有理论意义；\sdju@cbox{1}{2}有工程背景；\sdju@cbox{1}{3}有实用价值；\sdju@cbox{1}{4}意义不大。\par
+      2、论文的难度：\sdju@cbox{2}{1}偏高；\sdju@cbox{2}{2}适当；\sdju@cbox{2}{3}偏低。\par
+      3、论文的工作量：\sdju@cbox{3}{1}偏大；\sdju@cbox{3}{2}适当；\sdju@cbox{3}{3}偏小。\par
+      4、设计或研究方案的可行性：\sdju@cbox{4}{1}好；\sdju@cbox{4}{2}较好；\sdju@cbox{4}{3}一般；\sdju@cbox{4}{4}不可行。\par
+      5、学生对文献资料及课题的了解程度：\sdju@cbox{5}{1}好；\sdju@cbox{5}{2}较好；\sdju@cbox{5}{3}一般；\sdju@cbox{5}{4}较差。\par
       6、学生在论文选题报告中反映出的综合能力和表达能力：\par
-      \hspace*{3.5em}\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 较差。\par
+      \hspace*{3.5em}\sdju@cbox{6}{1}好；\sdju@cbox{6}{2}较好；\sdju@cbox{6}{3}一般；\sdju@cbox{6}{4}较差。\par
       7、学生在论文选题报告中反映出的创新能力：\par
-      \hspace*{3.5em}\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 较差。\par
-      8、对论文选题报告的总体评价：\sdju@box 好；\sdju@box 较好；\sdju@box 一般；\sdju@box 较差\par
+      \hspace*{3.5em}\sdju@cbox{7}{1}好；\sdju@cbox{7}{2}较好；\sdju@cbox{7}{3}一般；\sdju@cbox{7}{4}较差。\par
+      8、对论文选题报告的总体评价：\sdju@cbox{8}{1}好；\sdju@cbox{8}{2}较好；\sdju@cbox{8}{3}一般；\sdju@cbox{8}{4}较差\par
       \vskip 11.2bp（在相应的方块内作记号“√”）\par};
     % 建议：小四号，基线在本行顶下 12.4 磅
     \node[anchor=base west,inner sep=0pt] at ([xshift=\Wl+\sdju@cellpad,yshift=-12.4bp]B)
       {\sdjufont{12bp}{15.6bp}建议：};
+    % 建议内容：从「建议：」的下一行起排（行距 19.5 磅）
+    \node[anchor=north west,inner sep=0pt,text width=\W-\Wl-2*\sdju@cellpad]
+      at ([xshift=\Wl+\sdju@cellpad,yshift=-12.4bp-19.5bp+\sdju@above{12bp}{19.5bp}]B)
+      {\sdjufont{12bp}{19.5bp}\setlength\parindent{2em}\rule{\z@}{\sdju@above{12bp}{19.5bp}}\sdju@comadvice\par};
     % 结论：小四号，首行基线在本行顶下 28.1 磅，行距 31.2 磅（组员签名前多空半行）
     \begin{scope}[every node/.style={anchor=base west,inner sep=0pt,font=\sdjufont{12bp}{15.6bp}}]
       \node at ([xshift=\Wl+\sdju@cellpad,yshift=-28.1bp]C)
-        {答辩结论：\hspace{1.5em}通过\sdju@box\hspace{5em}不通过\sdju@box};
+        {答辩结论：\hspace{1.5em}通过\sdju@cbox{c}{1}\hspace{5em}不通过\sdju@cbox{c}{2}};
       \node at ([xshift=\Wl+\sdju@cellpad,yshift=-28.1bp-31.2bp]C)
-        {等第评定：\hspace{1.5em}优秀\sdju@box\hspace{1.5em}良好\sdju@box\hspace{1.5em}及格\sdju@box};
+        {等第评定：\hspace{1.5em}优秀\sdju@cbox{g}{1}\hspace{1.5em}良好\sdju@cbox{g}{2}\hspace{1.5em}及格\sdju@cbox{g}{3}};
       \node at ([xshift=\Wl+\sdju@cellpad,yshift=-28.1bp-2*31.2bp]C) {答辩小组组长签名：};
       \node at ([xshift=\Wl+\sdju@cellpad,yshift=-28.1bp-3.5*31.2bp]C) {答辩小组组员签名：};
-      \node at ([xshift=293.8bp,yshift=-28.1bp-4.5*31.2bp]C) {年\hspace{2em}月\hspace{2em}日};
+      \node at ([xshift=293.8bp,yshift=-28.1bp-4.5*31.2bp]C) {\sdju@datefields{\sdju@comdate}};
     \end{scope}
   \end{tikzpicture}\par
   \clearpage\restoregeometry\setlength\headwidth{\textwidth}}
