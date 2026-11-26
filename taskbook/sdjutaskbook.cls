@@ -2,7 +2,7 @@
 %% 上海电机学院 毕业设计（论文）任务书 LaTeX 模板
 %% 依据：《教学归档材料及质量评价要素（2026 版）》附件22《毕业设计（论文）任务书》
 %%
-%% 行距约定：「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp。
+%% 行距约定：Word 中文字体单倍行距 = 1.3 × 字号（小四号 15.6bp）；反面各栏正文四号 1.5 倍 = 27.3bp。
 %% 编译：xelatex（或直接 latexmk taskbook.tex）
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{sdjutaskbook}[2026/11/20 v1.0 SDJU Task Book Template]
@@ -38,7 +38,8 @@
   \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
   \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=2]
   \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
-  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}}{\setCJKfamilyfont{zhfs}{SimSun}}
+  \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}[AutoFakeBold=2]}
+    {\setCJKfamilyfont{zhfs}{SimSun}[AutoFakeBold=2]}
 }{%
   \setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
   \setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
@@ -46,7 +47,7 @@
   \setCJKfamilyfont{zhsong}{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
   \setCJKfamilyfont{zhhei}{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
   \setCJKfamilyfont{zhkai}{FandolKai-Regular.otf}
-  \setCJKfamilyfont{zhfs}{FandolFang-Regular.otf}
+  \setCJKfamilyfont{zhfs}{FandolFang-Regular.otf}[AutoFakeBold=2]
 }
 \renewcommand\songti{\CJKfamily{zhsong}}
 \renewcommand\heiti{\CJKfamily{zhhei}}
@@ -70,22 +71,35 @@
 % 格式参数（字号单位 bp，即 Word 中的「磅」）
 % ===============================================================
 \newcommand\sdjufont[2]{\fontsize{#1}{#2}\selectfont}
-\def\sdju@grid{15.6bp}                       % 单倍行距
-% 表格内填写的内容：小四号宋体 / Times New Roman，1.25 倍行距，首行缩进 2 字符
+\def\sdju@grid{15.6bp}                       % 小四号单倍行距
+% Word 中中文字体（宋体、仿宋等）不对齐网格时的单倍行距 = 1.3 × 字号；「x 倍行距」= x × 单倍行距。
+% 文字在行框内上下居中：行框高 L、字号 s 时，基线在行框顶之下 (L - s)/2 + 0.86s（\sdju@ascent）。
+\def\sdju@single{1.3}
+% 表格内填写的内容（附件16 任务书反面各栏的段落格式，2026 版附件22 未另作规定）：
+%   四号仿宋 / Times New Roman，1.5 倍行距（1.5 × 1.3 × 14 = 27.3 磅），两端对齐；
+%   附件16 的空白栏目未设首行缩进，模板按中文段落习惯首行缩进 2 字符（\sdju@bodyindent）。
+\def\sdju@bodysize{14bp}
+\def\sdju@bodyskip{27.3bp}
+\newcommand\sdju@bodyindent{2em}
+\newcommand\sdju@bodyfont{\fangsong}
 \renewcommand\normalsize{%
-  \@setfontsize\normalsize{12bp}{19.5bp}%
+  \@setfontsize\normalsize{\sdju@bodysize}{\sdju@bodyskip}%
   \abovedisplayskip 6bp plus 3bp minus 3bp
   \abovedisplayshortskip 0bp plus 3bp
   \belowdisplayshortskip 6bp plus 3bp minus 3bp
   \belowdisplayskip \abovedisplayskip
   \let\@listi\@listI}
 \normalsize
-\setlength{\parindent}{2em}
+\setlength{\parindent}{\sdju@bodyindent}
 \setlength{\parskip}{0pt}
-% 按 Word 的「x 倍行距」设置当前字号的行距：\sdjuspacing{1.5}
+% 当前字号、行距下 Word 行框中基线距行框顶的距离
+\newcommand\sdju@ascent{\dimexpr(\baselineskip-1em)/2+0.86em\relax}
+% 格子中正文第一行：基线在格子上边线之下一个 \sdju@ascent（在竖直模式的开头使用）
+\newcommand\sdju@firstline{\prevdepth=\dimexpr\baselineskip-\sdju@ascent\relax}
+% 按 Word 的「x 倍行距」设置当前字号的行距：\sdjuspacing{1.5}（x × 1.3 × 字号）
 \ExplSyntaxOn
 \NewDocumentCommand\sdjuspacing{m}
-  {\fontsize{\f@size}{\fp_eval:n{#1*15.6}bp}\selectfont}
+  {\fontsize{\f@size}{\fp_eval:n{#1*\sdju@single*\f@size}pt}\selectfont}
 \ExplSyntaxOff
 
 % 断行：与 Word 一致，英文单词不用连字符拆开；排不下时放宽词距
@@ -244,7 +258,7 @@
 \newlength\sdju@orule      \setlength\sdju@orule{0.5bp}%    左右外框线
 \newlength\sdju@labelw     \setlength\sdju@labelw{32.4bp}%  竖排栏目名格宽（含其右侧竖线）
 \newlength\sdju@padx       \setlength\sdju@padx{5.4bp}%     单元格左右内边距
-\newlength\sdju@pady       \setlength\sdju@pady{4bp}%       单元格上下内边距
+\newlength\sdju@pady       \setlength\sdju@pady{0bp}%       单元格上下内边距（附件16 为 0）
 \newlength\sdju@cw         % 内容格中文字的宽度
 \newlength\sdju@avail \newlength\sdju@minh \newlength\sdju@tmpa \newlength\sdju@tmpb
 \newdimen\sdju@reserve % 栏目最后一段之下须与它留在同一页的高度（「以上各项由指导教师填写」一行）
@@ -294,8 +308,8 @@
 % 内容格的排版环境
 \newcommand\sdju@bodysetup{%
   \hsize=\sdju@cw \linewidth=\hsize \columnwidth=\hsize \@totalleftmargin=\z@
-  \normalfont\normalsize\parindent=2em \parskip=\z@
-  \everypar{}}
+  \normalfont\normalsize\sdju@bodyfont\parindent=\sdju@bodyindent \parskip=\z@
+  \everypar{}\sdju@firstline}
 % 输出一段：#1 段内文字区高度；\sdju@piece 为内容
 \newcommand\sdju@outpiece[1]{%
   \nointerlineskip
@@ -350,7 +364,7 @@
     \setlength\sdju@tmpa{\sdju@minh}%
   \fi
   \sdju@firstpiecetrue
-  \splittopskip=14bp \splitmaxdepth=\maxdimen \vbadness=\@M
+  \splittopskip=\sdju@ascent \splitmaxdepth=\maxdimen \vbadness=\@M
   \loop
     \ifdim\sdju@tmpa>\dimexpr\sdju@avail-\sdju@reserve\relax
       % 放不下就在本页底断开；全部放得下、只是放不下其后的一行时，少排一点，把那一行带到下一页
@@ -480,7 +494,7 @@
   \setcounter{subsection}{0}%
   \global\sdju@rowopentrue
   \setbox\sdju@body\vbox\bgroup\sdju@bodysetup}
-% 栏目内的小标题：\subsection{…}，小四号宋体加粗，编号 1、2、3…；\subsection* 不编号
+% 栏目内的小标题：\subsection{…}，与正文同字体字号（四号仿宋）加粗，编号 1、2、3…；\subsection* 不编号
 \RenewDocumentCommand\subsection{s m}{%
   \par\IfBooleanF{#1}{\stepcounter{subsection}}%
   \noindent{\bfseries\IfBooleanF{#1}{\arabic{subsection}\enspace}#2}\par\nobreak}
