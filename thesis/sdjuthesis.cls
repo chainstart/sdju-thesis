@@ -222,9 +222,23 @@
 %   \begin{sdju@reflist} \item 作者. 题名[J]. 刊名, 年, 卷(期): 页码. \end{sdju@reflist}
 %   标题、字号、行距由 references 环境设定；正文中用 \sdjucite{1} 标注上标 [1]，
 %   也可给条目加 \label{...}，再写 \sdjucite{\ref{...}}。
+%   条目中「题名[J]」「手册[EB/OL]」的「[」与前面的汉字之间不留空（与 .bib 生成的条目、样本一致）：
+%   xeCJK 默认在汉字与半角左括号「[」「(」之间加中西文间距，这里在列表内去掉这一处，
+%   汉字与西文字母、数字之间的间距（如「基于 RFID」）不变
+\ExplSyntaxOn
+\cs_new_protected:Npn \sdju@nobracketglue
+  {
+    \cs_if_exist:NT \__xeCJK_boundary_capture_class:n
+      {
+        \xeCJK_inter_class_toks:nnn { CJK } { HalfLeft }
+          { \xeCJK_class_group_end: \__xeCJK_boundary_capture_class:n { default } }
+      }
+  }
+\ExplSyntaxOff
 \newcounter{sdjuref}
 \newenvironment{sdju@reflist}
-  {\list{[\arabic{sdjuref}]\space}{\usecounter{sdjuref}%
+  {\sdju@nobracketglue
+   \list{[\arabic{sdjuref}]\space}{\usecounter{sdjuref}%
      \setlength{\leftmargin}{2\ccwd}\setlength{\itemindent}{-2\ccwd}%
      \setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}%
      \setlength{\topsep}{0pt}\setlength{\partopsep}{0pt}%
