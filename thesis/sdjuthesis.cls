@@ -36,6 +36,7 @@
 \RequirePackage{xcolor}
 \RequirePackage{booktabs,longtable,multirow,array}
 \RequirePackage{caption}
+\RequirePackage{float}% 不浮动的图表：\begin{figure}[H] 就地排出（如章末的图不被推到「本章小结」之后）
 \RequirePackage{enumitem}
 \RequirePackage{tikz}
 \RequirePackage[backend=biber,style=gb7714-2005,gbnamefmt=lowercase,
