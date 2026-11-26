@@ -6,7 +6,7 @@
 %% 行距约定：「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp，「2 倍」= 31.2bp。
 %% 编译：xelatex -> biber -> xelatex -> xelatex（或直接 latexmk proposal.tex）
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjuproposal}[2026/11/20 v2.0 SDJU Thesis Proposal Template]
+\ProvidesClass{sdjuproposal}[2026/11/26 v2.1 SDJU Thesis Proposal Template]
 
 % 页码默认在页脚右侧（2026 版附件23 样本的位置）；选项 pagenumcenter 改为页脚居中。
 % pagenumright 为旧选项，保留以兼容，效果与默认相同
@@ -38,15 +38,20 @@
 
 % ===============================================================
 % 字体：宋体 / 黑体 / Times New Roman，封面用华文中宋；找不到时用 Fandol / TeX Gyre Termes
+%   加粗：附件23 中的「加粗」是 Word 的描边加粗（字形填充后再描边）。宋体、黑体没有粗体字形，
+%   用 XeTeX 的伪粗体（AutoFakeBold）模拟，强度 \sdju@fakebold 按 2026 版 PDF 中各字号
+%   （12～26 磅）加粗文字的笔画粗细（字面墨迹占比）标定：2.7 时与样表一致，原来的 2 偏细。
+%   Fandol 宋体有真正的粗体字形，其笔画粗细与样表的描边加粗相当（同法核对），直接使用。
 % ===============================================================
+\def\sdju@fakebold{2.7}
 \providecommand\songti{}\providecommand\heiti{}
 \providecommand\kaishu{}\providecommand\fangsong{}
 \IfFontExistsTF{SimSun}{%
-  \setCJKmainfont{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKsansfont{SimHei}[AutoFakeBold=2]
+  \setCJKmainfont{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKsansfont{SimHei}[AutoFakeBold=\sdju@fakebold]
   \setCJKmonofont{SimSun}
-  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=2,AutoFakeSlant=.2]
-  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=2]
+  \setCJKfamilyfont{zhsong}{SimSun}[AutoFakeBold=\sdju@fakebold,AutoFakeSlant=.2]
+  \setCJKfamilyfont{zhhei}{SimHei}[AutoFakeBold=\sdju@fakebold]
   \IfFontExistsTF{KaiTi}{\setCJKfamilyfont{zhkai}{KaiTi}}{\setCJKfamilyfont{zhkai}{SimSun}}
   \IfFontExistsTF{FangSong}{\setCJKfamilyfont{zhfs}{FangSong}}{\setCJKfamilyfont{zhfs}{SimSun}}
 }{%
@@ -93,10 +98,18 @@
 \NewDocumentCommand\sdjuspacing{m}
   {\fontsize{\f@size}{\fp_eval:n{#1*15.6}bp}\selectfont}
 \ExplSyntaxOff
-% 华文中宋（封面的校名和标题用，无则用宋体）
+% 华文中宋（封面的校名和标题用，一号加粗）。华文中宋的字形比宋体粗，没有它时用宋体代替，
+%   代替的粗体再加重，使笔画粗细与样表的「华文中宋＋描边加粗」相当（按 2026 版 PDF 封面标定）：
+%   SimSun 的伪粗体强度 \sdju@zsfakebold；Fandol 宋体粗体上再加伪粗体 \sdju@zsfandolbold
+\def\sdju@zsfakebold{4.5}
+\def\sdju@zsfandolbold{1.8}
 \IfFontExistsTF{STZhongsong}
-  {\setCJKfamilyfont{sdjuzhongsong}{STZhongsong}[AutoFakeBold=2]\newcommand\sdju@zhongsong{\CJKfamily{sdjuzhongsong}}}
-  {\newcommand\sdju@zhongsong{\songti}}
+  {\setCJKfamilyfont{sdjuzhongsong}{STZhongsong}[AutoFakeBold=\sdju@fakebold]}
+  {\IfFontExistsTF{SimSun}
+    {\setCJKfamilyfont{sdjuzhongsong}{SimSun}[AutoFakeBold=\sdju@zsfakebold]}
+    {\setCJKfamilyfont{sdjuzhongsong}{FandolSong-Regular.otf}
+       [BoldFont=FandolSong-Bold.otf,BoldFeatures={FakeBold=\sdju@zsfandolbold}]}}
+\newcommand\sdju@zhongsong{\CJKfamily{sdjuzhongsong}}
 
 % ===============================================================
 % Word 行框与 TeX 基线间距的换算
@@ -180,6 +193,16 @@
 % 参考文献：GB/T 7714-2005 顺序编码制（附件23 中的参考文献示例也是按顺序编号），\cite 为上标中括号；
 %   条目不缩进：编号顶格，转行后也顶格（与附件23 一致）。字号、行距与标题在后面「参考文献」一节设定。
 % ===============================================================
+% 正文中的上标引用：附件23 的 2026 版 PDF 中为 6 磅（小四号的一半），基线比正文基线高 6 磅
+\newcommand\sdju@supsize{6bp}
+\newcommand\sdju@supraise{6bp}
+\DeclareRobustCommand\sdju@sup[1]{%
+  \raisebox{\sdju@supraise}{\fontsize{\sdju@supsize}{\sdju@supsize}\selectfont #1}}
+\renewrobustcmd{\mkbibsuperscript}[1]{%
+  \unspace\allowhyphens\sdju@sup{%
+    \begingroup
+    \protected\long\def\mkbibsuperscript##1{\mkbibbrackets{##1}}%
+    #1\endgroup}\kern\z@}
 \AtBeginBibliography{\renewcommand*{\bibpagespunct}{\addcolon}}% 页码前用冒号：1998:11-12
 \AtBeginBibliography{\hyphenpenalty=10000 }% 文献样式会重设断词，这里改回不拆单词
 \defbibenvironment{bibliography}
@@ -204,7 +227,7 @@
      \let\makelabel\@firstofone}%
    \hbadness=5000 }% 文献条目里不可拆的长串多，词距偏松时不必逐条警告（与 .bib 方式一致）
   {\endlist}
-\newcommand\sdjucite[1]{\textsuperscript{[#1]}}
+\newcommand\sdjucite[1]{\sdju@sup{[#1]}}
 
 % ===============================================================
 % 页面：上 2.54cm，下 2cm，左、右 2.5cm；页脚距纸边 1.25cm；
@@ -278,8 +301,11 @@
   \hbox to\hsize{\vrule width\z@ height 1.081\dimexpr#1bp\relax depth 1.142\dimexpr#1bp\relax
     \sdjufont{#1bp}{#1bp}#2}}
 % 一条下划线及写在上面的内容（居中，小三号）：#1 长度，#2 内容
+%   下划线线粗 \sdju@ulinerule，中线在栏目基线之下 \sdju@ulinepos（附件23 中为 1.7～2.2 磅，取 1.9 磅）
+\newcommand\sdju@ulinepos{1.9bp}
+\newcommand\sdju@ulinerule{0.72bp}
 \newcommand\sdju@coverline[2]{%
-  \rlap{\rule[-3bp]{#1}{0.6bp}}%
+  \rlap{\rule[\dimexpr-\sdju@ulinepos-\sdju@ulinerule/2\relax]{#1}{\sdju@ulinerule}}%
   \hbox to#1{\hss\sdjufont{15bp}{15bp}#2\hss}}
 % 栏目行：#1 栏目名（盒子），#2 内容；下划线从栏目名后 0.5 字起，到右端为止
 \newcommand\sdju@coverfield[2]{%
@@ -392,10 +418,11 @@
      \hangindent\@tempdima\hangafter1 ##1：##2\par}}
   {\par}
 
-% 列表：(1)、(2)…，与正文同样首行缩进 2 字符
+% 列表：（1）、（2）…（全角括号，附件23），与正文同样首行缩进 2 字符，编号后紧接内容，
+%   转行顶格（与正文段落相同）
 \setlist{nosep}
-\setlist[enumerate,1]{label=(\arabic*),leftmargin=0pt,labelindent=2em,
-  itemindent=*,labelsep=0.5em,align=left,listparindent=2em}
+\setlist[enumerate,1]{label=（\arabic*）,leftmargin=0pt,labelindent=2em,
+  itemindent=*,labelsep=0pt,align=left,listparindent=2em}
 \setlist[itemize,1]{leftmargin=0pt,labelindent=2em,itemindent=*,
   labelsep=0.5em,listparindent=2em}
 
@@ -438,7 +465,7 @@
 %     评议项目五号、行距 20 磅；结论各行小四号、行距 31.2 磅
 % ===============================================================
 \newlength\sdju@formw \newlength\sdju@formx \newlength\sdju@formy
-\tikzset{sdjuform/.style={line width=0.5bp}}
+\tikzset{sdjuform/.style={line width=0.48bp}}% 表格线粗（附件23 为 0.48 磅）
 \newcommand\sdju@cellpad{5.4bp}% 单元格左右内边距
 % 竖排栏目名：#1 格宽，#2 字号，#3 行距，#4 基线到行框顶的距离，#5 各行（逗号分开）
 \newcommand\sdju@vlabel[5]{%
@@ -446,29 +473,67 @@
     \@for\sdju@ln:=#5\do{%
       \hbox to#1{\hss\vrule width\z@ height #4 depth\dimexpr#3-#4\relax
         \sdjufont{#2}{#2}\sdju@ln\hss}}}}
+%   意见内容多、写到签名处时，表格续排到下一页：续页是同样大小的表格（不重复栏目名），
+%   内容从表格顶部接着排，签名和日期在最后一页的原位置；每页内容至多排到表格底部之上
+%   \sdju@opbottom 处，最后一页的内容与签名之间至少留一行（\sdju@opsignroom 为最后一页内容的最大高度）
+\newcommand\sdju@opH{622.9bp}%        表格高度
+\newcommand\sdju@opsigny{507.4bp}%    「指导教师签名：」基线距表格顶
+\newcommand\sdju@opdatey{534.9bp}%    「年 月 日」基线距表格顶
+\newcommand\sdju@opsignroom{\dimexpr\sdju@opsigny-2\dimexpr19.5bp\relax\relax}
+\newcommand\sdju@opbottom{8bp}
+\newbox\sdju@opbox \newbox\sdju@oppiece
+\newif\ifsdju@opfirst
+% 排一页意见表：#1 为 1 时印栏目名，#2 为 1 时印签名和日期；内容在 \sdju@oppiece 中
+\newcommand\sdju@oppage[2]{%
+  \clearpage
+  \noindent\begin{tikzpicture}[remember picture,overlay,sdjuform]
+    \coordinate (O) at ([xshift=\sdju@formx,yshift=-\sdju@formy]current page.north west);
+    \draw (O) rectangle ++(\sdju@formw,-\sdju@opH);
+    \draw ([xshift=24.8bp]O) -- ++(0,-\sdju@opH);
+    \ifnum#1=\@ne
+      \node[inner sep=0pt] at ([xshift=12.4bp,yshift=-0.5*\sdju@opH]O)
+        {\sdju@vlabel{24.8bp}{12bp}{31.2bp}{\sdju@above{12bp}{31.2bp}}{指,导,教,师,意,见}};
+    \fi
+    \node[anchor=north west,inner sep=0pt] at ([xshift=24.8bp+\sdju@cellpad]O) {\box\sdju@oppiece};
+    \ifnum#2=\@ne
+      \node[anchor=base west,inner sep=0pt] at ([xshift=267.1bp,yshift=-\sdju@opsigny]O)
+        {\sdjufont{12bp}{15.6bp}指导教师签名：};
+      \node[anchor=base west,inner sep=0pt] at ([xshift=336.1bp,yshift=-\sdju@opdatey]O)
+        {\sdjufont{12bp}{15.6bp}年\hspace{2em}月\hspace{2em}日};
+    \fi
+  \end{tikzpicture}\par}
+\newcommand\sdju@oploop{%
+  \@tempdima=\dimexpr\ht\sdju@opbox+\dp\sdju@opbox\relax
+  \ifdim\@tempdima>\sdju@opsignroom
+    \setbox\sdju@oppiece\vsplit\sdju@opbox to\dimexpr\sdju@opH-\sdju@opbottom\relax
+    \setbox\sdju@oppiece\vbox{\unvbox\sdju@oppiece}%
+    \sdju@oppage{\ifsdju@opfirst 1\else 0\fi}{0}%
+    \sdju@opfirstfalse
+    \expandafter\sdju@oploop
+  \else
+    \setbox\sdju@oppiece\box\sdju@opbox
+    \sdju@oppage{\ifsdju@opfirst 1\else 0\fi}{1}%
+  \fi}
 \newcommand\supervisoropinion[1]{%
   \clearpage
+  \begingroup
   \setlength\sdju@formw{\dimexpr\textwidth+2\dimexpr\sdju@cellpad\relax\relax}%
   % 表格左上角：版心左边外 5.4 磅，版心上边下 0.3 磅
   \setlength\sdju@formx{\dimexpr1in+\oddsidemargin+\hoffset-\sdju@cellpad\relax}%
   \setlength\sdju@formy{\dimexpr1in+\topmargin+\voffset+\headheight+\headsep+0.3bp\relax}%
-  \noindent\begin{tikzpicture}[remember picture,overlay,sdjuform]
-    \coordinate (O) at ([xshift=\sdju@formx,yshift=-\sdju@formy]current page.north west);
-    \draw (O) rectangle ++(\sdju@formw,-622.9bp);
-    \draw ([xshift=24.8bp]O) -- ++(0,-622.9bp);
-    \node[inner sep=0pt] at ([xshift=12.4bp,yshift=-311.45bp]O)
-      {\sdju@vlabel{24.8bp}{12bp}{31.2bp}{\sdju@above{12bp}{31.2bp}}{指,导,教,师,意,见}};
-    \node[anchor=north west,inner sep=0pt,align=justify,
-        text width=\sdju@formw-24.8bp-2*\sdju@cellpad]
-      at ([xshift=24.8bp+\sdju@cellpad]O)
-      {\sdjufont{12bp}{19.5bp}\setlength\parindent{2em}%
-       \rule{\z@}{\sdju@above{12bp}{19.5bp}}#1\par};
-    \node[anchor=base west,inner sep=0pt] at ([xshift=267.1bp,yshift=-507.4bp]O)
-      {\sdjufont{12bp}{15.6bp}指导教师签名：};
-    \node[anchor=base west,inner sep=0pt] at ([xshift=336.1bp,yshift=-534.9bp]O)
-      {\sdjufont{12bp}{15.6bp}年\hspace{2em}月\hspace{2em}日};
-  \end{tikzpicture}\par}
-\newcommand\sdju@box{□}
+  % 意见内容：小四号，1.25 倍行距，首行缩进 2 字符；首行基线在表格顶下一个行框上部的高度处
+  \setbox\sdju@opbox\vbox{\hsize=\dimexpr\sdju@formw-24.8bp-2\dimexpr\sdju@cellpad\relax\relax
+    \sdjufont{12bp}{19.5bp}\setlength\parindent{2em}\setlength\parskip{\z@}%
+    \rule{\z@}{\sdju@above{12bp}{19.5bp}}#1\par}%
+  \splittopskip=\sdju@above{12bp}{19.5bp}\relax
+  \vbadness=\@M
+  \sdju@opfirsttrue
+  \sdju@oploop
+  \endgroup}
+% 方框「□」：按附件23（宋体的 □）画出，边长 0.71 字、线粗 0.04 字，底边在基线上，
+%   左边距 0.14 字，占 1 字宽；不用字体里的 □（Fandol 的 □ 几乎占满整个字身，比样表大得多）
+\newcommand\sdju@box{\makebox[1em][l]{\hspace{0.14em}%
+  \fboxsep=\z@\fboxrule=0.04em\framebox{\rule{0pt}{0.63em}\rule{0.63em}{0pt}}}}
 \newcommand\committeeopinion{%
   \newgeometry{top=72bp,bottom=72bp,left=90bp,right=90bp,headheight=0pt,headsep=0pt,
     footskip=\dimexpr 72bp-49.6bp-\sdju@below{9bp}{11.7bp}\relax}%
