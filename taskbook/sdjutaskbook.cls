@@ -135,33 +135,44 @@
 % ===============================================================
 % 封面（附件22 第 1 页）
 %   版心左上角起 432 × 624 磅的方框，线粗 1.5 磅；框内各行的基线位置：
+%     框内文字一律加粗（附件22 为宋体加粗；填写的内容随之加粗）
 %     校名「上海电机学院」：小初号华文中宋，基线距框顶 61 磅，居中
 %     「毕业设计（论文）任务书」：一号宋体，基线再下 52 磅，居中
+%     「课题」一行：基线再下 77.5 磅（\sdju@coverhead）
 %     其下各栏目行按 40 磅等距排（Word 中为固定行距 40 磅），小三号宋体，栏目名缩进 82 磅：
-%       （空两行）课题（两行下划线）／空一行／专业／班级／姓名、学号／空一行／
-%       学院院长（签字）／校内指导教师（签字）／企业指导教师（签字）／（空 1.5 行）年 月 日
-%   框外下方一行「注：本任务书由上海电机学院教务处印制。」五号楷体
+%       课题（两行下划线，长 241 磅）／空一行／专业／班级／姓名、学号（下划线总长 233.5 磅）／空一行／
+%       学院院长（签字）／校内指导教师（签字）／企业指导教师（签字）（栏目名连下划线共 271 磅）／
+%       （空 1.5 行）年 月 日；下划线线粗 0.72 磅，中线在基线下 1.6 磅
+%   框外下方一行「注：本任务书由上海电机学院教务处印制。」五号楷体（不加粗），基线在框底下 43.5 磅
 %   课题名称一行写不下时自动转到第二条下划线，两行仍排不下则逐级缩小字号。
 %   学院院长、校内指导教师、企业指导教师三栏须手签，模板不印姓名。
 % ===============================================================
 \newlength\sdju@coverpitch  \setlength\sdju@coverpitch{40bp}% 栏目行距
+\newlength\sdju@coverhead   \setlength\sdju@coverhead{77.5bp}% 「任务书」一行基线到「课题」一行基线
 \newlength\sdju@coverindent \setlength\sdju@coverindent{82bp}% 栏目名缩进
-\newlength\sdju@coverw      \setlength\sdju@coverw{240bp}% 栏目下划线长度
+\newlength\sdju@coverw      \setlength\sdju@coverw{241bp}% 课题下划线长度
+\newlength\sdju@coverfieldw \setlength\sdju@coverfieldw{233.5bp}% 专业、班级、姓名＋学号下划线的总长
+\newlength\sdju@coversignw  \setlength\sdju@coversignw{271bp}% 签字行（栏目名＋下划线）的总长
+\newlength\sdju@covernote   \setlength\sdju@covernote{43.5bp}% 框外「注」的基线在框底之下的距离
+\newlength\sdju@ulinepos    \setlength\sdju@ulinepos{1.6bp}% 下划线中线在基线之下的距离
+\newlength\sdju@ulinew      \setlength\sdju@ulinew{0.72bp}% 下划线线粗
 \newcommand\sdju@coverlabelw{2.5em}% 「课 题」等两字栏目名所占宽度（按小三号计）
+% 框内文字（校名、「毕业设计（论文）任务书」、栏目名、填写内容、日期）全部加粗（附件22 为宋体加粗）
+\newcommand\sdju@coverfont{\songti\bfseries}
 % 一行（不占高度）：#1 与上一行基线的距离，#2 内容
 \newcommand\sdju@coverat[2]{\kern#1\hbox to\hsize{\smash{\hbox to\hsize{#2}}}}
 % 一条下划线及写在上面的内容（居中）：#1 宽度，#2 内容
 \newcommand\sdju@uline[2]{%
-  \rlap{\rule[-1.6bp]{#1}{0.72bp}}%
+  \rlap{\rule[\dimexpr-\sdju@ulinepos-\sdju@ulinew/2\relax]{#1}{\sdju@ulinew}}%
   \hbox to#1{\hss#2\hss}}
-% 栏目行：#1 栏目名，#2 内容
-\newcommand\sdju@coverfield[2]{%
-  \hskip\sdju@coverindent\makebox[\sdju@coverlabelw][s]{#1}\hskip 0.5em
-  \sdju@uline{\sdju@coverw}{#2}\hfil}
-% 签字行：#1 栏目名；下划线右端与上面的栏目下划线对齐
+% 栏目行：#1 栏目名，#2 内容，#3 下划线长度
+\newcommand\sdju@coverfield[3][\sdju@coverfieldw]{%
+  \hskip\sdju@coverindent\makebox[\sdju@coverlabelw][s]{#2}\hskip 0.5em
+  \sdju@uline{#1}{#3}\hfil}
+% 签字行：#1 栏目名；栏目名与下划线共长 \sdju@coversignw
 \newcommand\sdju@coversign[1]{%
   \hskip\sdju@coverindent\setbox\z@\hbox{#1}\copy\z@
-  \sdju@uline{\dimexpr\sdju@coverlabelw+0.5em+\sdju@coverw-\wd\z@\relax}{}\hfil}
+  \sdju@uline{\dimexpr\sdju@coversignw-\wd\z@\relax}{}\hfil}
 % 课题名称按下划线宽度分成两行（\sdju@tla、\sdju@tlb）；小三号排不下时逐级缩小字号
 \newbox\sdju@tla \newbox\sdju@tlb
 \newcommand\sdju@striptail{% 去掉行与行之间的间距和惩罚，露出上一行
@@ -184,7 +195,7 @@
 \newcommand\makecover{%
   \clearpage\thispagestyle{empty}%
   \begingroup
-  \songti\sdju@fittitle
+  \sdju@coverfont\sdju@fittitle
   \noindent
   \begin{tikzpicture}[remember picture,overlay]
     \draw[line width=1.5bp]
@@ -194,25 +205,26 @@
     \kern-\topskip
     \sdju@coverat{61bp}{\hfil\sdju@zhongsong\sdjufont{36bp}{36bp}上海电机学院\hfil}%
     \sdju@coverat{52bp}{\hfil\sdjufont{26bp}{26bp}毕业设计（论文）任务书\hfil}%
-    \sdju@coverat{2\sdju@coverpitch}{%
-      \ifvoid\sdju@tla \sdju@coverfield{课\hfill 题}{\copy\sdju@tlb}%
-      \else \sdju@coverfield{课\hfill 题}{\copy\sdju@tla}\fi}%
+    \sdju@coverat{\sdju@coverhead}{%
+      \ifvoid\sdju@tla \sdju@coverfield[\sdju@coverw]{课\hfill 题}{\copy\sdju@tlb}%
+      \else \sdju@coverfield[\sdju@coverw]{课\hfill 题}{\copy\sdju@tla}\fi}%
     \sdju@coverat{\sdju@coverpitch}{%
-      \ifvoid\sdju@tla \sdju@coverfield{}{}\else \sdju@coverfield{}{\box\sdju@tlb}\fi}%
+      \ifvoid\sdju@tla \sdju@coverfield[\sdju@coverw]{}{}%
+      \else \sdju@coverfield[\sdju@coverw]{}{\box\sdju@tlb}\fi}%
     \sdju@coverat{2\sdju@coverpitch}{\sdju@coverfield{专\hfill 业}{\sdju@major}}%
     \sdju@coverat{\sdju@coverpitch}{\sdju@coverfield{班\hfill 级}{\sdju@classname}}%
     \sdju@coverat{\sdju@coverpitch}{%
       \hskip\sdju@coverindent\makebox[\sdju@coverlabelw][s]{姓\hfill 名}\hskip 0.5em
-      \sdju@uline{\dimexpr(\sdju@coverw-\sdju@coverlabelw)/2\relax}{\sdju@author}%
+      \sdju@uline{\dimexpr(\sdju@coverfieldw-\sdju@coverlabelw)/2\relax}{\sdju@author}%
       \makebox[\sdju@coverlabelw][s]{学\hfill 号}%
-      \sdju@uline{\dimexpr(\sdju@coverw-\sdju@coverlabelw)/2\relax}{\sdju@studentid}\hfil}%
+      \sdju@uline{\dimexpr(\sdju@coverfieldw-\sdju@coverlabelw)/2\relax}{\sdju@studentid}\hfil}%
     \sdju@coverat{2\sdju@coverpitch}{\sdju@coversign{学院院长（签字）}}%
     \sdju@coverat{\sdju@coverpitch}{\sdju@coversign{校内指导教师（签字）}}%
     \sdju@coverat{\sdju@coverpitch}{\sdju@coversign{企业指导教师（签字）}}%
     \sdju@coverat{1.5\sdju@coverpitch}{\hfil\sdju@taskdate\hfil}%
-    % 框外的注：在框底下一个栏目行距处
-    \sdju@coverat{\dimexpr 624bp+\sdju@coverpitch-61bp-52bp-12.5\sdju@coverpitch\relax}%
-      {\kaishu\sdjufont{10.5bp}{10.5bp}注：本任务书由上海电机学院教务处印制。\hfil}%
+    % 框外的注：基线在框底之下 \sdju@covernote（不加粗）
+    \sdju@coverat{\dimexpr 624bp+\sdju@covernote-61bp-52bp-\sdju@coverhead-10.5\sdju@coverpitch\relax}%
+      {\mdseries\kaishu\sdjufont{10.5bp}{10.5bp}注：本任务书由上海电机学院教务处印制。\hfil}%
     \vss}%
   \par\endgroup
   \clearpage}
@@ -220,7 +232,9 @@
 % ===============================================================
 % 表格（附件22 第 2 页「任务书反面」）
 %   表格宽 462 磅，左边线伸出版心左边 5.4 磅（Word 表格默认的单元格边距）；线粗 0.5 磅。
-%   左格为竖排栏目名（宽 32.4 磅，四号仿宋，字距 22 磅），右格为填写内容。
+%   左格为竖排栏目名（宽 32.4 磅，四号仿宋，字距随行高而定，见下），右格为填写内容。
+%   「任务书反面：」基线距版心顶 16 磅，表格上边线再下 7.6 磅；表后「以上各项由指导教师填写」
+%   的基线在表格下边线之下 16.3 磅。各栏目的高度（最小高度）指相邻两条横线之间的距离。
 %   每个栏目可跨页：内容写不下时在页底断开、下一页接着排（续页不重复栏目名）；
 %   内容少时按「最小高度」留白（取自附件22 各行的高度）。
 % ===============================================================
@@ -242,17 +256,38 @@
 %   在字身左下角，整字居中时看上去偏左、像是漏排；这里把标点的字身右移 \sdju@punctshift
 %   （附件22 中为 3.8 磅，即 0.27 字），使字形落在栏目中线上，与上下文字对齐。
 \newcommand\sdju@punctshift{0.27em}
-%   字距（行距）通常为 \sdju@labelpitch；整张表需要收缩才能排进一页时，可减到 \sdju@labelpitchmin
-%   （附件22 各栏的字距在 18～25 磅之间）。可选参数为字距。
-\newcommand\sdju@labelpitch{22bp}
+%   字距（行距）按栏目的高度统一确定：栏目名从首字到末字的跨度为栏目高度的 \sdju@labelspan，
+%   字距限制在 \sdju@labelpitchmin～\sdju@labelpitch 之间（附件22 各栏的字距为 22、18、25、25 磅，
+%   正是 0.72 倍栏高的跨度、上限 25 磅的结果）；栏目名居中。可选参数为字距。
+\newcommand\sdju@labelpitch{25bp}
 \newcommand\sdju@labelpitchmin{18bp}
+\newcommand\sdju@labelspan{0.72}
+%   每个字占一个高为字距的行框，基线在行框底之上 \sdju@labeldesc；整列行框在栏目中上下居中
+%   （与 Word 单元格垂直居中的排法相同）
+\newcommand\sdju@labeldesc{0.32em}
+\newlength\sdju@backtop  \setlength\sdju@backtop{16bp}%  「任务书反面：」基线距版心顶
+\newlength\sdju@backgap  \setlength\sdju@backgap{7.6bp}% 「任务书反面：」基线到表格上边线（中线）
+\newlength\sdju@notegap  \setlength\sdju@notegap{16.3bp}% 表格下边线到「以上各项由指导教师填写」基线
+\newcount\sdju@nch
+% 按栏目高度 #1（相邻两条横线之间）重排第 \sdju@i 个栏目的竖排栏目名
+\newcommand\sdju@fitlabel[1]{%
+  \expandafter\let\expandafter\sdju@labeltext\csname sdju@rowtext\the\sdju@i\endcsname
+  \sdju@nch=\z@
+  \expandafter\@tfor\expandafter\sdju@ch\expandafter:\expandafter=\sdju@labeltext\do{\advance\sdju@nch\@ne}%
+  \ifnum\sdju@nch>\@ne
+    \edef\sdju@pitch{\the\dimexpr\sdju@labelspan\dimexpr#1\relax/(\sdju@nch-1)\relax}%
+    \ifdim\sdju@pitch>\sdju@labelpitch \edef\sdju@pitch{\sdju@labelpitch}\fi
+    \ifdim\sdju@pitch<\sdju@labelpitchmin \edef\sdju@pitch{\sdju@labelpitchmin}\fi
+    \sdju@relabel{\sdju@pitch}%
+  \fi}
 \newcommand\sdju@makelabel[2][\sdju@labelpitch]{%
   \setbox\sdju@label\vbox{\hsize=\dimexpr\sdju@labelw-\sdju@rule\relax
     \sdju@labelfont \baselineskip=#1\relax \lineskip=\z@ \lineskiplimit=\z@
+    \def\sdju@strut{\vrule height\dimexpr#1-\sdju@labeldesc\relax depth\sdju@labeldesc width\z@}%
     \@tfor\sdju@ch:=#2\do{%
       \expandafter\in@\expandafter{\sdju@ch}{、，。；：！？}%
-      \ifin@ \hbox to\hsize{\hss\hbox to 1em{\kern\sdju@punctshift\rlap{\sdju@ch}\hss}\hss}%
-      \else \hbox to\hsize{\hss\sdju@ch\hss}\fi}}}
+      \ifin@ \hbox to\hsize{\sdju@strut\hss\hbox to 1em{\kern\sdju@punctshift\rlap{\sdju@ch}\hss}\hss}%
+      \else \hbox to\hsize{\sdju@strut\hss\sdju@ch\hss}\fi}}}
 \newcommand\sdju@setcw{%
   \setlength\sdju@cw{\sdju@formw-2\sdju@orule-2\sdju@padx}%
   \ifdim\sdju@labelw>\z@ \addtolength\sdju@cw{-\sdju@labelw}\fi}
@@ -269,6 +304,8 @@
     \hbox to\sdju@formw{%
       \vrule width\sdju@orule
       \ifdim\sdju@labelw>\z@
+        \ifsdju@firstpiece \ifvoid\sdju@label\else
+          \sdju@fitlabel{#1+2\sdju@pady+\sdju@rule}\fi\fi
         \vbox to\dimexpr#1+2\sdju@pady\relax{\hsize=\dimexpr\sdju@labelw-\sdju@rule\relax
           \vss\ifsdju@firstpiece\copy\sdju@label\fi\vss}%
         \vrule width\sdju@rule
@@ -289,7 +326,7 @@
 \newcommand\sdju@formrow[1]{%
   \par
   \setlength\sdju@minh{#1}%
-  \addtolength\sdju@minh{-2\sdju@pady-2\sdju@rule}%
+  \addtolength\sdju@minh{-2\sdju@pady-\sdju@rule}%
   \ifvoid\sdju@label\else
     \ifdim\sdju@minh<\ht\sdju@label \setlength\sdju@minh{\ht\sdju@label}\fi
   \fi
@@ -350,22 +387,19 @@
 \newlength\sdju@sumneed \newlength\sdju@sumfloor \newlength\sdju@fit
 % 第 \sdju@i 个栏目的内容高度 \sdju@tmpa、留白下限 \sdju@tmpb（竖排栏目名的高度）与最小高度 \sdju@minh
 %   （均为格内文字区的高度，不含内边距和框线）
-%   竖排栏目名按正常字距的高度记在 \sdju@labmax，按最小字距的高度记在 \sdju@labmin；
-%   下限 \sdju@tmpb 取内容高度与 \sdju@labmin 的较大者
-\newdimen\sdju@labmax \newdimen\sdju@labmin
+%   竖排栏目名按最小字距排时的高度记在 \sdju@labmin；下限 \sdju@tmpb 取内容高度与 \sdju@labmin 的较大者
+\newdimen\sdju@labmin
 \newcommand\sdju@rowdims{%
   \setlength\sdju@tmpa{\ht\csname sdju@rowbox\the\sdju@i\endcsname
     +\dp\csname sdju@rowbox\the\sdju@i\endcsname}%
-  \sdju@labmax=\ht\csname sdju@rowlab\the\sdju@i\endcsname
   \begingroup
     \sdju@relabel{\sdju@labelpitchmin}%
-    \global\sdju@labmin=\ht\sdju@label
+    \global\sdju@labmin=\dimexpr\ht\sdju@label+\dp\sdju@label\relax
   \endgroup
   \setlength\sdju@tmpb{\sdju@labmin}%
   \ifdim\sdju@tmpb<\sdju@tmpa \setlength\sdju@tmpb{\sdju@tmpa}\fi
   \setlength\sdju@minh{\csname sdju@rowminh\the\sdju@i\endcsname}%
-  \addtolength\sdju@minh{-2\sdju@pady-2\sdju@rule}%
-  \ifdim\sdju@minh<\sdju@labmax \setlength\sdju@minh{\sdju@labmax}\fi
+  \addtolength\sdju@minh{-2\sdju@pady-\sdju@rule}%
   \ifdim\sdju@minh<\sdju@tmpb \setlength\sdju@minh{\sdju@tmpb}\fi}
 % 按字距 #1 重排第 \sdju@i 个栏目的竖排栏目名（放在 \sdju@label 中）
 \newcommand\sdju@relabel[1]{%
@@ -394,7 +428,7 @@
     \setbox\sdju@note\hbox{\fangsong\sdjufont{12bp}{15.6bp}以上各项由指导教师填写}%
     % 本页能给各栏目文字区的总高度
     \sdju@getavail
-    \sdju@fit=\dimexpr\sdju@avail-4bp-\baselineskip-\dp\sdju@note
+    \sdju@fit=\dimexpr\sdju@avail-\sdju@notegap-\dp\sdju@note
       -(2\sdju@pady+\sdju@rule)*(\sdju@nrows-1)\relax\relax
     \setlength\sdju@sumneed{\z@}\setlength\sdju@sumfloor{\z@}%
     \sdju@i=\z@
@@ -410,22 +444,15 @@
       \begingroup
       \setbox\sdju@body\box\csname sdju@rowbox\the\sdju@i\endcsname
       \global\setbox\sdju@label\box\csname sdju@rowlab\the\sdju@i\endcsname
-      % 收缩后比竖排栏目名矮时，栏目名的字距按同一比例在正常与最小字距之间减小
-      \ifdim\sdju@minh<\sdju@labmax
-        \ifdim\sdju@labmax>\sdju@labmin
-          \edef\sdju@pitch{\the\dimexpr\sdju@labelpitch-(\sdju@labelpitch-\sdju@labelpitchmin)
-            *(\sdju@labmax-\sdju@minh)/(\sdju@labmax-\sdju@labmin)\relax}%
-          \sdju@relabel{\sdju@pitch}%
-          \global\setbox\sdju@label\box\sdju@label
-        \fi
-      \fi
+      % 收缩后栏目变矮时，竖排栏目名的字距在输出时按栏目高度随之减小（\sdju@fitlabel）
       \ifnum\sdju@i=\sdju@nrows
-        \sdju@reserve=\dimexpr 4bp+\baselineskip+\dp\sdju@note\relax
+        \sdju@reserve=\dimexpr\sdju@notegap+\dp\sdju@note\relax
       \fi
-      \sdju@formrow{\sdju@minh+2\sdju@pady+2\sdju@rule}%
+      \sdju@formrow{\sdju@minh+2\sdju@pady+\sdju@rule}%
       \endgroup}%
     \global\sdju@nrows=\z@
-    \nobreak\vskip 4bp\noindent\copy\sdju@note\par
+    \nobreak\nointerlineskip
+    \hbox{\vrule height\sdju@notegap depth\z@ width\z@\copy\sdju@note}%
   \fi}
 \AtEndDocument{\sdju@closeform}
 % 各栏目的默认最小高度（附件22 中各行的高度）
@@ -437,7 +464,10 @@
   \sdju@closerow
   \ifsdju@formstarted\else
     \global\sdju@formstartedtrue
-    \par\noindent{\kaishu\sdjufont{12bp}{15.6bp}任务书反面：}\par\vskip 6bp
+    \par\nointerlineskip
+    \hbox{\vrule height\sdju@backtop depth\dimexpr\sdju@backgap-\sdju@rule/2\relax width\z@
+      \kaishu\sdjufont{12bp}{15.6bp}任务书反面：}%
+    \prevdepth=\z@
   \fi
   \IfNoValueTF{#2}
     {\ifcsname sdju@minh@#3\endcsname
@@ -445,7 +475,7 @@
      \else \def\sdju@rowminh{30mm}\fi}
     {\def\sdju@rowminh{#2}}%
   \sdju@setcw
-  \sdju@makelabel{#3}%
+  \sdju@makelabel[\sdju@labelpitchmin]{#3}% 字距在输出时按栏目高度确定
   \def\sdju@curlabel{#3}%
   \setcounter{subsection}{0}%
   \global\sdju@rowopentrue
