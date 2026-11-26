@@ -128,6 +128,9 @@
 \ExplSyntaxOff
 
 % 断行：与 Word 一致，英文单词不用连字符拆开；排不下时放宽词距
+% 句末标点（. : ? !）之后与普通词距相同，不加大（\frenchspacing；Word 也不加大）。
+%   放在 \AtBeginDocument 中，以免被宏包改回
+\AtBeginDocument{\frenchspacing}
 \hyphenpenalty=10000
 \tolerance=1000
 \setlength{\emergencystretch}{3em}
