@@ -703,15 +703,13 @@
   {\sdjuchapter{摘\hspace{1em}要}\setlength{\parskip}{12bp}\vspace{-\parskip}}
   {\sdju@kwline{15.6bp}{{\heiti\sdjufont{10.5bp}{15.6bp}关键词：}}{\sdju@keywords}%
    \setlength{\parskip}{0pt}}
-% 英文摘要的词间距按 Word 的两端对齐方式排（只在有 Times New Roman 等真字体时启用）：Word 只拉宽、
-%   不压缩词间空格，行末空格留在行内（附件26 样本英文摘要各行右端都比版心右边短一个空格，
+% 英文摘要的词间距按 Word 的两端对齐方式排（真字体与 Fandol 回退版都启用，用户 2026-11-26 决定）：
+%   Word 只拉宽、不压缩词间空格，行末空格留在行内（附件26 样本英文摘要各行右端都比版心右边短一个空格，
 %   521.2 磅对 524.4 磅）。TeX 默认可压缩词间空格、行末不留空，每行多排几个字母，样本 23 行排成 22 行，
 %   「Key words」比样本高 19.5 磅；按 Word 的方式排后与样本同为 23 行。
 \newcommand\sdju@wordjustify{%
-  \ifsdju@realfonts
-    \spaceskip=\fontdimen2\font plus \fontdimen3\font\relax
-    \rightskip=\fontdimen2\font\relax
-  \fi}
+  \spaceskip=\fontdimen2\font plus \fontdimen3\font\relax
+  \rightskip=\fontdimen2\font\relax}
 \newenvironment{abstracten}
   {\sdjuchapter[][31.2bp]{\rmfamily\bfseries ABSTRACT}\setlength{\parskip}{12bp}\vspace{-\parskip}%
    \sdju@wordjustify}
