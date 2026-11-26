@@ -2,7 +2,8 @@
 %% 上海电机学院 毕业设计（论文）任务书 LaTeX 模板
 %% 依据：《教学归档材料及质量评价要素（2026 版）》附件22《毕业设计（论文）任务书》
 %%
-%% 行距约定：Word 中文字体单倍行距 = 1.3 × 字号（小四号 15.6bp）；反面各栏正文四号 1.5 倍 = 27.3bp。
+%% 行距约定：Word 中文字体单倍行距 = 1.3 × 字号（小四号 15.6bp）；反面各栏正文四号 1.5 倍 = 27.3bp
+%%   （一页放不下时自动减小，下限单倍，见 \sdju@choosespacing）。
 %% 编译：xelatex（或直接 latexmk taskbook.tex）
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{sdjutaskbook}[2026/11/20 v1.0 SDJU Task Book Template]
@@ -87,6 +88,19 @@
 %   不设首行缩进（附件16 各栏段落没有缩进；样表没写明的按模板原样，不另加惯例）。
 \def\sdju@bodysize{14bp}
 \def\sdju@bodyskip{27.3bp}
+% 反面四个栏目必须排在一页内（用户 2026-11-26 决定）：先按正常的 1.5 倍行距排；放不下时
+%   逐级减小行距（每级 0.05 倍，下限单倍，字号不变），直到放进一页；单倍仍放不下时给出警告、
+%   排到第二页（不截字）。所用倍数（以百分之一计）记在 .aux 中（\sdju@tbspacing），下一遍编译
+%   按它排版，latexmk 会自动重新编译直到不再变化（见 \sdju@closeform）。
+\newcommand\sdju@spacingmax{150}
+\newcommand\sdju@spacingmin{100}
+\newcommand\sdju@spacingstep{5}
+\providecommand\sdju@tbspacing{\sdju@spacingmax}
+\AtBeginDocument{%
+  \ifnum\sdju@tbspacing=\sdju@spacingmax\else
+    \edef\sdju@bodyskip{\fpeval{round(\sdju@tbspacing*\sdju@single*(\sdju@bodysize)/100,4)}pt}%
+    \normalsize
+  \fi}
 \newcommand\sdju@bodyindent{0pt}
 \newcommand\sdju@bodyfont{\fangsong}
 \renewcommand\normalsize{%
@@ -343,11 +357,12 @@
       \hfil\vrule width\sdju@orule}%
     \hrule height\sdju@rule width\sdju@formw}%
   \kern-\sdju@rule\prevdepth=\z@}
-% 本页剩余可用高度（扣除边框与内边距）
+% 本页剩余可用高度（扣除边框与内边距）；本页最后一行的深度（如「任务书反面：」一行到表格上边线的
+%   距离）记在 \pagedepth 中、不在 \pagetotal 里，一并扣除
 \newcommand\sdju@getavail{%
   \par\penalty\@M
   \ifdim\pagegoal=\maxdimen \setlength\sdju@avail{\vsize}%
-  \else \setlength\sdju@avail{\pagegoal-\pagetotal}\fi
+  \else \setlength\sdju@avail{\pagegoal-\pagetotal-\pagedepth}\fi
   \addtolength\sdju@avail{-2\sdju@pady-2\sdju@rule}}
 % 把 \sdju@body（内容）与 \sdju@tail（签名栏，可为空）排成一个栏目：#1 最小高度
 \newcommand\sdju@formrow[1]{%
@@ -405,7 +420,9 @@
 %   各栏目先排好存起来，到文档结束时一起输出，以便按整张表统一安排高度：
 %     (1)「以上各项由指导教师填写」与表格末尾在同一页，不单独换页；
 %     (2) 各栏目的内容本来一页放得下、只因最小高度（留白）放不下时，各栏目的留白按同一比例收缩，
-%         使整张表与末行排在一页；内容本身超过一页时，按最小高度排，在页底断开、下一页接着排。
+%         使整张表与末行排在一页；
+%     (3) 内容本身超过一页时，逐级减小正文行距（\sdju@choosespacing），直到排进一页；
+%         单倍行距仍超过一页时给出警告，按最小高度排，在页底断开、下一页接着排。
 % ===============================================================
 \newif\ifsdju@rowopen
 \newif\ifsdju@formstarted
@@ -448,6 +465,53 @@
     \expandafter\xdef\csname sdju@rowminh\the\sdju@nrows\endcsname{\sdju@rowminh}%
     \global\expandafter\let\csname sdju@rowtext\the\sdju@nrows\endcsname\sdju@curlabel
   \fi}
+% 选定反面正文的行距（\sdju@closeform 中调用；\sdju@cont<i>、\sdju@labm<i> 为本遍第 i 个栏目的
+%   内容高度和竖排栏目名的下限，\sdju@fit 为本页可用高度）：
+%   本遍按 f 倍（\sdju@tbspacing）排出的内容高度为 c_i，按 g 倍排时估为 c_i × g / f（文字各行的
+%   行框都与行距成正比；图表等不随行距变化）。从 1.5 倍起每级减 0.05 倍，取第一个使
+%   Σ max(c_i × g / f, 栏目名下限) 小于可用高度的 g，下限单倍。图表使估算在减小行距时偏乐观、
+%   在增大行距时偏保守，所以试排只会逐级向下，不会在两档之间来回跳；g 与本遍不同时写入 .aux，
+%   提示重新编译。单倍仍放不下时给出警告，内容在页底断开、排到第二页。
+\newcount\sdju@spg \newcount\sdju@spnew
+\newif\ifsdju@spmore
+\newcommand\sdju@choosespacing{%
+  \sdju@spnew=\z@
+  \sdju@spg=\sdju@spacingmax\relax
+  \loop
+    \setlength\sdju@tmpb{\z@}%
+    \sdju@i=\z@
+    \@whilenum\sdju@i<\sdju@nrows\do{\advance\sdju@i\@ne
+      \setlength\sdju@tmpa{\dimexpr\csname sdju@cont\the\sdju@i\endcsname
+        *\sdju@spg/\sdju@tbspacing\relax}%
+      \ifdim\sdju@tmpa<\csname sdju@labm\the\sdju@i\endcsname
+        \setlength\sdju@tmpa{\csname sdju@labm\the\sdju@i\endcsname}\fi
+      \addtolength\sdju@tmpb{\sdju@tmpa}}%
+    \ifdim\sdju@tmpb<\sdju@fit \sdju@spnew=\sdju@spg \fi
+    \sdju@spmorefalse
+    \ifnum\sdju@spnew=\z@ \ifnum\sdju@spg>\sdju@spacingmin\relax \sdju@spmoretrue \fi\fi
+  \ifsdju@spmore
+    \advance\sdju@spg-\sdju@spacingstep\relax
+  \repeat
+  \ifnum\sdju@spnew=\z@ \sdju@spnew=\sdju@spacingmin\relax \fi
+  \ifdim\sdju@sumfloor<\sdju@fit\else
+    % 本遍放不下：至少降一级（估算与本遍一致，一般不会用到）
+    \ifnum\sdju@spnew<\sdju@tbspacing\relax\else
+      \ifnum\sdju@tbspacing>\sdju@spacingmin\relax
+        \sdju@spnew=\numexpr\sdju@tbspacing-\sdju@spacingstep\relax
+      \fi
+    \fi
+    \ifnum\sdju@tbspacing>\sdju@spacingmin\relax\else
+      \ClassWarningNoLine{sdjutaskbook}{任务书反面内容过多：正文行距已减到单倍，仍排不下一页，%
+排到了第二页。请删减内容}%
+    \fi
+  \fi
+  \immediate\write\@auxout{\gdef\noexpand\sdju@tbspacing{\the\sdju@spnew}}%
+  \ifnum\sdju@spnew=\sdju@tbspacing\relax
+    \typeout{sdjutaskbook: 任务书反面正文行距 \fpeval{\sdju@spnew/100} 倍}%
+  \else
+    \ClassWarningNoLine{sdjutaskbook}{任务书反面正文行距改为 \fpeval{\sdju@spnew/100} 倍%
+（本遍 \fpeval{\sdju@tbspacing/100} 倍）。Rerun to get the line spacing right}%
+  \fi}
 \newcommand\sdju@closeform{%
   \sdju@closerow
   \ifsdju@formstarted
@@ -461,7 +525,10 @@
     \setlength\sdju@sumneed{\z@}\setlength\sdju@sumfloor{\z@}%
     \sdju@i=\z@
     \@whilenum\sdju@i<\sdju@nrows\do{\advance\sdju@i\@ne \sdju@rowdims
+      \expandafter\xdef\csname sdju@cont\the\sdju@i\endcsname{\the\sdju@tmpa}%
+      \expandafter\xdef\csname sdju@labm\the\sdju@i\endcsname{\the\sdju@labmin}%
       \addtolength\sdju@sumneed{\sdju@minh}\addtolength\sdju@sumfloor{\sdju@tmpb}}%
+    \sdju@choosespacing
     \sdju@i=\z@
     \@whilenum\sdju@i<\sdju@nrows\do{\advance\sdju@i\@ne \sdju@rowdims
       % 留白按比例收缩：最小高度 = 下限 + 留白 × (可用 - 下限之和) / (需要 - 下限之和)
