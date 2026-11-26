@@ -186,12 +186,33 @@
 \newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}% 校内指导教师
 \newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}% 企业指导教师
 \newcommand\projectsource[1]{\renewcommand\sdju@projectsource{#1}}% 课题来源/项目编号
-% 课题有无变化：\topicchange{无}，或 \topicchange[变化原因]{有}；不写则两个方框都不勾
+% 课题有无变化：\topicchange{无}，或 \topicchange{有} 加 \changereason{变化原因}
+%   （也可写 \topicchange[变化原因]{有}）；不写或留空（\topicchange{}）则两个方框都不勾
 \NewDocumentCommand\topicchange{o m}{%
   \ifstrequal{#2}{有}
     {\renewcommand\sdju@changeyes{1}\renewcommand\sdju@changeno{0}}
-    {\renewcommand\sdju@changeno{1}\renewcommand\sdju@changeyes{0}}%
+    {\ifblank{#2}{\renewcommand\sdju@changeno{0}\renewcommand\sdju@changeyes{0}}
+      {\renewcommand\sdju@changeno{1}\renewcommand\sdju@changeyes{0}}}%
   \IfNoValueTF{#1}{}{\renewcommand\sdju@changereason{#1}}}
+\newcommand\changereason[1]{\renewcommand\sdju@changereason{#1}}
+% 意见页的栏目（和基本信息一样直接填写；留空时为空白表，与样表相同）：
+%   \studentdate{年}{月}{日}：中期报告栏底部学生签名的日期
+%   \supervisordate{年}{月}{日}：指导教师意见的日期
+%   \committeeresult{通过|不通过}、\committeegrade{优秀|良好|及格}：答辩小组结论中勾选答辩结论、等第
+%   \committeedate{年}{月}{日}：答辩小组结论的日期
+%   指导教师意见、答辩小组的建议分别写在 \supervisoropinion{…}、\committeeconclusion{…} 的花括号内
+\newcommand\studentdate[3]{\sdju@setsrcdate{student}{#1}{#2}{#3}}
+\newcommand\supervisordate[3]{\sdju@setsrcdate{supervisor}{#1}{#2}{#3}}
+\newcommand\committeedate[3]{\sdju@setsrcdate{committee_chair}{#1}{#2}{#3}}
+\newcommand\sdju@respass{0}\newcommand\sdju@resfail{0}
+\newcommand\sdju@gradea{0}\newcommand\sdju@gradeb{0}\newcommand\sdju@gradec{0}
+\newcommand\committeeresult[1]{\renewcommand\sdju@respass{0}\renewcommand\sdju@resfail{0}%
+  \ifstrequal{#1}{通过}{\renewcommand\sdju@respass{1}}{}%
+  \ifstrequal{#1}{不通过}{\renewcommand\sdju@resfail{1}}{}}
+\newcommand\committeegrade[1]{\renewcommand\sdju@gradea{0}\renewcommand\sdju@gradeb{0}\renewcommand\sdju@gradec{0}%
+  \ifstrequal{#1}{优秀}{\renewcommand\sdju@gradea{1}}{}%
+  \ifstrequal{#1}{良好}{\renewcommand\sdju@gradeb{1}}{}%
+  \ifstrequal{#1}{及格}{\renewcommand\sdju@gradec{1}}{}}
 % 方框：\sdju@checkbox{1} 打勾，\sdju@checkbox{0} 空
 \newcommand\sdju@checkbox[1]{%
   \ifnum#1=1 \makebox[0pt][l]{□}\makebox[1em]{\raisebox{0.08em}{\fontsize{0.8\dimexpr\f@size pt\relax}{0pt}\selectfont √}}%
@@ -458,8 +479,8 @@
   % 下部：答辩结论
   \setbox\sdju@tail\vbox{\hsize=\sdju@cw \parindent=\z@ \offinterlineskip
     \kern 6.5bp
-    \sdju@ccline{答辩结论：\hspace{1.5em}通过\sdju@checkbox{0}\hspace{5em}不通过\sdju@checkbox{0}}%
-    \sdju@ccline{等第评定：\hspace{1.5em}优秀\sdju@checkbox{0}\hspace{1.5em}良好\sdju@checkbox{0}\hspace{1.5em}及格\sdju@checkbox{0}}%
+    \sdju@ccline{答辩结论：\hspace{1.5em}通过\sdju@checkbox{\sdju@respass}\hspace{5em}不通过\sdju@checkbox{\sdju@resfail}}%
+    \sdju@ccline{等第评定：\hspace{1.5em}优秀\sdju@checkbox{\sdju@gradea}\hspace{1.5em}良好\sdju@checkbox{\sdju@gradeb}\hspace{1.5em}及格\sdju@checkbox{\sdju@gradec}}%
     \sdju@ccline{答辩小组组长签名：\sdju@signleft{committee_chair}{\dimexpr\hsize-9em\relax}{22bp}}%
     \kern 15.6bp
     \sdju@ccline{答辩小组组员签名：\sdju@signmembers{\dimexpr\hsize-9em\relax}{22bp}{6bp}{2}{\dimexpr\hsize-9em-15em\relax}}% 第二行避开日期%
@@ -629,7 +650,16 @@
   \@for\sdju@r:=#1\do{%
     \ifcsname sdju@sdate@\sdju@r\endcsname
       \expandafter\expandafter\expandafter\sdju@getdate@i\csname sdju@sdate@\sdju@r\endcsname
+    \fi}%
+  % 源码中写了日期（\studentdate、\supervisordate、\committeedate）时以源码为准
+  \@for\sdju@r:=#1\do{%
+    \ifcsname sdju@srcdate@\sdju@r\endcsname
+      \expandafter\expandafter\expandafter\sdju@usesrcdate\csname sdju@srcdate@\sdju@r\endcsname
     \fi}}
+\newcommand\sdju@usesrcdate[3]{\global\sdju@hasdatetrue\gdef\sdju@dy{#1}\gdef\sdju@dm{#2}\gdef\sdju@dd{#3}}
+% 源码中的日期：\sdju@setsrcdate{角色}{年}{月}{日}；三项都留空时取消（为空白的「年 月 日」，或签名配置的日期）
+\newcommand\sdju@setsrcdate[4]{\ifblank{#2#3#4}{\global\csundef{sdju@srcdate@#1}}
+  {\global\@namedef{sdju@srcdate@#1}{{#2}{#3}{#4}}}}
 \newcommand\sdju@getdate@i[3]{%
   \sdju@dcur=\numexpr(#1)*10000+(#2)*100+(#3)\relax
   \ifnum\sdju@dcur>\sdju@dbest

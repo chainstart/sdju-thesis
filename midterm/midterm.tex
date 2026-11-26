@@ -4,6 +4,7 @@
 \documentclass{sdjumidterm}
 
 % ---------------- 基本信息 ----------------
+% 两页上的每个栏目都在源码中直接填写；没有内容的留空（花括号内不写），版面上照原表留出空白。
 \title{兆瓦级风力发电机控制系统设计——液压系统}
 \author{XXX}
 \studentid{XXXXXXXXX}
@@ -12,7 +13,17 @@
 \major{电气工程及其自动化}
 \school{电气学院}
 \projectsource{XXXX企业合作项目／XXXXXX}
-\topicchange{无}                 % 有变化时写：\topicchange[变化原因]{有}
+\topicchange{无}                 % 课题有无变化：无／有（留空则两个方框都不勾）
+\changereason{}                  % 变化原因（有变化时填写）
+
+% ---------------- 签字日期与答辩小组结论 ----------------
+% 这些栏目和基本信息一样，直接填写；留空时照原表留出空白。
+\studentdate{}{}{}               % 中期报告栏底部「学生签名」的日期：{年}{月}{日}
+\supervisordate{}{}{}            % 指导教师意见的日期：{年}{月}{日}
+\committeeresult{}               % 答辩结论：通过／不通过
+\committeegrade{}                % 等第评定：优秀／良好／及格
+\committeedate{}{}{}             % 答辩小组结论的日期：{年}{月}{日}
+% 签名：手签，或由系统放入签名图片（源码中不写）
 
 \begin{document}
 
@@ -57,8 +68,8 @@
   \item{20XX年XX月--20XX年XX月}{系统仿真与调试，撰写毕业设计（论文）。}
 \end{schedule}
 
-% ---------------- 以下由指导教师、答辩小组填写 ----------------
-\supervisoropinion{}        % 花括号内可填写指导教师意见
-\committeeconclusion{}      % 花括号内可填写答辩小组的建议
+% ---------------- 第 2 页：指导教师意见、答辩小组结论 ----------------
+\supervisoropinion{}        % 指导教师意见：直接写在花括号内
+\committeeconclusion{}      % 答辩小组结论中的「建议」：直接写在花括号内
 
 \end{document}
