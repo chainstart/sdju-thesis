@@ -420,7 +420,8 @@
 %   课题名称：小一号宋体加粗居中；副标题右对齐
 %   「摘要：」「关键词：」小四号加粗，内容小四号宋体；首行缩进 2 字符，1.25 倍行距
 %   一级标题：四号宋体加粗，左对齐，1.73 倍行距（行框 31.55 磅），段前段后 13 磅（「1 文献综述」）
-%   二级标题：小四号宋体，首行缩进 2 字符（「3.1 …」）
+%   二级标题：小四号宋体，首行缩进 2 字符，段前 12 磅、段后 0 磅（与三级标题相同，用户 2026-11-26 决定；
+%     紧跟在一级标题之后时不另加）（「3.1 …」）
 %   正文：小四号宋体 / Times New Roman，首行缩进 2 字符，1.25 倍行距
 % ===============================================================
 \renewcommand\maketitle{%
@@ -439,7 +440,7 @@
 
 % 三级标题（「3.1.1 …」）：附件23 只有两级标题；学生的开题报告常用到三级。按附件26 的文字规定
 %   「章节采用三级标题，用阿拉伯数字连续编号，例如 1，1.1，1.1.1」「三级标题黑体小四」排：
-%   小四号黑体、不加粗，与二级标题同样首行缩进 2 字符、1.25 倍行距；段前 12 磅、段后 0 磅
+%   小四号黑体、不加粗，与二级标题同样首行缩进 2 字符、1.25 倍行距；与二级标题同样段前 12 磅、段后 0 磅
 %   （附件26 三级标题的段前段后，用户 2026-11-26 决定；紧跟在二级标题之后时不另加）
 \setcounter{secnumdepth}{3}
 \def\sdju@secbox{31.55bp}% 一级标题行框：Word 中为 1.73 倍行距（416/240），1.733 × 1.3 × 14 磅
@@ -452,9 +453,9 @@
     indent=0pt, afterindent=true,
   },
   subsection={
-    format=\sdju@headstart{12bp}{19.5bp}{0bp}{0bp}\raggedright\songti\sdjufont{12bp}{19.5bp},
+    format=\sdju@headstart{12bp}{19.5bp}{12bp}{0bp}\raggedright\songti\sdjufont{12bp}{19.5bp},
     aftername=\enspace, indent=2em,
-    beforeskip=0pt, afterskip=0pt, afterindent=true,
+    beforeskip=12bp, afterskip=0pt, afterindent=true,
   },
   subsubsection={
     format=\sdju@headstart{12bp}{19.5bp}{12bp}{0bp}\raggedright\heiti\mdseries\sdjufont{12bp}{19.5bp},
