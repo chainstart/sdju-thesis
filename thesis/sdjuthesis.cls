@@ -464,7 +464,7 @@
 %   校徽：宽 97.1mm，顶边距纸边 156 磅，居中
 %   「学士学位论文」：40 磅微软雅黑居中，基线距纸边 329.7 磅
 %   中文题目、英文题目：小一号（24 磅）微软雅黑居中，首行基线距纸边 385.7 磅，行距 46.8 磅（1.5 倍）；
-%     题目过长时自动换行，下面的栏目随之下移
+%     题目过长时自动换行（各行长度均衡，见 \sdju@balance），下面的栏目随之下移
 %   栏目：三号（16 磅）宋体，左端距纸边 116.6 磅，栏目名按实际宽度，下划线右端距纸边 452.7 磅；
 %     自上而下为学生姓名、学生学号、专业、校内指导教师、企业指导教师、学院，行距 31.2 磅，
 %     首行基线距纸边 514.6 磅（样本中题目末行基线之下 82.1 磅）
@@ -508,14 +508,36 @@
   \sdju@ulinew=\dimexpr\sdju@coverright-\sdju@coverleft-\wd\z@\relax
   \box\z@\rlap{\rule[-2.5bp]{\sdju@ulinew}{0.6bp}}%
   \hbox to\sdju@ulinew{\hss#2\hss}}
+% 均衡折行（用户 2026-11-26 决定：长题目转行时两行长度大致相当，不让一两个字单独成行）：
+%   \sdju@balance{内容} 在当前字体、\hsize 下求出与整宽排时行数相同的最小行宽 w（二分，精度 0.1 磅），
+%   把 \leftskip、\rightskip 设为 (\hsize - w)/2 加上原有的伸展，各行仍居中、长度大致相当。
+%   只有一行时不改动；用 \\ 手工分行时各段照原样（行宽不小于最长的一段）。
+\newdimen\sdju@ballo \newdimen\sdju@balhi \newdimen\sdju@balw \newcount\sdju@baln
+\newcommand\sdju@ballines[2]{% 行宽 #1 时 #2 排成几行（结果在 \count@）
+  \setbox\z@\vbox{\hsize=#1\relax \hfuzz=\maxdimen \hbadness=\@M
+    \leftskip=\z@\@plus1fil \rightskip=\leftskip \parfillskip=\z@skip \parindent=\z@
+    \let\\\@normalcr % 手工分行在同一段内计行数
+    #2\par\global\count@=\prevgraf}}
+\newcommand\sdju@balance[1]{%
+  \sdju@ballines{\hsize}{#1}\sdju@baln=\count@
+  \ifnum\sdju@baln>\@ne
+    \sdju@ballo=\z@ \sdju@balhi=\hsize
+    \loop
+      \sdju@balw=\dimexpr(\sdju@ballo+\sdju@balhi)/2\relax
+      \sdju@ballines{\sdju@balw}{#1}%
+      \ifnum\count@>\sdju@baln \sdju@ballo=\sdju@balw \else \sdju@balhi=\sdju@balw \fi
+    \ifdim\dimexpr\sdju@balhi-\sdju@ballo\relax>0.1bp \repeat
+    \leftskip=\dimexpr(\hsize-\sdju@balhi)/2\relax\@plus1fil
+    \rightskip=\leftskip
+  \fi}
 % 题目块：中文题目、英文题目各自居中，可自动换行；盒子深度 = 首行到末行基线的距离
 \newcommand\sdju@covertitles{%
   \vtop{\hsize=170mm \parindent=\z@ \centering
     \dimen@=1.95\dimexpr\sdju@titlesize\relax
     \sdju@yahei\fontsize{\sdju@titlesize}{\the\dimen@}\selectfont
     \lineskiplimit=-\maxdimen
-    \sdju@title\par
-    \ifx\sdju@titleen\@empty\else\sdju@titleen\par\fi
+    {\sdju@balance{\sdju@title}\sdju@title\par}%
+    \ifx\sdju@titleen\@empty\else{\sdju@balance{\sdju@titleen}\sdju@titleen\par}\fi
     % 题目为空时盒中没有行，\prevdepth 为 -1000pt，不能拿来回退（否则盒子深 1000pt）
     \ifdim\prevdepth>\z@ \kern-\prevdepth\fi}}
 % 封面能容纳的额外高度：上移 + 下移 + 两处弹性间距的压缩量

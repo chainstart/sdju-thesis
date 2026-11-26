@@ -185,7 +185,7 @@
 %       学院院长（签字）／校内指导教师（签字）／企业指导教师（签字）（栏目名连下划线共 271 磅）／
 %       （空 1.5 行）年 月 日；下划线线粗 0.72 磅，中线在基线下 1.6 磅
 %   框外下方一行「注：本任务书由上海电机学院教务处印制。」五号楷体（不加粗），基线在框底下 43.5 磅
-%   课题名称一行写不下时自动转到第二条下划线，两行仍排不下则逐级缩小字号。
+%   课题名称一行写不下时自动转到第二条下划线（两行长度均衡，见 \sdju@balance），两行仍排不下则逐级缩小字号。
 %   学院院长、校内指导教师、企业指导教师三栏须手签，模板不印姓名。
 % ===============================================================
 \newlength\sdju@coverpitch  \setlength\sdju@coverpitch{40bp}% 栏目行距
@@ -218,9 +218,32 @@
 \newbox\sdju@tla \newbox\sdju@tlb
 \newcommand\sdju@striptail{% 去掉行与行之间的间距和惩罚，露出上一行
   \unskip\unpenalty\unskip\unpenalty\unskip\unpenalty\unskip\unpenalty\unskip}
+% 均衡折行（用户 2026-11-26 决定：长题目转行时两行长度大致相当，不让一两个字单独成行）：
+%   \sdju@balance{内容} 在当前字体、\hsize 下求出与整宽排时行数相同的最小行宽 w（二分，精度 0.1 磅），
+%   把 \leftskip、\rightskip 设为 (\hsize - w)/2 加上原有的伸展，各行仍居中、长度大致相当。
+%   只有一行时不改动；用 \\ 手工分行时各段照原样（行宽不小于最长的一段）。
+\newdimen\sdju@ballo \newdimen\sdju@balhi \newdimen\sdju@balw \newcount\sdju@baln
+\newcommand\sdju@ballines[2]{% 行宽 #1 时 #2 排成几行（结果在 \count@）
+  \setbox\z@\vbox{\hsize=#1\relax \hfuzz=\maxdimen \hbadness=\@M
+    \leftskip=\z@\@plus1fil \rightskip=\leftskip \parfillskip=\z@skip \parindent=\z@
+    \let\\\@normalcr % 手工分行在同一段内计行数
+    #2\par\global\count@=\prevgraf}}
+\newcommand\sdju@balance[1]{%
+  \sdju@ballines{\hsize}{#1}\sdju@baln=\count@
+  \ifnum\sdju@baln>\@ne
+    \sdju@ballo=\z@ \sdju@balhi=\hsize
+    \loop
+      \sdju@balw=\dimexpr(\sdju@ballo+\sdju@balhi)/2\relax
+      \sdju@ballines{\sdju@balw}{#1}%
+      \ifnum\count@>\sdju@baln \sdju@ballo=\sdju@balw \else \sdju@balhi=\sdju@balw \fi
+    \ifdim\dimexpr\sdju@balhi-\sdju@ballo\relax>0.1bp \repeat
+    \leftskip=\dimexpr(\hsize-\sdju@balhi)/2\relax\@plus1fil
+    \rightskip=\leftskip
+  \fi}
 \newcommand\sdju@splittitle[1]{%
   \setbox\z@\vbox{\hsize=\sdju@coverw \centering \parindent=\z@
     \sdjufont{#1}{#1}\baselineskip=1.5\dimexpr#1\relax \lineskiplimit=\z@ \lineskip=\z@
+    \sdju@balance{\sdju@title}%
     \sdju@title\par
     \sdju@striptail \global\setbox\sdju@tlb\lastbox
     \sdju@striptail \global\setbox\sdju@tla\lastbox
