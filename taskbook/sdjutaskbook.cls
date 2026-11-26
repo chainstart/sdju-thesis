@@ -174,7 +174,12 @@
 \newcommand\sdju@author{}
 \newcommand\sdju@supervisor{}
 \newcommand\sdju@companysupervisor{}
-\newcommand\sdju@taskdate{年\hspace{2em}月\hspace{2em}日}
+% 封面日期：源码中用 \taskdate 写了日期时照写；没有写时，若签名配置文件给了院长、校内或企业
+%   指导教师的签字日期，取其中最晚的，写作「年 月 日」形式；都没有时为空白的「年 月 日」
+\newcommand\sdju@taskdate{\sdju@getdate{dean,supervisor,company_supervisor}%
+  \ifsdju@hasdate
+    \sdju@dy\hspace{1em}年\hspace{1em}\sdju@dm\hspace{1em}月\hspace{1em}\sdju@dd\hspace{1em}日%
+  \else 年\hspace{2em}月\hspace{2em}日\fi}
 \renewcommand\title[1]{\renewcommand\sdju@title{#1}}
 \newcommand\school[1]{\renewcommand\sdju@school{#1}}
 \newcommand\major[1]{\renewcommand\sdju@major{#1}}
@@ -198,7 +203,9 @@
 %       （空 1.5 行）年 月 日；下划线线粗 0.72 磅，中线在基线下 1.6 磅
 %   框外下方一行「注：本任务书由上海电机学院教务处印制。」五号楷体（不加粗），基线在框底下 43.5 磅
 %   课题名称一行写不下时自动转到第二条下划线（两行长度均衡，见 \sdju@balance），两行仍排不下则逐级缩小字号。
-%   学院院长、校内指导教师、企业指导教师三栏须手签，模板不印姓名。
+%   学院院长、校内指导教师、企业指导教师三栏不印姓名：没有签名配置时留空，待手签；有配置时由系统
+%   放入签名图片（见文末「电子签名」），三人的签名中心在同一条竖线上（最短的一条下划线，即企业
+%   指导教师一栏的中心），高 30 磅，底部压在下划线上。
 % ===============================================================
 \newlength\sdju@coverpitch  \setlength\sdju@coverpitch{40bp}% 栏目行距
 \newlength\sdju@coverhead   \setlength\sdju@coverhead{77.5bp}% 「任务书」一行基线到「课题」一行基线
@@ -222,9 +229,13 @@
 \newcommand\sdju@coverfield[3][\sdju@coverfieldw]{%
   \hskip\sdju@coverindent\makebox[\sdju@coverlabelw][s]{#2}\hskip 0.5em
   \sdju@uline{#1}{#3}\hfil}
-% 签字行：#1 栏目名；栏目名与下划线共长 \sdju@coversignw
-\newcommand\sdju@coversign[1]{%
-  \hskip\sdju@coverindent\setbox\z@\hbox{#1}\copy\z@
+% 签字行：#1 签名角色，#2 栏目名；栏目名与下划线共长 \sdju@coversignw
+\newcommand\sdju@coversignh{30bp}% 签名图片的高度
+\newcommand\sdju@coversign[2]{%
+  \hskip\sdju@coverindent\setbox\z@\hbox{#2}\copy\z@
+  \setbox\tw@\hbox{企业指导教师（签字）}% 签名放在最短一条下划线的范围内（右端对齐）
+  \rlap{\kern\dimexpr\wd\tw@-\wd\z@\relax\raise-\sdju@ulinepos\hbox{%
+    \sdju@sign{#1}{\dimexpr\sdju@coversignw-\wd\tw@\relax}{\sdju@coversignh}}}%
   \sdju@uline{\dimexpr\sdju@coversignw-\wd\z@\relax}{}\hfil}
 % 课题名称按下划线宽度分成两行（\sdju@tla、\sdju@tlb）；小三号排不下时逐级缩小字号
 \newbox\sdju@tla \newbox\sdju@tlb
@@ -294,9 +305,9 @@
       \sdju@uline{\dimexpr(\sdju@coverfieldw-\sdju@coverlabelw)/2\relax}{\sdju@author}%
       \makebox[\sdju@coverlabelw][s]{学\hfill 号}%
       \sdju@uline{\dimexpr(\sdju@coverfieldw-\sdju@coverlabelw)/2\relax}{\sdju@studentid}\hfil}%
-    \sdju@coverat{2\sdju@coverpitch}{\sdju@coversign{学院院长（签字）}}%
-    \sdju@coverat{\sdju@coverpitch}{\sdju@coversign{校内指导教师（签字）}}%
-    \sdju@coverat{\sdju@coverpitch}{\sdju@coversign{企业指导教师（签字）}}%
+    \sdju@coverat{2\sdju@coverpitch}{\sdju@coversign{dean}{学院院长（签字）}}%
+    \sdju@coverat{\sdju@coverpitch}{\sdju@coversign{supervisor}{校内指导教师（签字）}}%
+    \sdju@coverat{\sdju@coverpitch}{\sdju@coversign{company_supervisor}{企业指导教师（签字）}}%
     \sdju@coverat{1.5\sdju@coverpitch}{\hfil\sdju@taskdate\hfil}%
     % 框外的注：基线在框底之下 \sdju@covernote（不加粗）
     \sdju@coverat{\dimexpr 624bp+\sdju@covernote-61bp-52bp-\sdju@coverhead-10.5\sdju@coverpitch\relax}%
@@ -670,4 +681,114 @@
 
 \RequirePackage[hidelinks,unicode]{hyperref}
 \graphicspath{{figures/}}
+
+% ===============================================================
+% 电子签名与签字日期（由系统在服务端编译时放入；学生、教师的源码中不使用这些命令）
+%   编译目录中有 sdju-signatures.cfg 时，在类文件末尾（\begin{document} 之前）读入。配置文件中：
+%     \sdju@signrole{<角色>}              启用该角色：在它的每个签字处放入 signatures/<角色>.png
+%     \sdju@signdate{<角色>}{年}{月}{日}   该角色签字处的日期（填在「年 月 日」的空白处）
+%   角色：student、supervisor、company_supervisor、dean、committee_chair、
+%     committee_member-1、committee_member-2、…（从 1 起连续编号）、recorder
+%   没有配置文件、或配置文件中没有声明某角色时，该签字处与原来完全相同（空白，待手签）；
+%   signatures/ 中有图片而配置文件未声明的角色不起作用。签名图片按签字处的高度等比缩放、
+%   宽度不超过签字处，底部压在签字线（没有签字线时为栏目文字的基线）上；图片排成零尺寸的盒子，
+%   不改变分页、行数和其他任何位置。几人共用一个日期的（如答辩小组），取其中最晚的日期。
+%   源码中已写了日期（如 \taskdate、\supervisordate）时以源码为准。
+% ===============================================================
+\newcommand\sdju@signrole[1]{\global\@namedef{sdju@sigon@#1}{}}
+\newcommand\sdju@signdate[4]{\global\@namedef{sdju@sdate@#1}{{#2}{#3}{#4}}}
+\newcommand\sdju@signdir{signatures/}
+% \sdju@ifsign{角色}{有签名时}{没有时}
+\newcommand\sdju@ifsign[3]{%
+  \ifcsname sdju@sigon@#1\endcsname
+    \IfFileExists{\sdju@signdir#1.png}{#2}{%
+      \ClassWarningNoLine{sdjutaskbook}{配置文件声明了签名角色 #1，但找不到 \sdju@signdir#1.png，该处留空}#3}%
+  \else #3\fi}
+\newbox\sdju@sigbox
+% 签名图片（零尺寸，参考点在签字处左端的签字线上）：#1 角色，#2 签字处宽度，#3 签名高度；
+%   图片在签字处中水平居中
+\newcommand\sdju@sign[3]{\sdju@ifsign{#1}{%
+  \setbox\sdju@sigbox\hbox{\includegraphics[height=#3,width=#2,keepaspectratio]{\sdju@signdir#1.png}}%
+  \smash{\rlap{\kern\dimexpr(#2-\wd\sdju@sigbox)/2\relax\box\sdju@sigbox}}}{}}
+% 同上，图片靠签字处左端排（签字处没有下划线、紧接在栏目名之后时）
+\newcommand\sdju@signleft[3]{\sdju@ifsign{#1}{%
+  \smash{\rlap{\includegraphics[height=#3,width=#2,keepaspectratio]{\sdju@signdir#1.png}}}}{}}
+% 答辩小组组员（committee_member-1、-2…）：从签字处左端起横向排列，间隔 #3；一行排不下时换到
+%   下一行（向下，行距为签名高度加 #3）。#1 第一行的宽度，#5 以下各行的宽度（避开其右侧的日期），
+%   #2 签名高度，#4 至多几行：行数超过 #4 时签名高度逐级缩小（每级 10%，最小为原来的一半），
+%   直到排得下。零尺寸，参考点在第一行的基线上
+\newcount\sdju@signn \newcount\sdju@signrows
+\newdimen\sdju@signh \newdimen\sdju@signw
+\newcommand\sdju@signmembers[5]{%
+  \def\sdju@signwrest{#5}%
+  \begingroup
+  \sdju@signh=#2\relax
+  \sdju@signbuild{#1}{#3}%
+  \loop
+    \@tempswafalse
+    \ifnum\sdju@signrows>#4\relax \ifdim\sdju@signh>\dimexpr#2/2+1sp\relax \@tempswatrue \fi\fi
+  \if@tempswa
+    \sdju@signh=\dimexpr\sdju@signh-#2/10\relax
+    \sdju@signbuild{#1}{#3}%
+  \repeat
+  \ifnum\sdju@signrows>\z@
+    \smash{\rlap{\vtop{\offinterlineskip\unvbox\sdju@sigbox}}}%
+  \fi
+  \endgroup}
+% 按高度 \sdju@signh 把组员签名排成若干行，放在 \sdju@sigbox，行数在 \sdju@signrows
+\newcommand\sdju@signbuild[2]{%
+  \setbox\sdju@sigbox\vbox{}\setbox\z@\hbox{}\sdju@signrows=\z@ \sdju@signn=\@ne
+  \def\sdju@signrow{% 把当前一行（\box\z@）接到已排的各行之下
+    \setbox\sdju@sigbox\vbox{\offinterlineskip\unvbox\sdju@sigbox
+      \ifnum\sdju@signrows>\z@ \kern#2\fi \box\z@}%
+    \advance\sdju@signrows\@ne}%
+  \sdju@signbuild@i{#1}{#2}%
+  \ifdim\wd\z@>\z@ \sdju@signrow \fi}
+\newcommand\sdju@signbuild@i[2]{%
+  \ifcsname sdju@sigon@committee_member-\the\sdju@signn\endcsname
+    \sdju@ifsign{committee_member-\the\sdju@signn}{%
+      \ifnum\sdju@signrows=\z@ \sdju@signw=#1\relax \else \sdju@signw=\sdju@signwrest\relax \fi
+      \setbox\tw@\hbox{\includegraphics[height=\sdju@signh,width=\sdju@signw,keepaspectratio]%
+        {\sdju@signdir committee_member-\the\sdju@signn.png}}%
+      \ifdim\wd\z@>\z@
+        \ifdim\dimexpr\wd\z@+#2+\wd\tw@\relax>\sdju@signw
+          \sdju@signrow \setbox\z@\hbox{\box\tw@}%
+        \else \setbox\z@\hbox{\unhbox\z@\kern#2\box\tw@}\fi
+      \else \setbox\z@\hbox{\box\tw@}\fi}{}%
+    \advance\sdju@signn\@ne
+    \expandafter\sdju@signbuild@i
+  \else \expandafter\@gobbletwo
+  \fi{#1}{#2}}
+% 答辩小组全体（组长与组员）的角色列表，用于取共用的日期
+\newcommand\sdju@committeeroles{committee_chair,committee_member-1,committee_member-2,committee_member-3,committee_member-4,committee_member-5,committee_member-6,committee_member-7,committee_member-8,committee_member-9,committee_member-10,committee_member-11,committee_member-12,committee_member-13,committee_member-14,committee_member-15,committee_member-16,committee_member-17,committee_member-18,committee_member-19,committee_member-20}
+% 日期：\sdju@getdate{角色,角色,…} 取这些角色中最晚的日期，放在 \sdju@dy、\sdju@dm、\sdju@dd
+%   （没有时为空，\ifsdju@hasdate 为假）
+\newif\ifsdju@hasdate
+\newcount\sdju@dbest \newcount\sdju@dcur
+\newcommand\sdju@getdate[1]{%
+  \global\sdju@hasdatefalse \sdju@dbest=\m@ne
+  \gdef\sdju@dy{}\gdef\sdju@dm{}\gdef\sdju@dd{}%
+  \@for\sdju@r:=#1\do{%
+    \ifcsname sdju@sdate@\sdju@r\endcsname
+      \expandafter\expandafter\expandafter\sdju@getdate@i\csname sdju@sdate@\sdju@r\endcsname
+    \fi}}
+\newcommand\sdju@getdate@i[3]{%
+  \sdju@dcur=\numexpr(#1)*10000+(#2)*100+(#3)\relax
+  \ifnum\sdju@dcur>\sdju@dbest
+    \sdju@dbest=\sdju@dcur \global\sdju@hasdatetrue
+    \gdef\sdju@dy{#1}\gdef\sdju@dm{#2}\gdef\sdju@dd{#3}%
+  \fi}
+% 「年 月 日」填入日期：#1 角色列表，#2「年」前空白的宽度（年份右对齐写在其中；为 0 时年份写在
+%   「年」左侧之外，不占宽度），#3、#4「月」「日」前空白的宽度（月、日在其中居中）。没有日期时
+%   与原来的「年\hspace{#3}月\hspace{#4}日」相同。数字放在 \hbox 中（不用 \makebox：xeCJK 会在
+%   汉字与 \makebox 之间加中西文间距，使「月」「日」右移），填入日期后「年」「月」「日」的位置不变
+\newcommand\sdju@datefill[4]{%
+  \sdju@getdate{#1}%
+  \ifsdju@hasdate
+    \ifdim#2=\z@ \llap{\sdju@dy}\else \hbox to#2{\hss\sdju@dy}\fi
+    年\hbox to#3{\hss\sdju@dm\hss}月\hbox to#4{\hss\sdju@dd\hss}日%
+  \else
+    \ifdim#2=\z@\else\hspace{#2}\fi 年\hspace{#3}月\hspace{#4}日%
+  \fi}
+\InputIfFileExists{sdju-signatures.cfg}{}{}
 \endinput

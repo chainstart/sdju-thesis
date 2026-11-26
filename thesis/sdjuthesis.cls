@@ -678,7 +678,11 @@
 \newcommand\sdju@declindent{31.5bp}% 声明正文首行缩进
 \newcommand\sdju@signone{189bp}%      学术诚信声明签名栏的左端
 \newcommand\sdju@signright{286.9bp}%  两栏签名的右栏左端
-\newcommand\sdju@date{日期：\hspace{2\ccwd}年\hspace{1.5\ccwd}月\hspace{1.5\ccwd}日}
+% 日期：#1 签名人角色；签名配置文件给了该角色的日期时填入，否则为空白（待手写）
+\newcommand\sdju@date[1]{日期：\sdju@datefill{#1}{2\ccwd}{1.5\ccwd}{1.5\ccwd}}
+% 签名处：#1 角色，#2 签名处的宽度。没有签名配置时留空（待手签）；有配置时由系统放入签名图片，
+%   高 28 磅，紧接在「作者签名：」「指导教师签名：」之后，底部压在基线上（见文末「电子签名」）
+\newcommand\sdju@signhere[2]{\sdju@signleft{#1}{#2}{28bp}}
 % \sdju@signpair{左栏左端}{左栏}{右栏}
 \newcommand\sdju@signpair[3]{\noindent\hspace*{#1}%
   \makebox[\dimexpr\sdju@signright-(#1)\relax][l]{#2}#3\par}
@@ -689,9 +693,9 @@
   \begin{sdju@declbody}
    本人郑重声明：所呈交的毕业设计（论文），是本人在导师的指导下，独立进行研究工作所取得的成果。除文中已经注明引用的内容外，本论文不包含任何其他个人或集体已经发表或撰写过的作品成果。对本文的研究做出重要贡献的个人和集体，均已在文中以明确方式标明。本人完全意识到本声明的法律结果由本人承担。\par
    \vspace{3\baselineskip}
-   \noindent\hspace*{\sdju@signone}作者签名：\par
+   \noindent\hspace*{\sdju@signone}作者签名：\sdju@signhere{student}{\dimexpr\textwidth-\sdju@signone-5\ccwd\relax}\par
    \vspace{\baselineskip}
-   \noindent\hspace*{\sdju@signone}\sdju@date\par
+   \noindent\hspace*{\sdju@signone}\sdju@date{student}\par
   \end{sdju@declbody}
   % ---- AI 使用情况声明（2026 版样本中没有这一页，按用户要求保留）----
   \ifsdju@opt@noaideclaration\else
@@ -705,9 +709,11 @@
    5．未引用AI生成的未经标注版权的内容。\par
    本人承诺所提交论文的原创性，完全符合《上海电机学院本科毕业设计（论文）过程管理实施细则》及《上海电机学院本科毕业设计（论文）使用AI工具的指导性意见》及相关学术诚信要求。\par
    \vspace{\baselineskip}
-   \sdju@signpair{\sdju@declindent}{作者签名：}{指导教师签名：}
+   \sdju@signpair{\sdju@declindent}%
+     {作者签名：\sdju@signhere{student}{\dimexpr\sdju@signright-\sdju@declindent-5\ccwd-1\ccwd\relax}}%
+     {指导教师签名：\sdju@signhere{supervisor}{\dimexpr\textwidth-\sdju@signright-7\ccwd\relax}}
    \vspace{\baselineskip}
-   \sdju@signpair{\sdju@declindent}{\sdju@date}{\sdju@date}
+   \sdju@signpair{\sdju@declindent}{\sdju@date{student}}{\sdju@date{supervisor}}
   \end{sdju@declbody}
   \fi
   % ---- 版权使用授权书 ----
@@ -719,9 +725,11 @@
    \hphantom{本论文属于}\hspace{2\ccwd}\textbf{不保密}\sdju@publicbox。\par
    （请在以上方框内打“√”）\par
    \vspace{3\baselineskip}
-   \sdju@signpair{\z@}{作者签名：}{指导教师签名：}
+   \sdju@signpair{\z@}%
+     {作者签名：\sdju@signhere{student}{\dimexpr\sdju@signright-5\ccwd-1\ccwd\relax}}%
+     {指导教师签名：\sdju@signhere{supervisor}{\dimexpr\textwidth-\sdju@signright-7\ccwd\relax}}
    \vspace{\baselineskip}
-   \sdju@signpair{\z@}{\sdju@date}{\sdju@date}
+   \sdju@signpair{\z@}{\sdju@date{student}}{\sdju@date{supervisor}}
   \end{sdju@declbody}
   \clearpage
   \fi}
@@ -804,4 +812,114 @@
 
 \RequirePackage[hidelinks,bookmarksnumbered,unicode]{hyperref}
 \graphicspath{{figures/}}
+
+% ===============================================================
+% 电子签名与签字日期（由系统在服务端编译时放入；学生、教师的源码中不使用这些命令）
+%   编译目录中有 sdju-signatures.cfg 时，在类文件末尾（\begin{document} 之前）读入。配置文件中：
+%     \sdju@signrole{<角色>}              启用该角色：在它的每个签字处放入 signatures/<角色>.png
+%     \sdju@signdate{<角色>}{年}{月}{日}   该角色签字处的日期（填在「年 月 日」的空白处）
+%   角色：student、supervisor、company_supervisor、dean、committee_chair、
+%     committee_member-1、committee_member-2、…（从 1 起连续编号）、recorder
+%   没有配置文件、或配置文件中没有声明某角色时，该签字处与原来完全相同（空白，待手签）；
+%   signatures/ 中有图片而配置文件未声明的角色不起作用。签名图片按签字处的高度等比缩放、
+%   宽度不超过签字处，底部压在签字线（没有签字线时为栏目文字的基线）上；图片排成零尺寸的盒子，
+%   不改变分页、行数和其他任何位置。几人共用一个日期的（如答辩小组），取其中最晚的日期。
+%   源码中已写了日期（如 \taskdate、\supervisordate）时以源码为准。
+% ===============================================================
+\newcommand\sdju@signrole[1]{\global\@namedef{sdju@sigon@#1}{}}
+\newcommand\sdju@signdate[4]{\global\@namedef{sdju@sdate@#1}{{#2}{#3}{#4}}}
+\newcommand\sdju@signdir{signatures/}
+% \sdju@ifsign{角色}{有签名时}{没有时}
+\newcommand\sdju@ifsign[3]{%
+  \ifcsname sdju@sigon@#1\endcsname
+    \IfFileExists{\sdju@signdir#1.png}{#2}{%
+      \ClassWarningNoLine{sdjuthesis}{配置文件声明了签名角色 #1，但找不到 \sdju@signdir#1.png，该处留空}#3}%
+  \else #3\fi}
+\newbox\sdju@sigbox
+% 签名图片（零尺寸，参考点在签字处左端的签字线上）：#1 角色，#2 签字处宽度，#3 签名高度；
+%   图片在签字处中水平居中
+\newcommand\sdju@sign[3]{\sdju@ifsign{#1}{%
+  \setbox\sdju@sigbox\hbox{\includegraphics[height=#3,width=#2,keepaspectratio]{\sdju@signdir#1.png}}%
+  \smash{\rlap{\kern\dimexpr(#2-\wd\sdju@sigbox)/2\relax\box\sdju@sigbox}}}{}}
+% 同上，图片靠签字处左端排（签字处没有下划线、紧接在栏目名之后时）
+\newcommand\sdju@signleft[3]{\sdju@ifsign{#1}{%
+  \smash{\rlap{\includegraphics[height=#3,width=#2,keepaspectratio]{\sdju@signdir#1.png}}}}{}}
+% 答辩小组组员（committee_member-1、-2…）：从签字处左端起横向排列，间隔 #3；一行排不下时换到
+%   下一行（向下，行距为签名高度加 #3）。#1 第一行的宽度，#5 以下各行的宽度（避开其右侧的日期），
+%   #2 签名高度，#4 至多几行：行数超过 #4 时签名高度逐级缩小（每级 10%，最小为原来的一半），
+%   直到排得下。零尺寸，参考点在第一行的基线上
+\newcount\sdju@signn \newcount\sdju@signrows
+\newdimen\sdju@signh \newdimen\sdju@signw
+\newcommand\sdju@signmembers[5]{%
+  \def\sdju@signwrest{#5}%
+  \begingroup
+  \sdju@signh=#2\relax
+  \sdju@signbuild{#1}{#3}%
+  \loop
+    \@tempswafalse
+    \ifnum\sdju@signrows>#4\relax \ifdim\sdju@signh>\dimexpr#2/2+1sp\relax \@tempswatrue \fi\fi
+  \if@tempswa
+    \sdju@signh=\dimexpr\sdju@signh-#2/10\relax
+    \sdju@signbuild{#1}{#3}%
+  \repeat
+  \ifnum\sdju@signrows>\z@
+    \smash{\rlap{\vtop{\offinterlineskip\unvbox\sdju@sigbox}}}%
+  \fi
+  \endgroup}
+% 按高度 \sdju@signh 把组员签名排成若干行，放在 \sdju@sigbox，行数在 \sdju@signrows
+\newcommand\sdju@signbuild[2]{%
+  \setbox\sdju@sigbox\vbox{}\setbox\z@\hbox{}\sdju@signrows=\z@ \sdju@signn=\@ne
+  \def\sdju@signrow{% 把当前一行（\box\z@）接到已排的各行之下
+    \setbox\sdju@sigbox\vbox{\offinterlineskip\unvbox\sdju@sigbox
+      \ifnum\sdju@signrows>\z@ \kern#2\fi \box\z@}%
+    \advance\sdju@signrows\@ne}%
+  \sdju@signbuild@i{#1}{#2}%
+  \ifdim\wd\z@>\z@ \sdju@signrow \fi}
+\newcommand\sdju@signbuild@i[2]{%
+  \ifcsname sdju@sigon@committee_member-\the\sdju@signn\endcsname
+    \sdju@ifsign{committee_member-\the\sdju@signn}{%
+      \ifnum\sdju@signrows=\z@ \sdju@signw=#1\relax \else \sdju@signw=\sdju@signwrest\relax \fi
+      \setbox\tw@\hbox{\includegraphics[height=\sdju@signh,width=\sdju@signw,keepaspectratio]%
+        {\sdju@signdir committee_member-\the\sdju@signn.png}}%
+      \ifdim\wd\z@>\z@
+        \ifdim\dimexpr\wd\z@+#2+\wd\tw@\relax>\sdju@signw
+          \sdju@signrow \setbox\z@\hbox{\box\tw@}%
+        \else \setbox\z@\hbox{\unhbox\z@\kern#2\box\tw@}\fi
+      \else \setbox\z@\hbox{\box\tw@}\fi}{}%
+    \advance\sdju@signn\@ne
+    \expandafter\sdju@signbuild@i
+  \else \expandafter\@gobbletwo
+  \fi{#1}{#2}}
+% 答辩小组全体（组长与组员）的角色列表，用于取共用的日期
+\newcommand\sdju@committeeroles{committee_chair,committee_member-1,committee_member-2,committee_member-3,committee_member-4,committee_member-5,committee_member-6,committee_member-7,committee_member-8,committee_member-9,committee_member-10,committee_member-11,committee_member-12,committee_member-13,committee_member-14,committee_member-15,committee_member-16,committee_member-17,committee_member-18,committee_member-19,committee_member-20}
+% 日期：\sdju@getdate{角色,角色,…} 取这些角色中最晚的日期，放在 \sdju@dy、\sdju@dm、\sdju@dd
+%   （没有时为空，\ifsdju@hasdate 为假）
+\newif\ifsdju@hasdate
+\newcount\sdju@dbest \newcount\sdju@dcur
+\newcommand\sdju@getdate[1]{%
+  \global\sdju@hasdatefalse \sdju@dbest=\m@ne
+  \gdef\sdju@dy{}\gdef\sdju@dm{}\gdef\sdju@dd{}%
+  \@for\sdju@r:=#1\do{%
+    \ifcsname sdju@sdate@\sdju@r\endcsname
+      \expandafter\expandafter\expandafter\sdju@getdate@i\csname sdju@sdate@\sdju@r\endcsname
+    \fi}}
+\newcommand\sdju@getdate@i[3]{%
+  \sdju@dcur=\numexpr(#1)*10000+(#2)*100+(#3)\relax
+  \ifnum\sdju@dcur>\sdju@dbest
+    \sdju@dbest=\sdju@dcur \global\sdju@hasdatetrue
+    \gdef\sdju@dy{#1}\gdef\sdju@dm{#2}\gdef\sdju@dd{#3}%
+  \fi}
+% 「年 月 日」填入日期：#1 角色列表，#2「年」前空白的宽度（年份右对齐写在其中；为 0 时年份写在
+%   「年」左侧之外，不占宽度），#3、#4「月」「日」前空白的宽度（月、日在其中居中）。没有日期时
+%   与原来的「年\hspace{#3}月\hspace{#4}日」相同。数字放在 \hbox 中（不用 \makebox：xeCJK 会在
+%   汉字与 \makebox 之间加中西文间距，使「月」「日」右移），填入日期后「年」「月」「日」的位置不变
+\newcommand\sdju@datefill[4]{%
+  \sdju@getdate{#1}%
+  \ifsdju@hasdate
+    \ifdim#2=\z@ \llap{\sdju@dy}\else \hbox to#2{\hss\sdju@dy}\fi
+    年\hbox to#3{\hss\sdju@dm\hss}月\hbox to#4{\hss\sdju@dd\hss}日%
+  \else
+    \ifdim#2=\z@\else\hspace{#2}\fi 年\hspace{#3}月\hspace{#4}日%
+  \fi}
+\InputIfFileExists{sdju-signatures.cfg}{}{}
 \endinput
