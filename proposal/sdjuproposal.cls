@@ -417,22 +417,34 @@
 
 % ===============================================================
 % 正文
-%   课题名称：小一号宋体加粗居中；副标题右对齐
+%   课题名称：小一号宋体加粗居中（长题目第一行两边留白、其余转行）；副标题右对齐；与摘要之间约空一行
 %   「摘要：」「关键词：」小四号加粗，内容小四号宋体；首行缩进 2 字符，1.25 倍行距
 %   一级标题：四号宋体加粗，左对齐，1.73 倍行距（行框 31.55 磅），段前段后 13 磅（「1 文献综述」）
 %   二级标题：小四号宋体，首行缩进 2 字符，段前 12 磅、段后 0 磅（与三级标题相同，用户 2026-11-26 决定；
 %     紧跟在一级标题之后时不另加）（「3.1 …」）
 %   正文：小四号宋体 / Times New Roman，首行缩进 2 字符，1.25 倍行距
 % ===============================================================
+% 正文题目折行（用户 2026-11-27 决定，取代 11-26 的均衡折行）：整宽排一行放得下时照旧一行居中；
+%   放不下时第一行两边各留 \sdju@titleinset 空白、中间排满，写不下的转到下一行（整宽、居中）。
+%   用 \\ 手工分行时同样只约束第一行的宽度。
+\newcommand\sdju@titleinset{2em}
+% 题目（含副标题）与「摘要：」之间另加的距离（用户 2026-11-27：原先贴得太近），约空一行小四号
+\newcommand\sdju@titlegap{19.5bp}
+\newcommand\sdju@insetfirst[2]{%
+  \sdju@ballines{\hsize}{#2}%
+  \ifnum\count@>\@ne
+    \parshape\tw@ #1 \dimexpr\hsize-2\dimexpr#1\relax\relax \z@ \hsize
+  \fi}
 \renewcommand\maketitle{%
   \par
-  {\centering\songti\bfseries\sdjufont{24bp}{31.2bp}\sdju@balance{\sdju@title}%
+  {\centering\songti\bfseries\sdjufont{24bp}{31.2bp}\sdju@insetfirst{\sdju@titleinset}{\sdju@title}%
    \rule{\z@}{\sdju@above{24bp}{31.2bp}}\sdju@title\par}%
   % 留空判断用 \ifdefempty，不用 \ifx…\@empty：较早的 LaTeX（如 TeX Live 2022）中 \newcommand 定义的
   % 无参数宏是 \long 的，与 \@empty 用 \ifx 比较永远不等，没有副标题也会印出「——」
   \ifdefempty\sdju@subtitle{}{%
     {\raggedleft\songti\bfseries\sdjufont{24bp}{31.2bp}——\sdju@subtitle\par}}%
-  \vskip\sdju@post{24bp}{31.2bp}}
+  \vskip\sdju@post{24bp}{31.2bp}%
+  \vskip\sdju@titlegap}
 \newcommand\sdju@keywords{}
 \newcommand\keywords[1]{\renewcommand\sdju@keywords{#1}}
 \renewenvironment{abstract}
