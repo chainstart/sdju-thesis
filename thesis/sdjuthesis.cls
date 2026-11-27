@@ -8,7 +8,7 @@
 %% 行距约定：Word 文档网格为 15.6 磅，「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp，「2 倍」= 31.2bp。
 %% 标题、目录等处的间距按 Word 的行框算法换算（见下文 \sdju@pre、\sdju@post 的说明）。
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjuthesis}[2026/11/20 v3.0 SDJU Bachelor Thesis Template]
+\ProvidesClass{sdjuthesis}[2026/11/27 v3.1 SDJU Bachelor Thesis Template]
 
 % ---------------------------------------------------------------
 % 选项：nodeclaration 不输出声明页；noaideclaration 不输出 AI 使用情况声明页
@@ -598,7 +598,7 @@
     \sdju@yahei\fontsize{\sdju@titlesize}{\the\dimen@}\selectfont
     \lineskiplimit=-\maxdimen
     {\sdju@balance{\sdju@title}\sdju@title\par}%
-    \ifx\sdju@titleen\@empty\else{\sdju@balance{\sdju@titleen}\sdju@titleen\par}\fi
+    \ifdefempty\sdju@titleen{}{{\sdju@balance{\sdju@titleen}\sdju@titleen\par}}%
     % 题目为空时盒中没有行，\prevdepth 为 -1000pt，不能拿来回退（否则盒子深 1000pt）
     \ifdim\prevdepth>\z@ \kern-\prevdepth\fi}}
 % 封面能容纳的额外高度：上移 + 下移 + 两处弹性间距的压缩量

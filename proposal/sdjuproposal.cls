@@ -6,7 +6,7 @@
 %% 行距约定：「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp，「2 倍」= 31.2bp。
 %% 编译：xelatex -> biber -> xelatex -> xelatex（或直接 latexmk proposal.tex）
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjuproposal}[2026/11/26 v2.1 SDJU Thesis Proposal Template]
+\ProvidesClass{sdjuproposal}[2026/11/27 v2.2 SDJU Thesis Proposal Template]
 
 % 页码默认在页脚右侧（2026 版附件23 样本的位置）；选项 pagenumcenter 改为页脚居中。
 % pagenumright 为旧选项，保留以兼容，效果与默认相同
@@ -428,9 +428,10 @@
   \par
   {\centering\songti\bfseries\sdjufont{24bp}{31.2bp}\sdju@balance{\sdju@title}%
    \rule{\z@}{\sdju@above{24bp}{31.2bp}}\sdju@title\par}%
-  \ifx\sdju@subtitle\@empty\else
-    {\raggedleft\songti\bfseries\sdjufont{24bp}{31.2bp}——\sdju@subtitle\par}%
-  \fi
+  % 留空判断用 \ifdefempty，不用 \ifx…\@empty：较早的 LaTeX（如 TeX Live 2022）中 \newcommand 定义的
+  % 无参数宏是 \long 的，与 \@empty 用 \ifx 比较永远不等，没有副标题也会印出「——」
+  \ifdefempty\sdju@subtitle{}{%
+    {\raggedleft\songti\bfseries\sdjufont{24bp}{31.2bp}——\sdju@subtitle\par}}%
   \vskip\sdju@post{24bp}{31.2bp}}
 \newcommand\sdju@keywords{}
 \newcommand\keywords[1]{\renewcommand\sdju@keywords{#1}}

@@ -7,7 +7,7 @@
 %% 行距约定：「单倍行距」= 15.6bp，「1.25 倍」= 19.5bp。
 %% 编译：xelatex（或直接 latexmk defense.tex）
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjudefense}[2026/11/25 v1.0 SDJU Defense Record Template]
+\ProvidesClass{sdjudefense}[2026/11/27 v1.1 SDJU Defense Record Template]
 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ctexart}}
 \ProcessOptions\relax
@@ -268,12 +268,12 @@
 \newcommand\sdju@recordtail{%
   \global\setbox\sdju@tail\vbox{\hsize=\sdju@cw \parindent=\z@
     \normalfont\sdjufont{12bp}{21bp}%
-    \setbox\z@\hbox{记录人：\sdju@recorder\ifx\sdju@recorder\@empty\else\hspace{0.5em}\fi}%
+    \setbox\z@\hbox{记录人：\sdju@recorder\ifdefempty\sdju@recorder{}{\hspace{0.5em}}}%
     \hbox to\hsize{\hfil\hbox to\dimexpr177.2bp-\sdju@padx-\sdju@rule\relax{记录人：\sdju@recorder
-      \rlap{\ifx\sdju@recorder\@empty\else\hspace{0.5em}\fi
+      \rlap{\ifdefempty\sdju@recorder{}{\hspace{0.5em}}%
         \sdju@signleft{recorder}{\dimexpr177.2bp-\sdju@padx-\sdju@rule-\wd\z@\relax}{22bp}}\hfil}}%
     \hbox to\hsize{\hfil
-      \ifx\sdju@recorddate\@empty \sdju@datefill{recorder}{0pt}{2em}{2em}\else\sdju@recorddate\fi
+      \ifdefempty\sdju@recorddate{\sdju@datefill{recorder}{0pt}{2em}{2em}}{\sdju@recorddate}%
       \hspace{\dimexpr57.2bp-\sdju@padx-\sdju@rule\relax}}%
     \kern 21bp}}
 

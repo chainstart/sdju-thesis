@@ -1,7 +1,7 @@
 %% 上海电机学院 毕业设计（论文）答辩幻灯片
 %% 编译：latexmk slides.tex（XeLaTeX）
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjuslides}[2026/11/21 v1.0 SDJU Defense Slides]
+\ProvidesClass{sdjuslides}[2026/11/27 v1.1 SDJU Defense Slides]
 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{beamer}}
 \ProcessOptions\relax
@@ -105,7 +105,7 @@
 \newcommand\sdju@defensenamedefault{毕业设计（论文）答辩}
 \newcommand\sdju@defensenamesrc{}
 \newcommand\defensename[1]{\renewcommand\sdju@defensenamesrc{#1}}
-\newcommand\sdju@defensename{\ifx\sdju@defensenamesrc\@empty\sdju@defensenamedefault\else\sdju@defensenamesrc\fi}
+\newcommand\sdju@defensename{\ifdefempty\sdju@defensenamesrc{\sdju@defensenamedefault}{\sdju@defensenamesrc}}
 \defensedate{}
 
 \setbeamertemplate{title page}{%
@@ -114,10 +114,9 @@
   {\color{sdjumuted}\small \sdju@defensename\par}
   \smallskip
   {\usebeamercolor[fg]{title}\usebeamerfont{title}\raggedright\inserttitle\par}
-  \ifx\sdju@titleen\@empty\else
+  \ifdefempty\sdju@titleen{}{%
     \smallskip
-    {\color{sdjumuted}\small\raggedright\sdju@titleen\par}
-  \fi
+    {\color{sdjumuted}\small\raggedright\sdju@titleen\par}}%
   \medskip
   {\color{sdjuaccent}\rule{\textwidth}{.6pt}\par}
   \smallskip

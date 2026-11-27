@@ -5,7 +5,7 @@
 %% 行距约定：Word 中文字体单倍行距 = 1.3 × 字号（小四号 15.6bp），文字在行框内上下居中。
 %% 编译：xelatex（或直接 latexmk midterm.tex）
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdjumidterm}[2026/11/20 v1.0 SDJU Midterm Report Template]
+\ProvidesClass{sdjumidterm}[2026/11/27 v1.1 SDJU Midterm Report Template]
 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ctexart}}
 \ProcessOptions\relax
@@ -385,7 +385,7 @@
   \sdju@row{25.5bp}{%
     \sdju@cell{111.05bp}{l}{课题有无变化}%
     \sdju@lastcell{l}{\sdju@checkbox{\sdju@changeno}无\hspace{1em}\sdju@checkbox{\sdju@changeyes}有\hspace{1em}%
-      变化原因\ifx\sdju@changereason\@empty\else：\sdju@changereason\fi}}%
+      变化原因\ifdefempty\sdju@changereason{}{：\sdju@changereason}}}%
   \endgroup}
 
 % ===============================================================
