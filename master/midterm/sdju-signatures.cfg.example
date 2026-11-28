@@ -1,0 +1,9 @@
+% 由服务端使用，存为 sdju-signatures.cfg。日期为虚构示例。
+\sdju@signrole{supervisor}
+\sdju@signrole{dean}
+\sdju@signrole{midterm:committee_chair}
+\sdju@signrole{midterm:committee_member-1}
+\sdju@signrole{recorder}
+\sdju@signdate{supervisor}{2026}{11}{26}
+\sdju@signdate{dean}{2026}{11}{27}
+\sdju@signdate{midterm:committee_chair}{2026}{11}{28}
