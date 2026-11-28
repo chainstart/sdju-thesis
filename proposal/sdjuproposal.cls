@@ -341,7 +341,8 @@
 \newbox\sdju@tla \newbox\sdju@tlb
 \newcommand\sdju@striptail{% 去掉行与行之间的间距和惩罚，露出上一行
   \unskip\unpenalty\unskip\unpenalty\unskip\unpenalty\unskip\unpenalty\unskip}
-% 封面课题名称折行（用户 2026-11-28 决定，取代 11-26 的均衡折行）：一行放得下照旧居中；放不下时
+% 封面课题名称折行（用户 2026-11-28 决定）：一行放得下照旧居中；放不下时先按词的边界分两行
+%   （\sdju@wordsplit，第一行不超过下划线宽减两边各 \sdju@covertitleinset）；找不到合适的词界时，
 %   第一行两边各留 \sdju@covertitleinset 少量空白、中间排满，余下的转到第二行（居中）。
 \newcommand\sdju@covertitleinset{1em}
 % 均衡折行（用户 2026-11-26 决定；封面与正文题目已不再使用，保留备用：长题目转行时两行长度大致相当，不让一两个字单独成行）：
@@ -366,15 +367,84 @@
     \leftskip=\dimexpr(\hsize-\sdju@balhi)/2\relax\@plus1fil
     \rightskip=\leftskip
   \fi}
+% 题目按词的边界分成两行（用户 2026-11-28 决定）：TeX 没有中文分词，这里用题目里常见的词界：
+%   「的、之、与、和、及、或、、、：、级」之后，以及常见的题目用词（系统、设计、研究、实现、发电、机组、
+%   智能、数据……，见下方列表，可按需补充）之前。
+%   在这些位置中取第一行最长、且两行都放得下的一处断开（第一行不超过 #2，第二行不超过 #3）；
+%   一处都不行时返回“未分”，由调用者退回按字折行。题目里用 \\ 手工分行时不做处理。
+%   结果：\sdju@ifws{分成了}{没分成}，两行内容在 \sdju@wsA、\sdju@wsB。
+\ExplSyntaxOn
+\seq_new:N \l__sdju_ws_seq
+\tl_new:N \l__sdju_ws_tl
+\tl_new:N \l__sdju_wsa_tl
+\tl_new:N \l__sdju_wsb_tl
+\tl_new:N \sdju@wsA
+\tl_new:N \sdju@wsB
+\box_new:N \l__sdju_ws_box
+\bool_new:N \g__sdju_ws_bool
+\cs_new_protected:Npn \sdju@wsmark { }
+\cs_new_protected:Npn \sdju@wordsplit #1#2#3
+  {
+    \bool_gset_false:N \g__sdju_ws_bool
+    \tl_set:No \l__sdju_ws_tl {#1}
+    \tl_if_in:NnF \l__sdju_ws_tl { \\ }
+      {
+        \regex_replace_all:nnN { (的|之|与|和|及|或|、|：|级) } { \1\c{sdju@wsmark} } \l__sdju_ws_tl
+        \regex_replace_all:nnN
+          { (系统|设计|研究|实现|分析|控制|平台|装置|方法|算法|模型|技术|应用|优化|检测|监测|识别|管理|开发|仿真|评价|评估|预测|策略|机制|框架|方案|结构|电路|软件|网站|小程序|机器人|智能|自动|远程|在线|实时|无线|多功能|一体化|发电|电机|机组|风力|光伏|储能|电池|充电|数据|信息|网络|物联网|传感|控制器|监控|安全|校园|家居|环境|车辆|无人机|图像|视频|语音|深度|机器|神经|卷积|强化|嵌入式|单片机|教学|医疗|农业|工业|交通|物流|能源|材料|工艺|生产|制造|加工|测试|测量|驱动|伺服|电源|变频|变桨|偏航|液压|气动|机械|结构|零件|模具|夹具|数字|虚拟|可视化|云|边缘|移动|微信|用户|服务|调度|规划|路径|定位|导航|通信|协议) }
+          { \c{sdju@wsmark}\1 } \l__sdju_ws_tl
+        \seq_set_split_keep_spaces:NnV \l__sdju_ws_seq { \sdju@wsmark } \l__sdju_ws_tl
+        \int_step_inline:nn { \seq_count:N \l__sdju_ws_seq - 1 }
+          {
+            \tl_clear:N \l__sdju_wsa_tl
+            \tl_clear:N \l__sdju_wsb_tl
+            \seq_map_indexed_inline:Nn \l__sdju_ws_seq
+              {
+                \int_compare:nNnTF {####1} > {##1}
+                  { \tl_put_right:Nn \l__sdju_wsb_tl {####2} }
+                  { \tl_put_right:Nn \l__sdju_wsa_tl {####2} }
+              }
+            \tl_trim_spaces:N \l__sdju_wsa_tl
+            \tl_trim_spaces:N \l__sdju_wsb_tl
+            \bool_lazy_or:nnF { \tl_if_empty_p:N \l__sdju_wsa_tl } { \tl_if_empty_p:N \l__sdju_wsb_tl }
+              {
+                \hbox_set:Nn \l__sdju_ws_box { \l__sdju_wsa_tl }
+                \dim_compare:nNnF { \box_wd:N \l__sdju_ws_box } > {#2}
+                  {
+                    \hbox_set:Nn \l__sdju_ws_box { \l__sdju_wsb_tl }
+                    \dim_compare:nNnF { \box_wd:N \l__sdju_ws_box } > {#3}
+                      {
+                        \tl_set_eq:NN \sdju@wsA \l__sdju_wsa_tl
+                        \tl_set_eq:NN \sdju@wsB \l__sdju_wsb_tl
+                        \bool_gset_true:N \g__sdju_ws_bool
+                      }
+                  }
+              }
+          }
+      }
+  }
+\cs_new:Npn \sdju@ifws { \bool_if:NTF \g__sdju_ws_bool }
+\ExplSyntaxOff
 \newcommand\sdju@splittitle[1]{%
   \setbox\z@\vbox{\hsize=\sdju@coverw \centering \parindent=\z@
     \sdjufont{#1}{#1}\baselineskip=1.5\dimexpr#1\relax \lineskiplimit=\z@ \lineskip=\z@
-    \sdju@insetfirst{\sdju@covertitleinset}{\sdju@title}%
-    \sdju@title\par
-    \sdju@striptail \global\setbox\sdju@tlb\lastbox
-    \sdju@striptail \global\setbox\sdju@tla\lastbox
-    \sdju@striptail \setbox\tw@\lastbox
-    \ifvoid\tw@ \global\@tempswafalse \else \global\@tempswatrue \fi}}
+    \setbox\tw@\hbox{\sdju@title}%
+    \ifdim\wd\tw@>\sdju@coverw
+      \sdju@wordsplit{\sdju@title}{\dimexpr\sdju@coverw-2\dimexpr\sdju@covertitleinset\relax\relax}{\sdju@coverw}%
+    \else
+      \sdju@wordsplit{}{\z@}{\z@}% 一行放得下：不分
+    \fi
+    \sdju@ifws{%
+      \global\setbox\sdju@tla\hbox{\sdju@wsA}%
+      \global\setbox\sdju@tlb\hbox{\sdju@wsB}%
+      \global\@tempswafalse
+    }{%
+      \sdju@insetfirst{\sdju@covertitleinset}{\sdju@title}%
+      \sdju@title\par
+      \sdju@striptail \global\setbox\sdju@tlb\lastbox
+      \sdju@striptail \global\setbox\sdju@tla\lastbox
+      \sdju@striptail \setbox\tw@\lastbox
+      \ifvoid\tw@ \global\@tempswafalse \else \global\@tempswatrue \fi}}}
 \newcommand\sdju@fittitle{%
   \@tfor\sdju@tmp:={15bp}{14bp}{13bp}{12bp}{10.5bp}{9bp}\do{%
     \sdju@splittitle{\sdju@tmp}%
@@ -440,8 +510,17 @@
   \fi}
 \renewcommand\maketitle{%
   \par
-  {\centering\songti\bfseries\sdjufont{24bp}{31.2bp}\sdju@insetfirst{\sdju@titleinset}{\sdju@title}%
-   \rule{\z@}{\sdju@above{24bp}{31.2bp}}\sdju@title\par}%
+  {\centering\songti\bfseries\sdjufont{24bp}{31.2bp}%
+   \setbox\z@\hbox{\sdju@title}%
+   \ifdim\wd\z@>\hsize
+     \sdju@wordsplit{\sdju@title}{\dimexpr\hsize-2\dimexpr\sdju@titleinset\relax\relax}{\hsize}%
+   \else
+     \sdju@wordsplit{}{\z@}{\z@}%
+   \fi
+   \sdju@ifws
+     {\rule{\z@}{\sdju@above{24bp}{31.2bp}}\sdju@wsA\\\sdju@wsB\par}%
+     {\sdju@insetfirst{\sdju@titleinset}{\sdju@title}%
+      \rule{\z@}{\sdju@above{24bp}{31.2bp}}\sdju@title\par}}%
   % 留空判断用 \ifdefempty，不用 \ifx…\@empty：较早的 LaTeX（如 TeX Live 2022）中 \newcommand 定义的
   % 无参数宏是 \long 的，与 \@empty 用 \ifx 比较永远不等，没有副标题也会印出「——」
   \ifdefempty\sdju@subtitle{}{%
