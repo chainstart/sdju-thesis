@@ -179,6 +179,64 @@
 \NewDocumentCommand\CoverTitle{m}{%
   {\heiti\sdjufont{\sdju@coversize}{32}\TitleText{#1}}\par}
 \NewDocumentCommand\CoverField{mm}{\rule{0pt}{\sdju@fieldheight}#1 & #2\\\cline{2-2}}
+
+% 导言区基本信息命令。
+\author{}
+\newcommand\sdju@studentid{}
+\newcommand\studentid[1]{\renewcommand\sdju@studentid{#1}}
+\newcommand\sdju@school{}
+\newcommand\school[1]{\renewcommand\sdju@school{#1}}
+\newcommand\sdju@supervisor{}
+\newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}
+\newcommand\sdju@companysupervisor{}
+\newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}
+\title{}
+\newcommand\sdju@researchdirection{}
+\newcommand\researchdirection[1]{\renewcommand\sdju@researchdirection{#1}}
+\newcommand\sdju@degreefield{}
+\newcommand\degreefield[1]{\renewcommand\sdju@degreefield{#1}}
+\newcommand\sdju@companysupervisorunit{}
+\newcommand\companysupervisorunit[1]{\renewcommand\sdju@companysupervisorunit{#1}}
+\newcommand\sdju@thesisperiod{}
+\newcommand\thesisperiod[1]{\renewcommand\sdju@thesisperiod{#1}}
+\newcommand\sdju@proposaldatesrc{}
+\newcommand\proposaldate[1]{\renewcommand\sdju@proposaldatesrc{#1}}
+\newcommand\sdju@proposaldate{%
+  \ifx\sdju@proposaldatesrc\@empty 年\hspace{1em}月\hspace{1em}日\else\sdju@proposaldatesrc\fi}
+
+\newcommand\sdju@covertitle{\TitleText{\@title}}
+\newcommand\sdju@companymentor{%
+  \sdju@companysupervisor
+  \ifx\sdju@companysupervisorunit\@empty\else
+    \ifx\sdju@companysupervisor\@empty\else，\fi
+    \sdju@companysupervisorunit
+  \fi}
+
+\newcommand\makecover{%
+  \begin{titlepage}
+  \centering
+  \vspace*{\dimexpr13mm-12bp\relax}
+  \CoverLogo
+  \vspace{1mm}
+  \CoverTitle{硕士研究生学位论文开题报告}
+  \vspace{29mm}
+  \begin{coverfields}
+  \CoverField{论 文 题 目}{\sdju@covertitle}
+  \CoverField{类别（领域）}{\sdju@degreefield}
+  \CoverField{研 究 方 向}{\sdju@researchdirection}
+  \CoverField{校 内 导 师}{\sdju@supervisor}
+  \CoverField{企业导师及单位}{\sdju@companymentor}
+  \CoverField{学\qquad 号}{\sdju@studentid}
+  \CoverField{姓\qquad 名}{\@author}
+  \CoverField{学\qquad 院}{\sdju@school}
+  \CoverField{论文起止年限}{\sdju@thesisperiod}
+  \CoverField{申请开题日期}{\sdju@proposaldate}
+  \end{coverfields}
+  \vfill
+  {\sdjufont{15}{21}上海电机学院研究生处\par}
+  \vspace{8mm}
+  \end{titlepage}}
+
 \NewDocumentEnvironment{coverfields}{}{%
   \par\centering\sdjufont{\sdju@fieldsize}{19}%
   \begin{tabular}{@{}p{\sdju@labelwidth} >{\centering\arraybackslash}m{\sdju@fieldwidth}@{}}%
