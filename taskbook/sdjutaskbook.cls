@@ -211,7 +211,7 @@
 %       学院院长（签字）／校内指导教师（签字）／企业指导教师（签字）（栏目名连下划线共 271 磅）／
 %       （空 1.5 行）年 月 日；下划线线粗 0.72 磅，中线在基线下 1.6 磅
 %   框外下方一行「注：本任务书由上海电机学院教务处印制。」五号楷体（不加粗），基线在框底下 43.5 磅
-%   课题名称一行写不下时自动转到第二条下划线（两行长度均衡，见 \sdju@balance），两行仍排不下则逐级缩小字号。
+%   课题名称一行写不下时按词的边界转到第二条下划线（同开题报告封面，见 \sdju@wordsplit），两行仍排不下则逐级缩小字号。
 %   学院院长、校内指导教师、企业指导教师三栏不印姓名：没有签名配置时留空，待手签；有配置时由系统
 %   放入签名图片（见文末「电子签名」），三人的签名中心在同一条竖线上（最短的一条下划线，即企业
 %   指导教师一栏的中心），高 30 磅，底部压在下划线上。
@@ -272,15 +272,93 @@
     \leftskip=\dimexpr(\hsize-\sdju@balhi)/2\relax\@plus1fil
     \rightskip=\leftskip
   \fi}
+% 封面课题名称折行（与开题报告封面相同，用户 2026-11-28 要求统一）：一行放得下照旧居中；放不下时先按词的边界
+%   分两行（\sdju@wordsplit，第一行不超过下划线宽减两边各 \sdju@covertitleinset）；找不到合适词界时，
+%   第一行两边各留 \sdju@covertitleinset 少量空白、中间排满，余下的转到第二行（居中）。
+\newcommand\sdju@covertitleinset{1em}
+\newcommand\sdju@insetfirst[2]{%
+  \sdju@ballines{\hsize}{#2}%
+  \ifnum\count@>\@ne
+    \parshape\tw@ #1 \dimexpr\hsize-2\dimexpr#1\relax\relax \z@ \hsize
+  \fi}
+% 题目按词的边界分成两行（用户 2026-11-28 决定）：TeX 没有中文分词，这里用题目里常见的词界：
+%   「的、之、与、和、及、或、、、：、级」之后，以及常见的题目用词（系统、设计、研究、实现、发电、机组、
+%   智能、数据……，见下方列表，可按需补充）之前。
+%   在这些位置中取第一行最长、且两行都放得下的一处断开（第一行不超过 #2，第二行不超过 #3）；
+%   一处都不行时返回“未分”，由调用者退回按字折行。题目里用 \\ 手工分行时不做处理。
+%   结果：\sdju@ifws{分成了}{没分成}，两行内容在 \sdju@wsA、\sdju@wsB。
+\ExplSyntaxOn
+\seq_new:N \l__sdju_ws_seq
+\tl_new:N \l__sdju_ws_tl
+\tl_new:N \l__sdju_wsa_tl
+\tl_new:N \l__sdju_wsb_tl
+\tl_new:N \sdju@wsA
+\tl_new:N \sdju@wsB
+\box_new:N \l__sdju_ws_box
+\bool_new:N \g__sdju_ws_bool
+\cs_new_protected:Npn \sdju@wsmark { }
+\cs_new_protected:Npn \sdju@wordsplit #1#2#3
+  {
+    \bool_gset_false:N \g__sdju_ws_bool
+    \tl_set:No \l__sdju_ws_tl {#1}
+    \tl_if_in:NnF \l__sdju_ws_tl { \\ }
+      {
+        \regex_replace_all:nnN { (的|之|与|和|及|或|、|：|级) } { \1\c{sdju@wsmark} } \l__sdju_ws_tl
+        \regex_replace_all:nnN
+          { (系统|设计|研究|实现|分析|控制|平台|装置|方法|算法|模型|技术|应用|优化|检测|监测|识别|管理|开发|仿真|评价|评估|预测|策略|机制|框架|方案|结构|电路|软件|网站|小程序|机器人|智能|自动|远程|在线|实时|无线|多功能|一体化|发电|电机|机组|风力|光伏|储能|电池|充电|数据|信息|网络|物联网|传感|控制器|监控|安全|校园|家居|环境|车辆|无人机|图像|视频|语音|深度|机器|神经|卷积|强化|嵌入式|单片机|教学|医疗|农业|工业|交通|物流|能源|材料|工艺|生产|制造|加工|测试|测量|驱动|伺服|电源|变频|变桨|偏航|液压|气动|机械|结构|零件|模具|夹具|数字|虚拟|可视化|云|边缘|移动|微信|用户|服务|调度|规划|路径|定位|导航|通信|协议) }
+          { \c{sdju@wsmark}\1 } \l__sdju_ws_tl
+        \seq_set_split_keep_spaces:NnV \l__sdju_ws_seq { \sdju@wsmark } \l__sdju_ws_tl
+        \int_step_inline:nn { \seq_count:N \l__sdju_ws_seq - 1 }
+          {
+            \tl_clear:N \l__sdju_wsa_tl
+            \tl_clear:N \l__sdju_wsb_tl
+            \seq_map_indexed_inline:Nn \l__sdju_ws_seq
+              {
+                \int_compare:nNnTF {####1} > {##1}
+                  { \tl_put_right:Nn \l__sdju_wsb_tl {####2} }
+                  { \tl_put_right:Nn \l__sdju_wsa_tl {####2} }
+              }
+            \tl_trim_spaces:N \l__sdju_wsa_tl
+            \tl_trim_spaces:N \l__sdju_wsb_tl
+            \bool_lazy_or:nnF { \tl_if_empty_p:N \l__sdju_wsa_tl } { \tl_if_empty_p:N \l__sdju_wsb_tl }
+              {
+                \hbox_set:Nn \l__sdju_ws_box { \l__sdju_wsa_tl }
+                \dim_compare:nNnF { \box_wd:N \l__sdju_ws_box } > {#2}
+                  {
+                    \hbox_set:Nn \l__sdju_ws_box { \l__sdju_wsb_tl }
+                    \dim_compare:nNnF { \box_wd:N \l__sdju_ws_box } > {#3}
+                      {
+                        \tl_set_eq:NN \sdju@wsA \l__sdju_wsa_tl
+                        \tl_set_eq:NN \sdju@wsB \l__sdju_wsb_tl
+                        \bool_gset_true:N \g__sdju_ws_bool
+                      }
+                  }
+              }
+          }
+      }
+  }
+\cs_new:Npn \sdju@ifws { \bool_if:NTF \g__sdju_ws_bool }
+\ExplSyntaxOff
 \newcommand\sdju@splittitle[1]{%
   \setbox\z@\vbox{\hsize=\sdju@coverw \centering \parindent=\z@
     \sdjufont{#1}{#1}\baselineskip=1.5\dimexpr#1\relax \lineskiplimit=\z@ \lineskip=\z@
-    \sdju@balance{\sdju@title}%
-    \sdju@title\par
-    \sdju@striptail \global\setbox\sdju@tlb\lastbox
-    \sdju@striptail \global\setbox\sdju@tla\lastbox
-    \sdju@striptail \setbox\tw@\lastbox
-    \ifvoid\tw@ \global\@tempswafalse \else \global\@tempswatrue \fi}}
+    \setbox\tw@\hbox{\sdju@title}%
+    \ifdim\wd\tw@>\sdju@coverw
+      \sdju@wordsplit{\sdju@title}{\dimexpr\sdju@coverw-2\dimexpr\sdju@covertitleinset\relax\relax}{\sdju@coverw}%
+    \else
+      \sdju@wordsplit{}{\z@}{\z@}% 一行放得下：不分
+    \fi
+    \sdju@ifws{%
+      \global\setbox\sdju@tla\hbox{\sdju@wsA}%
+      \global\setbox\sdju@tlb\hbox{\sdju@wsB}%
+      \global\@tempswafalse
+    }{%
+      \sdju@insetfirst{\sdju@covertitleinset}{\sdju@title}%
+      \sdju@title\par
+      \sdju@striptail \global\setbox\sdju@tlb\lastbox
+      \sdju@striptail \global\setbox\sdju@tla\lastbox
+      \sdju@striptail \setbox\tw@\lastbox
+      \ifvoid\tw@ \global\@tempswafalse \else \global\@tempswatrue \fi}}}
 \newcommand\sdju@fittitle{%
   \@tfor\sdju@tmp:={15bp}{14bp}{13bp}{12bp}{10.5bp}{9bp}\do{%
     \sdju@splittitle{\sdju@tmp}%
