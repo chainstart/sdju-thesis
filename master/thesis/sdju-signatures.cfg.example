@@ -1,0 +1,5 @@
+% 由服务端使用，存为 sdju-signatures.cfg。日期为虚构示例。
+\sdju@signrole{student}
+\sdju@signrole{supervisor}
+\sdju@signdate{student}{2026}{11}{27}
+\sdju@signdate{supervisor}{2026}{11}{28}

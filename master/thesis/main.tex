@@ -1,0 +1,189 @@
+\documentclass{sdjumthesis}
+\addbibresource{refs.bib}
+\begin{document}
+\begin{titlepage}
+\centering
+\sdjufont{12}{19.5}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}ll@{}}
+分类号：TP000（示例） & 密级：公开\\
+UDC：000（示例） & 编号：11458
+\end{tabular*}\par
+\vspace{11mm}
+\CoverHeading{上海电机学院专业硕士学位论文}
+\vspace{14mm}
+\CoverChineseTitle{面向模拟台架的设备运行状态监测与异常检测方法研究}
+\vspace{7mm}
+\CoverEnglishTitle{Condition Monitoring and Anomaly Detection for a Simulated Test Bench}
+\vfill
+\begin{coverfields}
+\CoverField{硕士研究生：}{测试研究生甲}
+\CoverField{学\qquad 号：}{local:master-thesis}
+\CoverField{校内导师：}{测试导师甲（测试教授）}
+\CoverField{企业导师：}{测试导师乙（测试工程师）}
+\CoverField{类\qquad 别：}{电子信息}
+\CoverField{领\qquad 域：}{控制工程}
+\CoverField{申请学位：}{电子信息硕士}
+\CoverField{所在单位：}{测试工程学院}
+\CoverField{答辩日期：}{2026年11月28日}
+\CoverField{授予学位单位：}{上海电机学院}
+\end{coverfields}
+\vspace{6mm}
+\end{titlepage}
+
+\begin{declaration}{学位论文原创性声明}
+本人郑重声明：所呈交的学位论文《面向模拟台架的设备运行状态监测与异常检测方法研究》，是本人在导师的指导下，独立进行研究工作所取得的成果。除文中已经注明引用的内容外，本论文不包含任何其他个人或集体已经发表或撰写过的作品成果。对本文的研究做出重要贡献的个人和集体，均已在文中以明确方式标明。本人完全意识到本声明的法律结果由本人承担。
+
+\bigskip
+\noindent 学位论文作者签名：\Signature{student}\par
+\noindent 日期：\SignatureDate{student}
+\end{declaration}
+
+\begin{declaration}{学位论文版权使用授权书}
+本学位论文作者完全了解学校有关保留、使用学位论文的规定，同意学校保留并向国家有关部门或机构送交论文的复印件和电子版，允许论文被查阅和借阅。本人授权上海电机学院可以将本学位论文的全部或部分内容编入有关数据库进行检索，可以采用影印、缩印或扫描等复制手段保存和汇编本学位论文。
+
+\medskip
+\noindent 本学位论文属于\quad
+\begin{tabular}[t]{@{}l@{}}
+保密\FormCheckBox，在\underline{\hspace{15mm}}年解密后适用本授权书。\\
+不保密\FormCheckBox。
+\end{tabular}\par
+（请在以上方框内打“√”）
+
+\bigskip
+\noindent
+\begin{minipage}[t]{.52\linewidth}
+学位论文作者签名：\Signature[24mm]{student}\par
+日期：\SignatureDate{student}
+\end{minipage}\hfill
+\begin{minipage}[t]{.43\linewidth}
+指导教师签名：\Signature[24mm]{supervisor}\par
+日期：\SignatureDate{supervisor}
+\end{minipage}
+\end{declaration}
+
+\frontmatter
+\begin{thesisabstract}{面向模拟台架的设备运行状态监测与异常检测方法研究}{摘 要}
+针对模拟设备运行状态记录中不同工况难以直接比较的问题，本文用虚构台架研究可复核的数据处理方法。实验流程保留采样配置、工况标签和样本索引，以便核对处理前后的记录。
+
+研究按工况建立基线，比较对照批次，并记录异常标记的判定依据。示例结果表明，批次之间的差异能够从归档记录中追溯。本示例中的数据、结论和人物均为虚构。
+\ChineseKeywords{状态监测，模拟台架，异常检测，工况归一化}
+\end{thesisabstract}
+
+\begin{thesisabstract}{Condition Monitoring and Anomaly Detection for a Simulated Test Bench}{ABSTRACT}
+\setlength\parindent{4\fontdimen2\font}
+This fictional study illustrates how to organize condition monitoring experiments for a simulated test bench. Each batch stores the sampling configuration, operating labels, and sample identifiers used in the analysis.
+
+The example compares condition-specific baselines and documents the criteria used to flag unusual measurements. The records make it possible to trace observed differences to the corresponding operating conditions.
+\EnglishKeywords{condition monitoring, simulated test bench, anomaly detection, operating condition}
+\end{thesisabstract}
+
+\tableofcontents
+\ThesisEndChapter{物理量名称及符号表}
+\noindent
+\begin{tabular}{@{}ll@{}}
+$x_i$ & 第 $i$ 个测试信号读数\\
+$\bar{x}$ & 当前批次的平均读数\\
+$n$ & 当前批次的样本数
+\end{tabular}
+
+\mainmatter
+\chapter{绪论}
+\section{研究背景}
+工况变化会影响模拟设备的信号基线。示例文献提供了按批次记录测试的方法\supercite{local-cn}。
+\section{研究内容}
+本文用虚构试验演示可复核的记录及计算过程。
+\subsection{数据记录}
+每个样本保存批次号、工况标签和测试读数。由文献\cite{local-en}可知，批次索引可用于核对配置差异。
+
+\chapter{模拟试验与数据分析}
+\section{试验流程}
+图\ref{fig:flow}展示试验记录的两个阶段，表\ref{tab:readings}给出虚构读数。
+\begin{figure}[htbp]
+\centering\ThesisTableFont
+\begin{subfigure}{.42\linewidth}
+\centering\fbox{\rule{0pt}{17mm}\makebox[39mm]{采样与标记}}
+\caption{记录阶段\\Acquisition}
+\end{subfigure}\qquad
+\begin{subfigure}{.42\linewidth}
+\centering\fbox{\rule{0pt}{17mm}\makebox[39mm]{复核与归档}}
+\caption{复核阶段\\Review}
+\end{subfigure}
+\FigureCaption{模拟试验记录流程}{Simulated experiment workflow}
+\label{fig:flow}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\TableCaption{模拟读数示例}[Example simulated readings]
+\label{tab:readings}
+\ThesisTableFont
+\begin{tabular}{lrr}
+\toprule
+批次 & 样本数 & 平均读数（V）\\
+\midrule
+模拟甲 & 20 & 1.25\\
+模拟乙 & 22 & 1.48\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{基线计算}
+每一工况的平均读数由式\eqref{eq:mean}计算。
+\begin{equation}
+  \bar{x}=\frac{1}{n}\sum_{i=1}^{n}x_i
+  \label{eq:mean}
+\end{equation}
+式中：\par
+\noindent\hspace{2em}\begin{tabular}{@{}l@{\quad}l@{}}
+$\bar{x}$ & ——当前批次的平均读数；\\
+$n$ & ——当前批次的样本数；\\
+$x_i$ & ——当前批次第 $i$ 个读数。
+\end{tabular}
+
+\section{本章小结}
+本章给出了模拟实验的记录流程与基线计算方式。
+
+\chapter{结束语}
+\section{主要工作与创新点}
+在虚构场景中建立了工况记录和批次复核流程。
+\section{后续研究工作}
+后续可用更多合成工况验证数据核验流程。
+
+% 正式论文按原件要求补足文献数量、外文比例与时效要求。
+\ThesisEndChapter{参 考 文 献}
+\printbibliography[heading=none]
+
+\appendix
+\ThesisAppendix{模拟数据索引}
+表\ref{tab:appendix}演示附录的独立编号。
+\begin{table}[htbp]
+\centering
+\TableCaption{模拟批次标识}
+\label{tab:appendix}
+\ThesisTableFont
+\begin{tabular}{ll}
+\toprule
+批次 & 标识\\
+\midrule
+模拟甲 & local:batch-a\\
+模拟乙 & local:batch-b\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\ThesisEndChapter{致 谢}
+感谢虚构的测试导师甲、测试导师乙对示例台架和记录流程的指导。
+
+\ThesisEndChapter{攻读硕士学位期间取得的研究成果}
+\noindent 发表论文
+\begin{enumerate}
+\renewcommand\labelenumi{[\arabic{enumi}]}
+\item 测试作者甲. 模拟试验批次核验方法[J]. 虚构工业测试期刊, 2026, 2(1): 1--8.
+\end{enumerate}
+
+\noindent 申请专利
+\begin{enumerate}
+\renewcommand\labelenumi{[\arabic{enumi}]}
+\item 测试作者甲. 模拟工况记录装置，专利申请号：local:patent-1，\allowbreak 公开号：local:pub-1。
+\end{enumerate}
+\end{document}
