@@ -288,7 +288,7 @@
 %     （行框按附件23 中华文中宋的实际行高 1.482 × 字号计，基线在行框顶下 1.081 × 字号，
 %      没有华文中宋、用宋体代替时位置不变）
 %   空两行（三号）；各栏目：小二号宋体加粗，内容（小三号）写在下划线上；
-%     课题名称占两行下划线（第二行为小三号行），一行写不下时自动转到第二行（两行约 34 个汉字，
+%     课题名称占两行下划线（第二行为小三号行），一行写不下时第一行两边留少量空白排满、余下转到第二行（两行约 32 个汉字，
 %     再长则自动缩小字号）
 %   栏目依次为课题名称、学院、专业、班级、学号、姓名、校内指导教师、企业指导教师；
 %     两字栏目名撑满 4 字宽，其余按实际宽度；下划线右端对齐（距纸边 469.5 磅）
@@ -341,7 +341,10 @@
 \newbox\sdju@tla \newbox\sdju@tlb
 \newcommand\sdju@striptail{% 去掉行与行之间的间距和惩罚，露出上一行
   \unskip\unpenalty\unskip\unpenalty\unskip\unpenalty\unskip\unpenalty\unskip}
-% 均衡折行（用户 2026-11-26 决定：长题目转行时两行长度大致相当，不让一两个字单独成行）：
+% 封面课题名称折行（用户 2026-11-28 决定，取代 11-26 的均衡折行）：一行放得下照旧居中；放不下时
+%   第一行两边各留 \sdju@covertitleinset 少量空白、中间排满，余下的转到第二行（居中）。
+\newcommand\sdju@covertitleinset{1em}
+% 均衡折行（用户 2026-11-26 决定；封面与正文题目已不再使用，保留备用：长题目转行时两行长度大致相当，不让一两个字单独成行）：
 %   \sdju@balance{内容} 在当前字体、\hsize 下求出与整宽排时行数相同的最小行宽 w（二分，精度 0.1 磅），
 %   把 \leftskip、\rightskip 设为 (\hsize - w)/2 加上原有的伸展，各行仍居中、长度大致相当。
 %   只有一行时不改动；用 \\ 手工分行时各段照原样（行宽不小于最长的一段）。
@@ -366,7 +369,7 @@
 \newcommand\sdju@splittitle[1]{%
   \setbox\z@\vbox{\hsize=\sdju@coverw \centering \parindent=\z@
     \sdjufont{#1}{#1}\baselineskip=1.5\dimexpr#1\relax \lineskiplimit=\z@ \lineskip=\z@
-    \sdju@balance{\sdju@title}%
+    \sdju@insetfirst{\sdju@covertitleinset}{\sdju@title}%
     \sdju@title\par
     \sdju@striptail \global\setbox\sdju@tlb\lastbox
     \sdju@striptail \global\setbox\sdju@tla\lastbox
