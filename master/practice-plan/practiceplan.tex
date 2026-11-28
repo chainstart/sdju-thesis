@@ -1,26 +1,20 @@
 \documentclass{sdjumpracticeplan}
+
+% 网站预填和同步的基本信息
+\author{测试研究生甲}
+\studentid{local:practice-plan}
+\school{测试工程学院}
+\supervisor{测试导师甲}
+\companysupervisor{测试导师乙}
+\major{电子信息}
+\researchdirection{模拟设备状态监测}
+\practiceunit{测试实践中心}
+\practicestart{}
+\practiceend{}
+\practiceplandate{2026年11月28日}
+
 \begin{document}
-\begin{titlepage}
-\centering
-\vspace*{\dimexpr18mm-12bp\relax}
-\CoverLogo
-\vspace{30mm}
-\CoverTitle{硕士专业学位研究生专业实践计划表}
-\vspace{19mm}
-\begin{coverfields}
-\CoverField{学\quad 院：}{测试工程学院}
-\CoverField{姓\quad 名：}{测试研究生甲}
-\CoverField{学\quad 号：}{local:practice-plan}
-\CoverField{专\quad 业：}{电子信息}
-\CoverField{研究方向：}{模拟设备状态监测}
-\CoverField{校内导师：}{测试导师甲}
-\CoverField{企业导师：}{测试导师乙}
-\CoverField{填表日期：}{2026年11月28日}
-\end{coverfields}
-\vfill
-{\fangsong\sdjufont{18}{24}研究生处制\par}
-\vspace{13mm}
-\end{titlepage}
+\makecover
 
 \vspace*{26mm}
 {\centering\fangsong\sdjufont{22}{28}填表说明\par}
@@ -43,13 +37,14 @@
 \hline
 \multirow{3}{*}{\VerticalLabel{专业\\实践\\指导\\教师}} &
 姓名 & 职称 & 主要从事专业与研究领域 & 所在单位 & 联系方式 \RowHeight{14mm}\\\cline{2-6}
- & 测试导师甲 & 测试教授 & 仿真与信号分析 & 测试工程学院 & local:mentor-a \RowHeight{14mm}\\\cline{2-6}
- & 测试导师乙 & 测试工程师 & 台架试验 & 测试实践中心 & local:mentor-b \RowHeight{14mm}\\\hline
+ & \PracticeInternalMentor & 测试教授 & 仿真与信号分析 & \PracticeSchool & local:mentor-a \RowHeight{14mm}\\\cline{2-6}
+ & \PracticeExternalMentor & 测试工程师 & 台架试验 & \PracticeUnit & local:mentor-b \RowHeight{14mm}\\\hline
 \end{longtable}
 \endgroup
 
 \FormHeading{2、实践计划}
 \begin{formbox}{159mm}[实践计划]
+\PracticePlanPeriod
 \FormHeading{1. 实践形式}
 采用虚构台架开展校企联合实践。\par\vspace{33mm}
 \FormHeading{2. 实践内容}

@@ -179,6 +179,69 @@
 \NewDocumentCommand\CoverTitle{m}{%
   {\heiti\sdjufont{\sdju@coversize}{32}\TitleText{#1}}\par}
 \NewDocumentCommand\CoverField{mm}{\rule{0pt}{\sdju@fieldheight}#1 & #2\\\cline{2-2}}
+
+% 导言区基本信息命令。
+\author{}
+\newcommand\sdju@studentid{}
+\newcommand\studentid[1]{\renewcommand\sdju@studentid{#1}}
+\newcommand\sdju@school{}
+\newcommand\school[1]{\renewcommand\sdju@school{#1}}
+\newcommand\sdju@supervisor{}
+\newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}
+\newcommand\sdju@companysupervisor{}
+\newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}
+\newcommand\sdju@major{}
+\newcommand\major[1]{\renewcommand\sdju@major{#1}}
+\newcommand\sdju@researchdirection{}
+\newcommand\researchdirection[1]{\renewcommand\sdju@researchdirection{#1}}
+\newcommand\sdju@practiceunit{}
+\newcommand\practiceunit[1]{\renewcommand\sdju@practiceunit{#1}}
+\newcommand\sdju@practicestart{}
+\newcommand\practicestart[1]{\renewcommand\sdju@practicestart{#1}}
+\newcommand\sdju@practiceend{}
+\newcommand\practiceend[1]{\renewcommand\sdju@practiceend{#1}}
+\newcommand\sdju@practiceplandatesrc{}
+\newcommand\practiceplandate[1]{\renewcommand\sdju@practiceplandatesrc{#1}}
+\newcommand\sdju@practiceplandate{%
+  \ifx\sdju@practiceplandatesrc\@empty 年\hspace{1em}月\hspace{1em}日\else\sdju@practiceplandatesrc\fi}
+
+% 教师表中的基本信息与封面共用，职称、研究领域、联系方式另填。
+\newcommand\PracticeInternalMentor{\sdju@supervisor}
+\newcommand\PracticeExternalMentor{\sdju@companysupervisor}
+\newcommand\PracticeSchool{\sdju@school}
+\newcommand\PracticeUnit{\sdju@practiceunit}
+\newcommand\PracticePlanPeriod{%
+  \ifx\sdju@practicestart\@empty
+    \ifx\sdju@practiceend\@empty\else\sdju@printpracticeperiod\fi
+  \else\sdju@printpracticeperiod\fi}
+\newcommand\sdju@printpracticeperiod{%
+  \noindent 实践时间：\sdju@practiceplanendpoint\sdju@practicestart 至\sdju@practiceplanendpoint\sdju@practiceend\par}
+\newcommand\sdju@practiceplanendpoint[1]{%
+  \ifx#1\@empty 年\hspace{1em}月\hspace{1em}日\else#1\fi}
+
+\newcommand\makecover{%
+  \begin{titlepage}
+  \centering
+  \vspace*{\dimexpr18mm-12bp\relax}
+  \CoverLogo
+  \vspace{30mm}
+  \CoverTitle{硕士专业学位研究生专业实践计划表}
+  \vspace{19mm}
+  \begin{coverfields}
+  \CoverField{学\quad 院：}{\sdju@school}
+  \CoverField{姓\quad 名：}{\@author}
+  \CoverField{学\quad 号：}{\sdju@studentid}
+  \CoverField{专\quad 业：}{\sdju@major}
+  \CoverField{研究方向：}{\sdju@researchdirection}
+  \CoverField{校内导师：}{\sdju@supervisor}
+  \CoverField{企业导师：}{\sdju@companysupervisor}
+  \CoverField{填表日期：}{\sdju@practiceplandate}
+  \end{coverfields}
+  \vfill
+  {\fangsong\sdjufont{18}{24}研究生处制\par}
+  \vspace{13mm}
+  \end{titlepage}}
+
 \NewDocumentEnvironment{coverfields}{}{%
   \par\centering\sdjufont{\sdju@fieldsize}{19}%
   \begin{tabular}{@{}p{\sdju@labelwidth} >{\centering\arraybackslash}m{\sdju@fieldwidth}@{}}%
