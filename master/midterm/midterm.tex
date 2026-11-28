@@ -1,26 +1,17 @@
 \documentclass{sdjummidterm}
+
+% 网站预填和同步的基本信息
+\author{测试研究生甲}
+\studentid{local:midterm}
+\school{测试工程学院}
+\supervisor{测试导师甲}
+\companysupervisor{测试导师乙}
+\researchdirection{模拟设备状态监测}
+\degreefield{电子信息（控制工程）}
+\midtermdate{2026年11月28日}
+
 \begin{document}
-\begin{titlepage}
-\centering
-\vspace*{\dimexpr2mm-12bp\relax}
-\CoverLogo
-\vspace{12mm}
-\CoverTitle{硕士研究生中期考核表}
-\vspace{23mm}
-\begin{coverfields}
-\CoverField{学\quad 号}{local:midterm}
-\CoverField{姓\quad 名}{测试研究生甲}
-\CoverField{校内导师}{测试导师甲}
-\CoverField{企业导师}{测试导师乙}
-\CoverField{研究方向}{模拟设备状态监测}
-\CoverField{类别（领域）}{电子信息（控制工程）}
-\CoverField{学\quad 院}{测试工程学院}
-\CoverField{考核时间}{2026年11月28日}
-\end{coverfields}
-\vfill
-{\sdjufont{15}{23}上海电机学院研究生处\par 2026年11月28日\par}
-\vspace{22mm}
-\end{titlepage}
+\makecover{2026年11月28日} % 研究生处落款日期
 
 \FormHeading{一、自我小结}
 \begin{formbox}{113mm}[思想品德、行为表现、综合素质]

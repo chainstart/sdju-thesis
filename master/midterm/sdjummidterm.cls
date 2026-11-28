@@ -179,6 +179,49 @@
 \NewDocumentCommand\CoverTitle{m}{%
   {\heiti\sdjufont{\sdju@coversize}{32}\TitleText{#1}}\par}
 \NewDocumentCommand\CoverField{mm}{\rule{0pt}{\sdju@fieldheight}#1 & #2\\\cline{2-2}}
+
+% 导言区基本信息命令。
+\author{}
+\newcommand\sdju@studentid{}
+\newcommand\studentid[1]{\renewcommand\sdju@studentid{#1}}
+\newcommand\sdju@school{}
+\newcommand\school[1]{\renewcommand\sdju@school{#1}}
+\newcommand\sdju@supervisor{}
+\newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}
+\newcommand\sdju@companysupervisor{}
+\newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}
+\newcommand\sdju@researchdirection{}
+\newcommand\researchdirection[1]{\renewcommand\sdju@researchdirection{#1}}
+\newcommand\sdju@degreefield{}
+\newcommand\degreefield[1]{\renewcommand\sdju@degreefield{#1}}
+\newcommand\sdju@midtermdatesrc{}
+\newcommand\midtermdate[1]{\renewcommand\sdju@midtermdatesrc{#1}}
+\newcommand\sdju@midtermdate{%
+  \ifx\sdju@midtermdatesrc\@empty 年\hspace{1em}月\hspace{1em}日\else\sdju@midtermdatesrc\fi}
+
+\newcommand\makecover[1]{%
+  \begin{titlepage}
+  \centering
+  \vspace*{\dimexpr2mm-12bp\relax}
+  \CoverLogo
+  \vspace{12mm}
+  \CoverTitle{硕士研究生中期考核表}
+  \vspace{23mm}
+  \begin{coverfields}
+  \CoverField{学\quad 号}{\sdju@studentid}
+  \CoverField{姓\quad 名}{\@author}
+  \CoverField{校内导师}{\sdju@supervisor}
+  \CoverField{企业导师}{\sdju@companysupervisor}
+  \CoverField{研究方向}{\sdju@researchdirection}
+  \CoverField{类别（领域）}{\sdju@degreefield}
+  \CoverField{学\quad 院}{\sdju@school}
+  \CoverField{考核时间}{\sdju@midtermdate}
+  \end{coverfields}
+  \vfill
+  {\sdjufont{15}{23}上海电机学院研究生处\par #1\par}
+  \vspace{22mm}
+  \end{titlepage}}
+
 \NewDocumentEnvironment{coverfields}{}{%
   \par\centering\sdjufont{\sdju@fieldsize}{19}%
   \begin{tabular}{@{}p{\sdju@labelwidth} >{\centering\arraybackslash}m{\sdju@fieldwidth}@{}}%
