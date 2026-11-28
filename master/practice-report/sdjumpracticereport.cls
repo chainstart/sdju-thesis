@@ -112,4 +112,54 @@
 \newcommand\sdju@fieldwidth{81mm}
 \newcommand\sdju@fieldheight{35bp}
 \AtBeginDocument{\sdjufont{12}{19.5}\pagestyle{empty}}
+
+% 导言区基本信息命令。
+\author{}
+\newcommand\sdju@studentid{}
+\newcommand\studentid[1]{\renewcommand\sdju@studentid{#1}}
+\newcommand\sdju@school{}
+\newcommand\school[1]{\renewcommand\sdju@school{#1}}
+\newcommand\sdju@supervisor{}
+\newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}
+\newcommand\sdju@companysupervisor{}
+\newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}
+\newcommand\sdju@researchdirection{}
+\newcommand\researchdirection[1]{\renewcommand\sdju@researchdirection{#1}}
+\newcommand\sdju@degreefield{}
+\newcommand\degreefield[1]{\renewcommand\sdju@degreefield{#1}}
+\newcommand\sdju@practiceunit{}
+\newcommand\practiceunit[1]{\renewcommand\sdju@practiceunit{#1}}
+\newcommand\sdju@practicestart{}
+\newcommand\practicestart[1]{\renewcommand\sdju@practicestart{#1}}
+\newcommand\sdju@practiceend{}
+\newcommand\practiceend[1]{\renewcommand\sdju@practiceend{#1}}
+
+% 封面实践时间沿用原件的年月范围，网站写入的日期含日。
+\def\sdju@yearmonth#1月#2\@nil{#1月}
+\newcommand\sdju@monthordateblank[1]{%
+  \ifx#1\@empty 年\hspace{1em}月%
+  \else\expandafter\sdju@yearmonth#1月\@nil\fi}
+\newcommand\sdju@practiceperiod{%
+  \sdju@monthordateblank\sdju@practicestart 至\sdju@monthordateblank\sdju@practiceend}
+
+\newcommand\makecover{%
+  \begin{titlepage}
+  \centering
+  \vspace*{\dimexpr7mm-12bp\relax}
+  \CoverLogo
+  \vspace{10mm}
+  \CoverTitle{赴\sdju@practiceunit\\专业实践总结报告}
+  \vspace{11mm}
+  \begin{coverfields}
+  \CoverField{姓\quad 名}{\@author}
+  \CoverField{学\quad 号}{\sdju@studentid}
+  \CoverField{校内导师}{\sdju@supervisor}
+  \CoverField{企业导师}{\sdju@companysupervisor}
+  \CoverField{研究方向}{\sdju@researchdirection}
+  \CoverField{类别（领域）}{\sdju@degreefield}
+  \CoverField{学\quad 院}{\sdju@school}
+  \CoverField{实践时间}{\sdju@practiceperiod}
+  \end{coverfields}
+  \end{titlepage}}
+
 \RequirePackage[hidelinks,unicode]{hyperref}
