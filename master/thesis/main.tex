@@ -1,37 +1,29 @@
 \documentclass{sdjumthesis}
 \addbibresource{refs.bib}
+
+% 网站预填和同步的基本信息
+\author{测试研究生甲}
+\studentid{local:master-thesis}
+\school{测试工程学院}
+\supervisor{测试导师甲}
+\companysupervisor{测试导师乙}
+\title{面向模拟台架的设备运行状态监测与异常检测方法研究}
+\englishtitle{Condition Monitoring and Anomaly Detection for a Simulated Test Bench}
+\degreefield{电子信息（控制工程）}
+\degreename{电子信息硕士}
+\supervisortitle{测试教授}
+\companysupervisortitle{测试工程师}
+\defensedate{2026年11月28日}
+\classificationnumber{TP000（示例）}
+\confidentiality{公开}
+\udc{000（示例）}
+\thesisnumber{11458}
+
 \begin{document}
-\begin{titlepage}
-\centering
-\sdjufont{12}{19.5}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}ll@{}}
-分类号：TP000（示例） & 密级：公开\\
-UDC：000（示例） & 编号：11458
-\end{tabular*}\par
-\vspace{11mm}
-\CoverHeading{上海电机学院专业硕士学位论文}
-\vspace{14mm}
-\CoverChineseTitle{面向模拟台架的设备运行状态监测与异常检测方法研究}
-\vspace{7mm}
-\CoverEnglishTitle{Condition Monitoring and Anomaly Detection for a Simulated Test Bench}
-\vfill
-\begin{coverfields}
-\CoverField{硕士研究生：}{测试研究生甲}
-\CoverField{学\qquad 号：}{local:master-thesis}
-\CoverField{校内导师：}{测试导师甲（测试教授）}
-\CoverField{企业导师：}{测试导师乙（测试工程师）}
-\CoverField{类\qquad 别：}{电子信息}
-\CoverField{领\qquad 域：}{控制工程}
-\CoverField{申请学位：}{电子信息硕士}
-\CoverField{所在单位：}{测试工程学院}
-\CoverField{答辩日期：}{2026年11月28日}
-\CoverField{授予学位单位：}{上海电机学院}
-\end{coverfields}
-\vspace{6mm}
-\end{titlepage}
+\makecover{上海电机学院} % 授予学位单位
 
 \begin{declaration}{学位论文原创性声明}
-本人郑重声明：所呈交的学位论文《面向模拟台架的设备运行状态监测与异常检测方法研究》，是本人在导师的指导下，独立进行研究工作所取得的成果。除文中已经注明引用的内容外，本论文不包含任何其他个人或集体已经发表或撰写过的作品成果。对本文的研究做出重要贡献的个人和集体，均已在文中以明确方式标明。本人完全意识到本声明的法律结果由本人承担。
+本人郑重声明：所呈交的学位论文《\ThesisTitle》，是本人在导师的指导下，独立进行研究工作所取得的成果。除文中已经注明引用的内容外，本论文不包含任何其他个人或集体已经发表或撰写过的作品成果。对本文的研究做出重要贡献的个人和集体，均已在文中以明确方式标明。本人完全意识到本声明的法律结果由本人承担。
 
 \bigskip
 \noindent 学位论文作者签名：\Signature{student}\par
@@ -62,14 +54,14 @@ UDC：000（示例） & 编号：11458
 \end{declaration}
 
 \frontmatter
-\begin{thesisabstract}{面向模拟台架的设备运行状态监测与异常检测方法研究}{摘 要}
+\begin{thesisabstract}{\ThesisTitle}{摘 要}
 针对模拟设备运行状态记录中不同工况难以直接比较的问题，本文用虚构台架研究可复核的数据处理方法。实验流程保留采样配置、工况标签和样本索引，以便核对处理前后的记录。
 
 研究按工况建立基线，比较对照批次，并记录异常标记的判定依据。示例结果表明，批次之间的差异能够从归档记录中追溯。本示例中的数据、结论和人物均为虚构。
 \ChineseKeywords{状态监测，模拟台架，异常检测，工况归一化}
 \end{thesisabstract}
 
-\begin{thesisabstract}{Condition Monitoring and Anomaly Detection for a Simulated Test Bench}{ABSTRACT}
+\begin{thesisabstract}{\ThesisEnglishTitle}{ABSTRACT}
 \setlength\parindent{4\fontdimen2\font}
 This fictional study illustrates how to organize condition monitoring experiments for a simulated test bench. Each batch stores the sampling configuration, operating labels, and sample identifiers used in the analysis.
 

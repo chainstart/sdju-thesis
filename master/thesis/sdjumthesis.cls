@@ -194,6 +194,94 @@
 }{\end{tabular}\par}
 \NewDocumentCommand\CoverField{mm}{%
   \rule[-5bp]{0pt}{25bp}{\heiti\bfseries#1} & #2\\}
+
+% 导言区基本信息命令。
+\author{}
+\newcommand\sdju@studentid{}
+\newcommand\studentid[1]{\renewcommand\sdju@studentid{#1}}
+\newcommand\sdju@school{}
+\newcommand\school[1]{\renewcommand\sdju@school{#1}}
+\newcommand\sdju@supervisor{}
+\newcommand\supervisor[1]{\renewcommand\sdju@supervisor{#1}}
+\newcommand\sdju@companysupervisor{}
+\newcommand\companysupervisor[1]{\renewcommand\sdju@companysupervisor{#1}}
+\title{}
+\newcommand\sdju@englishtitle{}
+\newcommand\englishtitle[1]{\renewcommand\sdju@englishtitle{#1}}
+\newcommand\sdju@degreename{}
+\newcommand\degreename[1]{\renewcommand\sdju@degreename{#1}}
+\newcommand\sdju@supervisortitle{}
+\newcommand\supervisortitle[1]{\renewcommand\sdju@supervisortitle{#1}}
+\newcommand\sdju@companysupervisortitle{}
+\newcommand\companysupervisortitle[1]{\renewcommand\sdju@companysupervisortitle{#1}}
+\newcommand\sdju@defensedatesrc{}
+\newcommand\defensedate[1]{\renewcommand\sdju@defensedatesrc{#1}}
+\newcommand\sdju@defensedate{%
+  \ifx\sdju@defensedatesrc\@empty 年\hspace{1em}月\hspace{1em}日\else\sdju@defensedatesrc\fi}
+\newcommand\sdju@classificationnumber{}
+\newcommand\classificationnumber[1]{\renewcommand\sdju@classificationnumber{#1}}
+\newcommand\sdju@confidentiality{}
+\newcommand\confidentiality[1]{\renewcommand\sdju@confidentiality{#1}}
+\newcommand\sdju@udc{}
+\newcommand\udc[1]{\renewcommand\sdju@udc{#1}}
+\newcommand\sdju@thesisnumber{}
+\newcommand\thesisnumber[1]{\renewcommand\sdju@thesisnumber{#1}}
+
+\newcommand\sdju@internalmentor{%
+  \sdju@supervisor\ifx\sdju@supervisortitle\@empty\else（\sdju@supervisortitle）\fi}
+\newcommand\sdju@externalmentor{%
+  \sdju@companysupervisor\ifx\sdju@companysupervisortitle\@empty\else（\sdju@companysupervisortitle）\fi}
+% 同一个档案字段可写为「类别（领域）」或只写类别。
+\ExplSyntaxOn
+\tl_new:N \sdju@degreecategory
+\tl_new:N \sdju@degreearea
+\seq_new:N \l__sdju_degree_parts_seq
+\NewDocumentCommand\degreefield{m}
+  {
+    \regex_extract_once:nnNTF { \A (.*?) [（(] (.*?) [）)] \s* \Z } {#1}
+      \l__sdju_degree_parts_seq
+      {
+        \tl_set:Ne \sdju@degreecategory { \seq_item:Nn \l__sdju_degree_parts_seq {2} }
+        \tl_set:Ne \sdju@degreearea { \seq_item:Nn \l__sdju_degree_parts_seq {3} }
+        \tl_trim_spaces:N \sdju@degreecategory
+        \tl_trim_spaces:N \sdju@degreearea
+      }
+      { \tl_set:Nn \sdju@degreecategory {#1} \tl_clear:N \sdju@degreearea }
+  }
+\ExplSyntaxOff
+\newcommand\ThesisTitle{\@title}
+\newcommand\ThesisEnglishTitle{\sdju@englishtitle}
+
+\newcommand\makecover[1]{%
+  \begin{titlepage}
+  \centering
+  \sdjufont{12}{19.5}
+  \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}ll@{}}
+  分类号：\sdju@classificationnumber & 密级：\sdju@confidentiality\\
+  UDC：\sdju@udc & 编号：\sdju@thesisnumber
+  \end{tabular*}\par
+  \vspace{11mm}
+  \CoverHeading{上海电机学院专业硕士学位论文}
+  \vspace{14mm}
+  \CoverChineseTitle{\@title}
+  \vspace{7mm}
+  \CoverEnglishTitle{\sdju@englishtitle}
+  \vfill
+  \begin{coverfields}
+  \CoverField{硕士研究生：}{\@author}
+  \CoverField{学\qquad 号：}{\sdju@studentid}
+  \CoverField{校内导师：}{\sdju@internalmentor}
+  \CoverField{企业导师：}{\sdju@externalmentor}
+  \CoverField{类\qquad 别：}{\sdju@degreecategory}
+  \CoverField{领\qquad 域：}{\sdju@degreearea}
+  \CoverField{申请学位：}{\sdju@degreename}
+  \CoverField{所在单位：}{\sdju@school}
+  \CoverField{答辩日期：}{\sdju@defensedate}
+  \CoverField{授予学位单位：}{#1}
+  \end{coverfields}
+  \vspace{6mm}
+  \end{titlepage}}
+
 \NewDocumentEnvironment{declaration}{m}{%
   \clearpage\thispagestyle{empty}%
   \vspace*{19.85bp}%

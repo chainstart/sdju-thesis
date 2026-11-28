@@ -17,7 +17,7 @@
 
 ## 专业硕士
 
-专业硕士模板各自独立编译。学生、导师和审核意见等内容均直接填写在示例 `.tex` 中。各模板依据 [专业硕士 Word 原件](word-templates/专业硕士/) 排版。
+专业硕士模板各自独立编译。各模板在示例 `.tex` 的导言区填写基本信息，网站按学校档案预填和同步这些命令。实践内容、研究方案、审核意见等栏目直接在正文填写。各模板依据 [专业硕士 Word 原件](word-templates/专业硕士/) 排版。
 
 | 目录 | 类与主文件 | 栏目 |
 |---|---|---|
@@ -26,6 +26,18 @@
 | [硕士学位论文开题报告](master/proposal/) | `sdjumproposal.cls`、`proposal.tex`、`refs.bib` | 封面（论文题目、类别或领域、研究方向、校内导师、企业导师及单位、学号、姓名、学院、论文起止年限、申请开题日期）、填写事项、保密承诺、课题背景及意义、文献综述、主要研究内容、实施方案（方案、关键技术、问题和措施、创新和预期成果）、工作进度、参考文献、校内导师与企业导师意见、考核组意见及表决、备注、评议表（时间地点、意见、考核组签字、学院审核） |
 | [硕士中期考核表](master/midterm/) | `sdjummidterm.cls`、`midterm.tex` | 封面（学号、姓名、校内导师、企业导师、研究方向、类别或领域、学院、考核时间、落款日期）、自我小结（品德表现、自我等级、科研活动、奖惩、学位课和非学位课成绩、学院确认）、学位论文（题目、研究进度、阶段成果、与开题内容的差异、后续工作、发表及计划）、导师和学院审核、考核小组意见、考核结果及成员签字 |
 | [专业硕士学位论文](master/thesis/) | `sdjumthesis.cls`、`main.tex`、`refs.bib` | 封面（分类号、密级、UDC、编号、中英文题目、研究生、学号、校内导师、企业导师、类别、领域、申请学位、学院、答辩日期、学位授予单位）、原创性声明及版权使用授权书、中英文摘要及关键词、三级目录、物理量及符号、正文（标题、图表与公式）、参考文献、附录、致谢、攻读学位期间成果 |
+
+五个模板通用 `\author{姓名}`、`\studentid{学号}`、`\school{学院或所在单位}`、`\supervisor{校内导师}`、`\companysupervisor{企业导师}`。各模板另有以下导言区命令，每条命令均接收一组花括号参数。
+
+| 模板 | 其余导言区命令 |
+|---|---|
+| 专业实践计划表 | `\major`、`\researchdirection`、`\practiceunit`、`\practicestart`、`\practiceend`、`\practiceplandate` |
+| 专业实践总结报告 | `\researchdirection`、`\degreefield`、`\practiceunit`、`\practicestart`、`\practiceend` |
+| 硕士学位论文开题报告 | `\title`、`\researchdirection`、`\degreefield`、`\companysupervisorunit`、`\thesisperiod`、`\proposaldate` |
+| 硕士中期考核表 | `\researchdirection`、`\degreefield`、`\midtermdate` |
+| 专业硕士学位论文 | `\title`、`\englishtitle`、`\degreefield`、`\degreename`、`\supervisortitle`、`\companysupervisortitle`、`\defensedate`、`\classificationnumber`、`\confidentiality`、`\udc`、`\thesisnumber` |
+
+基本信息日期写作 `\proposaldate{2026年3月4日}`，月日不补零。实践总结封面的实践时间显示到月。学位论文可用 `\degreefield{电子信息（控制工程）}` 分别填写类别和领域，单写类别时领域留空。中期考核表的研究生处落款日期、学位论文的授予学位单位在正文的 `\makecover{…}` 中填写。
 
 进入对应目录后运行 `latexmk -xelatex 主文件.tex`。开题报告和论文使用 Biber 生成 GB/T 7714 参考文献。类文件逐个检测系统字体，可回退到 Fandol 和 TeX Gyre 字体。表单大栏目支持正文续页，月度安排、工作进度、课程成绩和成员表跨页时重复表头。
 
