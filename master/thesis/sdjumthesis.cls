@@ -241,8 +241,8 @@
     \regex_extract_once:nnNTF { \A (.*?) [（(] (.*?) [）)] \s* \Z } {#1}
       \l__sdju_degree_parts_seq
       {
-        \tl_set:Ne \sdju@degreecategory { \seq_item:Nn \l__sdju_degree_parts_seq {2} }
-        \tl_set:Ne \sdju@degreearea { \seq_item:Nn \l__sdju_degree_parts_seq {3} }
+        \tl_set:Nx \sdju@degreecategory { \seq_item:Nn \l__sdju_degree_parts_seq {2} }
+        \tl_set:Nx \sdju@degreearea { \seq_item:Nn \l__sdju_degree_parts_seq {3} }
         \tl_trim_spaces:N \sdju@degreecategory
         \tl_trim_spaces:N \sdju@degreearea
       }
