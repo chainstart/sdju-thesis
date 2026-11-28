@@ -712,6 +712,8 @@
     \setbox\sdju@oppiece\box\sdju@opbox
     \sdju@oppage{\ifsdju@opfirst 1\else 0\fi}{1}%
   \fi}
+% 意见内容上方空一行（小四号、1.25 倍行距的一行；用户 2026-11-28 要求）
+\newcommand\sdju@optopgap{19.5bp}
 \newcommand\supervisoropinion[1]{%
   \clearpage
   \begingroup
@@ -719,11 +721,11 @@
   % 表格左上角：版心左边外 5.4 磅，版心上边下 0.3 磅
   \setlength\sdju@formx{\dimexpr1in+\oddsidemargin+\hoffset-\sdju@cellpad\relax}%
   \setlength\sdju@formy{\dimexpr1in+\topmargin+\voffset+\headheight+\headsep+0.3bp\relax}%
-  % 意见内容：小四号，1.25 倍行距，首行缩进 2 字符；首行基线在表格顶下一个行框上部的高度处。
+  % 意见内容：小四号，1.25 倍行距，首行缩进 2 字符；上方空一行（\sdju@optopgap），首行基线再下一个行框上部的高度。
   %   用 \prevdepth 定第一行的位置（不另起一个空段落），意见开头有空行（\par）时也从栏目顶部排起
   \setbox\sdju@opbox\vbox{\hsize=\dimexpr\sdju@formw-24.8bp-2\dimexpr\sdju@cellpad\relax\relax
     \sdjufont{12bp}{19.5bp}\setlength\parindent{2em}\setlength\parskip{\z@}%
-    \sdju@firstline{12bp}#1\par}%
+    \sdju@firstline{12bp}\vskip\sdju@optopgap\relax#1\par}%
   \splittopskip=\sdju@above{12bp}{19.5bp}\relax
   \vbadness=\@M
   \sdju@opfirsttrue
