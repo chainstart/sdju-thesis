@@ -1,0 +1,159 @@
+\documentclass{sdjumproposal}
+\addbibresource{refs.bib}
+\begin{document}
+\begin{titlepage}
+\centering
+\vspace*{\dimexpr13mm-12bp\relax}
+\CoverLogo
+\vspace{1mm}
+\CoverTitle{硕士研究生学位论文开题报告}
+\vspace{29mm}
+\begin{coverfields}
+\CoverField{论 文 题 目}{\TitleText{面向模拟台架的设备运行状态监测与异常检测方法研究}}
+\CoverField{类别（领域）}{电子信息（控制工程）}
+\CoverField{研 究 方 向}{模拟设备状态监测}
+\CoverField{校 内 导 师}{测试导师甲}
+\CoverField{企业导师及单位}{测试导师乙，测试实践中心}
+\CoverField{学\qquad 号}{local:proposal}
+\CoverField{姓\qquad 名}{测试研究生甲}
+\CoverField{学\qquad 院}{测试工程学院}
+\CoverField{论文起止年限}{2026年11月至2028年6月}
+\CoverField{申请开题日期}{2026年11月28日}
+\end{coverfields}
+\vfill
+{\sdjufont{15}{21}上海电机学院研究生处\par}
+\vspace{8mm}
+\end{titlepage}
+
+\vspace*{28mm}
+{\centering\kaishu\sdjufont{18}{24}开题报告填写事项\par}
+\bigskip
+\begingroup\kaishu\sdjufont{14}{31.2}
+一、填写必须实事求是，字迹要端正、清楚。填写内容字体为：楷体小四号，行距为1.25倍；签字必须用蓝、黑墨水笔，如篇幅不够可另附纸。
+
+二、本报告的第一至第六部分由研究生本人填写（字数要求根据培养方案规定），其余部分由导师、开题报告考核小组、学院负责人填写。
+
+三、开题考核由二级学院统一组织，对开题答辩不通过的要在1个月再次进行开题，重新开题答辩通过后，正式进入论文撰写阶段。
+\par\endgroup
+
+\clearpage
+\vspace*{26mm}
+\begingroup\kaishu\sdjufont{14}{35}
+本课题涉及的内容（包括实验数据、计算机程序、导师未公开发表的研究成果及心得等），除在毕业论文中所发表的之外，本人保证：未经导师正式同意，五年内不以任何形式向第三方公开。
+\par
+\begin{center}
+研 究 生（签字）\Signature{student}\\
+校内导师（签字）\Signature{supervisor}\\
+企业导师（签字）\Signature{company_supervisor}\\
+日期：\SignatureDate{student,supervisor,company_supervisor}
+\end{center}
+\endgroup
+
+\clearpage
+\pagenumbering{arabic}
+\pagestyle{proposalbody}
+\kaishu
+\FormHeading{一、课题选题背景及意义}
+\begin{formbox}{79mm}[课题选题背景及意义]
+\noindent 1.1 课题来源\par
+课题来自虚构的校企联合实践项目。\par\vspace{23mm}
+\noindent 1.2 选题背景及意义\par
+使用台架模拟工况验证实验记录的可复现性。
+\end{formbox}
+
+\FormHeading{二、国内外研究现状（文献综述）}
+\begin{formbox}{91mm}[国内外研究现状]
+\noindent 2.1 国内研究\par
+示例研究关注按批次组织模拟数据\supercite{local-cn}。\par\vspace{25mm}
+\noindent 2.2 国外研究\par
+示例研究关注由工况差异引起的基线偏移\supercite{local-en}。
+\end{formbox}
+
+\clearpage
+\FormHeading{三、课题主要研究内容}
+\begin{formbox}{73mm}[课题主要研究内容]
+搭建模拟台架，建立工况标签，比较两种基线方法。
+\end{formbox}
+\FormHeading{四、实施方案（论文拟采用的实施方案、关键技术、研究过程中可能遇到的问题及解决措施、创新和预期成果）}
+\begin{formbox}{105mm}[实施方案]
+\noindent 4.1 实施方案\par
+固定采样流程，分批次进行对照实验。\par\vspace{32mm}
+\noindent 4.2 关键技术\par
+按工况归一化，并保存参数、测试配置与样本索引。
+\end{formbox}
+
+\clearpage
+\begin{formbox}{93mm}[实施方案]
+\noindent 4.3 研究过程中可能遇到的问题和解决措施\par
+工况标签可能不一致。通过双人复核实验记录修正。\par\vspace{32mm}
+\noindent 4.4 创新和预期成果\par
+给出可重复执行的模拟数据核验流程。
+\end{formbox}
+
+\FormHeading{五、工作进度安排（包括文献阅读、方案设计与实现、计算与实验、论文撰写等）}
+\begin{longtable}{|C{35mm}|p{102mm}|}
+\hline
+起止日期 & 课题阶段工作进度 \\\hline
+\endhead
+2026年11月至2027年2月 & 文献阅读与方案设计 \RowHeight{12mm}\\\hline
+2027年3月至2027年12月 & 建立模拟台架并开展计算与实验 \RowHeight{12mm}\\\hline
+2028年1月至2028年6月 & 整理记录、撰写论文 \RowHeight{12mm}\\\hline
+\end{longtable}
+
+\clearpage
+\FormHeading{六、参考文献（要求30篇以上，其中至少15篇外文文献，近5年文献不少于15篇）}
+\begin{formbox}{185mm}[参考文献]
+\printbibliography[heading=none]
+\end{formbox}
+
+\clearpage
+\pagestyle{empty}
+\songti
+\FormHeading{七、开题意见}
+\begin{formbox}{64mm}[校内导师意见][校\\内\\导\\师\\意\\见]
+同意提交开题考核。\par\vfill
+\begin{flushright}\begin{tabular}{l}签字：\Signature{supervisor}\\日期：\SignatureDate{supervisor}\end{tabular}\end{flushright}
+\end{formbox}
+\begin{formbox}{64mm}[企业导师意见][企\\业\\导\\师\\意\\见]
+同意使用模拟台架。\par\vfill
+\begin{flushright}\begin{tabular}{l}签字：\Signature{company_supervisor}\\日期：\SignatureDate{company_supervisor}\end{tabular}\end{flushright}
+\end{formbox}
+\begin{formbox}{51mm}[开题考核组意见][开\\题\\考\\核\\组\\意\\见]
+开题报告时间：2026年11月28日\par
+专家人数：6人\par
+审查结果：\FormCheckBox\,通过\quad\FormCheckBox\,不通过（同意6人，不同意0人）\par
+\noindent 考核组组长签名：\Signature{proposal:committee_chair}\quad 日期：\SignatureDate{proposal:committee_chair}
+\end{formbox}
+\begin{formbox}{10mm}[][备\\注]
+\noindent 本表为排版示例。
+\end{formbox}
+
+\clearpage
+\FormHeading{八、学位论文开题报告评议表}
+\begin{formbox}{66mm}[考核组对开题报告的意见]
+\noindent 报告时间及地点：2026年11月28日9时，测试室\par
+\noindent 考核组对开题报告的意见（包括选题意义、设计方案、关键技术、工作量、工作进度安排、参考文献等扼要记录）：\par
+测试方案可实施，建议提前明确工况切换的记录要求。
+\end{formbox}
+\begin{longtable}{|C{13mm}|C{26mm}|C{17mm}|C{42mm}|C{26mm}|}
+\hline
+\multicolumn{5}{|c|}{开题考核组成员}\\\hline
+ & 姓名 & 职称 & 单位 & 签字\\\hline
+\endhead
+组长 & 测试专家甲 & 教授 & 测试工程学院 & \Signature[23mm]{proposal:committee_chair} \RowHeight{8mm}\\\hline
+组员 & 测试专家乙 & 教授 & 测试工程学院 & \Signature[23mm]{proposal:committee_member-1} \RowHeight{8mm}\\\hline
+组员 & 测试专家丙 & 副教授 & 测试工程学院 & \Signature[23mm]{proposal:committee_member-2} \RowHeight{8mm}\\\hline
+组员 & 测试专家丁 & 副教授 & 测试工程学院 & \Signature[23mm]{proposal:committee_member-3} \RowHeight{8mm}\\\hline
+组员 & 测试专家戊 & 工程师 & 测试实践中心 & \Signature[23mm]{proposal:committee_member-4} \RowHeight{8mm}\\\hline
+组员 & 测试专家己 & 工程师 & 测试实践中心 & \Signature[23mm]{proposal:committee_member-5} \RowHeight{8mm}\\\hline
+秘书 & 测试秘书甲 & 讲师 & 测试工程学院 & \Signature[23mm]{recorder} \RowHeight{8mm}\\\hline
+\end{longtable}
+
+\begin{formbox}{40mm}[学院审核意见]
+\noindent 学院审核意见：\par
+同意。\par\vfill
+\begin{flushright}
+负责人：\Signature{dean}\\日期：\SignatureDate{dean}
+\end{flushright}
+\end{formbox}
+\end{document}
